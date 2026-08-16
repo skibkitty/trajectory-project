@@ -2,7 +2,7 @@
 
 ## Current Status
 
-Phase 1 — Domain foundation. TypeScript project initialized. This document records the intended architecture and is expected to evolve through documented decisions.
+Phase 1 — Domain foundation. Project, Task, Goal entities and invariants implemented. This document records the intended architecture and is expected to evolve through documented decisions.
 
 ## Dependency Direction
 

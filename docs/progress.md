@@ -46,7 +46,7 @@ Completed:
 - Implemented domain entities: Project, Task, Goal
 - Implemented TaskStatus enum (BACKLOG, TODO, IN_PROGRESS, BLOCKED, DONE)
 - Created factory functions with invariant validation
-- Wrote 24 domain invariant tests
+- Wrote 23 domain invariant tests (24 total with smoke test)
 - Verified all commands pass: `npm run verify`
 
 Domain model:

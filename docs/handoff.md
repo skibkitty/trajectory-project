@@ -31,7 +31,7 @@ TASK-002 is complete. Domain model entities (Project, Task, Goal) and invariants
 - Domain model entities: Project, Task, Goal
 - TaskStatus enum (BACKLOG, TODO, IN_PROGRESS, BLOCKED, DONE)
 - Factory functions with invariant validation
-- Domain invariant tests (24 tests passing)
+- Domain invariant tests (23 domain tests + 1 smoke test = 24 total passing)
 
 ## Not Yet Started
 
