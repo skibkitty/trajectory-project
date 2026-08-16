@@ -39,3 +39,20 @@ Toolchain:
 - Prettier
 
 Next: TASK-002 — Define project and task domain model.
+
+## 2026-08-16 — Domain model implemented (TASK-002)
+
+Completed:
+- Implemented domain entities: Project, Task, Goal
+- Implemented TaskStatus enum (BACKLOG, TODO, IN_PROGRESS, BLOCKED, DONE)
+- Created factory functions with invariant validation
+- Wrote 24 domain invariant tests
+- Verified all commands pass: `npm run verify`
+
+Domain model:
+- `Project` — top-level container with tasks and goals
+- `Task` — core entity with status, value, urgency, effort, confidence, goal reference, dependencies
+- `Goal` — named objective that tasks can reference
+- `TaskStatus` — enum with 5 states
+
+Next: TASK-003 — Implement dependency graph.
