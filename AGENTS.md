@@ -43,6 +43,7 @@ Before implementation:
 3. Read the active task in `docs/tasks.md`.
 4. Inspect relevant architecture and decisions.
 5. Verify prerequisites.
+6. Create a feature branch from `main` named `feat/NNN-task-slug` (e.g. `feat/002-domain-model`). If branch creation fails, continue implementation on `main` but include a reminder in the output so the human knows to create and push the branch manually.
 
 After implementation:
 
@@ -53,6 +54,7 @@ After implementation:
 5. Update `docs/handoff.md`.
 6. Append meaningful information to `docs/progress.md`.
 7. Commit only when the task is ready.
+8. If the task was implemented on a feature branch, remind the human to merge or push the branch. If on `main`, remind the human to create a feature branch for future tasks.
 
 ## Architectural Boundaries
 
