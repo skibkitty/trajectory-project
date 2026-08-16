@@ -38,7 +38,7 @@ Verification:
 
 ## TASK-001 — Initialize TypeScript project
 
-Status: BACKLOG
+Status: DONE
 
 Goal:
 Create the smallest justified TypeScript development environment.

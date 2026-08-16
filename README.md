@@ -29,7 +29,7 @@ The project is designed to demonstrate:
 
 ## Status
 
-Pre-implementation.
+Phase 1 — Domain foundation. TypeScript project initialized.
 
 Do not treat provisional product decisions as final until they are reviewed.
 

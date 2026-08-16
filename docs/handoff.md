@@ -6,11 +6,11 @@ Phase 1 — Domain foundation
 
 ## Current Task
 
-TASK-001 — Initialize TypeScript project
+TASK-002 — Define project and task domain model
 
 ## State
 
-TASK-000 is complete. The repository control plane is established and verified. The next task is to initialize the TypeScript development environment.
+TASK-001 is complete. TypeScript development environment is initialized and verified. The next task is to define the domain model.
 
 ## Completed
 
@@ -24,10 +24,13 @@ TASK-000 is complete. The repository control plane is established and verified. 
 - progress log
 - handoff document
 - Git repository initialized with initial commit
+- TypeScript project initialized (npm, strict mode)
+- Vitest test runner configured
+- ESLint + Prettier configured
+- Verification commands working (typecheck, test, lint, format)
 
 ## Not Yet Started
 
-- TypeScript project initialization (TASK-001)
 - domain model
 - dependency graph
 - graph algorithms
@@ -52,12 +55,12 @@ These are intentionally provisional:
 
 ## Next Recommended Action
 
-Implement TASK-001 — Initialize TypeScript project.
+Implement TASK-002 — Define project and task domain model.
 
 ## Verification
 
-No application tests exist yet. TASK-001 will establish the test runner.
+TASK-001 verification is complete. All commands pass: `npm run verify`.
 
 ## Important Constraint
 
-Do not begin product implementation until TASK-001 is complete and the TypeScript environment is verified.
+Domain code must not depend on React, Next.js, browser APIs, or persistence.

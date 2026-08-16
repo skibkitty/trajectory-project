@@ -1,0 +1,37 @@
+{
+  "name": "trajectory-project",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Trajectory is an explainable project-planning and decision-support engine that recommends the best next task from a project's current state.",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "verify": "npm run typecheck && npm run test && npm run lint && npm run format:check"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/skibkitty/trajectory-project.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/skibkitty/trajectory-project/issues"
+  },
+  "homepage": "https://github.com/skibkitty/trajectory-project#readme",
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@vitest/coverage-v8": "^4.1.10",
+    "eslint": "^10.8.1",
+    "prettier": "^3.9.6",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.67.0",
+    "vitest": "^4.1.10"
+  }
+}
