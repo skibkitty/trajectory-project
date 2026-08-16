@@ -433,6 +433,8 @@ Such changes require a documented proposal and human approval.
 
 The project should be developed through genuine incremental work.
 
+Each task should be implemented on a feature branch (`feat/NNN-task-slug`) and merged to `main` after review. This makes the workflow visible and keeps `main` always deployable.
+
 Good commits are bounded and descriptive.
 
 Examples:

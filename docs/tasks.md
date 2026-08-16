@@ -60,7 +60,7 @@ Verification:
 
 ## TASK-002 — Define project and task domain model
 
-Status: BACKLOG
+Status: DONE
 
 Goal:
 Implement the first domain entities and invariants.

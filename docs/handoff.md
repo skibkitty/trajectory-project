@@ -6,11 +6,11 @@ Phase 1 — Domain foundation
 
 ## Current Task
 
-TASK-002 — Define project and task domain model
+TASK-003 — Implement dependency graph
 
 ## State
 
-TASK-001 is complete. TypeScript development environment is initialized and verified. The next task is to define the domain model.
+TASK-002 is complete. Domain model entities (Project, Task, Goal) and invariants are implemented and verified. The next task is to implement the dependency graph.
 
 ## Completed
 
@@ -28,10 +28,13 @@ TASK-001 is complete. TypeScript development environment is initialized and veri
 - Vitest test runner configured
 - ESLint + Prettier configured
 - Verification commands working (typecheck, test, lint, format)
+- Domain model entities: Project, Task, Goal
+- TaskStatus enum (BACKLOG, TODO, IN_PROGRESS, BLOCKED, DONE)
+- Factory functions with invariant validation
+- Domain invariant tests (23 domain tests + 1 smoke test = 24 total passing)
 
 ## Not Yet Started
 
-- domain model
 - dependency graph
 - graph algorithms
 - scheduling and critical path
@@ -55,11 +58,11 @@ These are intentionally provisional:
 
 ## Next Recommended Action
 
-Implement TASK-002 — Define project and task domain model.
+Implement TASK-003 — Implement dependency graph.
 
 ## Verification
 
-TASK-001 verification is complete. All commands pass: `npm run verify`.
+TASK-002 verification is complete. All commands pass: `npm run verify`.
 
 ## Important Constraint
 
