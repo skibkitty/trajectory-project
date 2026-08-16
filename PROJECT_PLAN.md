@@ -132,6 +132,26 @@ The implementation must:
 
 Tie-breaking must be deterministic. The exact policy should be documented in the domain decision record once implemented.
 
+### Evaluation and selection policy
+
+The decision engine has two distinct responsibilities that must be kept separate:
+
+1. **Evaluation and ranking** — Deterministically compute a score and structured explanation for every eligible candidate task. This is the core of the engine and must remain deterministic, reproducible, and independently testable at all times.
+
+2. **Selection policy** — Choose one task from the ranked candidates to recommend as the "best next task."
+
+The MVP uses a **deterministic selection policy**: always select the highest-ranked candidate, with documented tie-breaking.
+
+A future **weighted selection policy** may be introduced that selects among eligible tasks with probability proportional to their evaluated priority. This policy must:
+
+- be implemented as a separate, clearly identified layer on top of the deterministic evaluation
+- never replace or weaken the deterministic ranking
+- remain optional — the deterministic policy must always be available as the default
+- inject randomness through an explicit abstraction (e.g. a `RandomSource` interface) rather than calling `Math.random()` directly inside domain logic, so that behavior remains testable and reproducible in unit tests
+- be documented in `docs/decisions.md` with rationale, tradeoffs, and testing approach before implementation
+
+This separation preserves the portfolio guarantee that the engine's reasoning is inspectable and reproducible while allowing experimentation with exploration strategies.
+
 ## 7. Explainability
 
 The decision engine must return structured reasoning, not formatted prose.
@@ -480,6 +500,9 @@ Automated verification and deployment.
 
 ### Phase 17 — Documentation
 Architecture case study, decisions, benchmark methodology, interview notes.
+
+### Phase 18 — Logging and observability (infrastructure)
+Structured logging and observability for the decision engine, application layer, and infrastructure. This is an infrastructure concern and must not leak into domain logic. Logging will be injected through interfaces so domain code remains testable without capturing log output.
 
 ## 21. Definition of Done
 
