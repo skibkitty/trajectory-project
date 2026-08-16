@@ -69,7 +69,7 @@ Completed:
 - Construction validation: duplicate task ids and unknown dependency references rejected, repeated entries deduplicated
 - Added ADR-005 documenting graph design (edge direction, determinism, cycle semantics)
 - Added `.gitattributes` to fix CRLF/LF line-ending instability in format checks
-- Wrote 30 graph tests (54 total passing)
+- Wrote 34 graph tests (58 total passing)
 - Verified all commands pass: `npm run verify`
 
 Next: TASK-004 — Implement scheduling and critical path.

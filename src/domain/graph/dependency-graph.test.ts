@@ -122,6 +122,12 @@ describe("traversal", () => {
       'Unknown task "missing"',
     );
   });
+
+  it("terminates and returns results on a cyclic graph", () => {
+    const g = graph(task("a"), task("b", ["a", "c"]), task("c", ["b"]));
+    expect(g.getAllDependents("a")).toEqual(["b", "c"]);
+    expect(g.getAllPrerequisites("b")).toEqual(["a", "c"]);
+  });
 });
 
 describe("reachability", () => {
@@ -150,6 +156,13 @@ describe("reachability", () => {
   it("is true for the same task when it is part of a cycle", () => {
     const g = graph(task("a", ["b"]), task("b", ["a"]));
     expect(g.isReachable("a", "a")).toBe(true);
+  });
+
+  it("is true for the same task on a three-node cycle", () => {
+    const g = graph(task("a", ["b"]), task("b", ["c"]), task("c", ["a"]));
+    expect(g.isReachable("a", "a")).toBe(true);
+    expect(g.isReachable("b", "b")).toBe(true);
+    expect(g.isReachable("c", "c")).toBe(true);
   });
 
   it("throws on unknown tasks", () => {
@@ -200,6 +213,12 @@ describe("cycle detection", () => {
       task("c", ["b"]),
       task("d", ["c"]),
     );
+    expect(g.hasCycle()).toBe(true);
+    expect(g.getCyclicTaskIds()).toEqual(["b", "c"]);
+  });
+
+  it("excludes tasks upstream of a cycle from the cyclic set", () => {
+    const g = graph(task("x"), task("b", ["x", "c"]), task("c", ["b"]));
     expect(g.hasCycle()).toBe(true);
     expect(g.getCyclicTaskIds()).toEqual(["b", "c"]);
   });
@@ -258,5 +277,35 @@ describe("topological order", () => {
     expect(() => g.topologicalOrder()).toThrow(
       "Dependency graph contains a cycle involving tasks: a, b, c",
     );
+  });
+});
+
+describe("immutability", () => {
+  it("returns fresh copies so callers cannot corrupt internal state", () => {
+    const g = graph(task("a", ["b"]), task("b"));
+    expect(g.taskIds).toEqual(["a", "b"]);
+    const ids = g.taskIds;
+    ids.push("corrupted");
+    expect(g.taskIds).toEqual(["a", "b"]);
+
+    expect(g.getPrerequisites("a")).toEqual(["b"]);
+    const prereqs = g.getPrerequisites("a");
+    prereqs.push("corrupted");
+    expect(g.getPrerequisites("a")).toEqual(["b"]);
+
+    expect(g.getAllDependents("b")).toEqual(["a"]);
+    const dependents = g.getAllDependents("b");
+    dependents.push("corrupted");
+    expect(g.getAllDependents("b")).toEqual(["a"]);
+
+    expect(g.getCyclicTaskIds()).toEqual([]);
+    const cyclic = g.getCyclicTaskIds();
+    cyclic.push("corrupted");
+    expect(g.getCyclicTaskIds()).toEqual([]);
+
+    expect(g.topologicalOrder()).toEqual(["b", "a"]);
+    const order = g.topologicalOrder();
+    order.push("corrupted");
+    expect(g.topologicalOrder()).toEqual(["b", "a"]);
   });
 });

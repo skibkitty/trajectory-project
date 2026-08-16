@@ -123,7 +123,9 @@ export function createDependencyGraph(tasks: readonly Task[]): DependencyGraph {
   };
 
   return {
-    taskIds: [...taskIds],
+    get taskIds() {
+      return [...taskIds];
+    },
     getPrerequisites: lookup(prerequisitesMap),
     getDependents: lookup(dependentsMap),
     getAllPrerequisites: (taskId) => traverse(prerequisitesMap, taskId),

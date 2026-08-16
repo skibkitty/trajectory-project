@@ -33,7 +33,7 @@ TASK-003 is complete. The dependency graph is implemented and verified. The next
 - Factory functions with invariant validation
 - Domain invariant tests (23 domain tests + 1 smoke test = 24 total passing)
 - Dependency graph: prerequisite/dependent lookup, traversal, reachability, cycle detection, deterministic topological ordering
-- Graph tests (30 tests = 54 total passing)
+- Graph tests (34 tests = 58 total passing)
 
 ## Not Yet Started
 
