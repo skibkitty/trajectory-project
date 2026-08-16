@@ -16,7 +16,7 @@ Only one builder should claim a task at a time.
 
 ## TASK-000 — Establish project control plane
 
-Status: READY
+Status: DONE
 
 Goal:
 Create and validate the repository documentation and OpenCode operating model.

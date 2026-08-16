@@ -2,34 +2,41 @@
 
 ## Phase
 
-Phase 0 — Project control plane
+Phase 1 — Domain foundation
 
 ## Current Task
 
-TASK-000 — Establish project control plane
+TASK-001 — Initialize TypeScript project
 
 ## State
 
-Planning/control-plane files have been generated.
+TASK-000 is complete. The repository control plane is established and verified. The next task is to initialize the TypeScript development environment.
 
 ## Completed
 
 - PROJECT_PLAN.md
 - AGENTS.md
-- opencode.json
-- agent definitions
+- opencode.json (default_agent: builder)
+- agent definitions (builder, tester, reviewer, orchestrator)
 - architecture document
-- decision record
+- decision record (ADR-001 through ADR-004)
 - task backlog
 - progress log
 - handoff document
+- Git repository initialized with initial commit
 
 ## Not Yet Started
 
-- application implementation
-- TypeScript project initialization
+- TypeScript project initialization (TASK-001)
 - domain model
+- dependency graph
 - graph algorithms
+- scheduling and critical path
+- decision engine
+- explainability
+- scenario simulation
+- persistence
+- application services
 - UI
 
 ## Human Decisions Still Needed
@@ -45,18 +52,12 @@ These are intentionally provisional:
 
 ## Next Recommended Action
 
-Review the generated control-plane files.
-
-Then initialize the Git repository and validate the OpenCode configuration before allowing an implementation agent to create application code.
+Implement TASK-001 — Initialize TypeScript project.
 
 ## Verification
 
-No application tests exist yet.
-
-## Working Tree
-
-Unknown until these files are copied into the actual Git repository.
+No application tests exist yet. TASK-001 will establish the test runner.
 
 ## Important Constraint
 
-Do not begin product implementation until the control plane has been reviewed and TASK-000 is verified.
+Do not begin product implementation until TASK-001 is complete and the TypeScript environment is verified.
