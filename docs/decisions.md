@@ -59,6 +59,26 @@ An additive model makes individual factor contributions easier to explain, test,
 ### Important
 Weights are not finalized. They must be validated through domain examples and tests before being treated as stable.
 
+## ADR-005 — Dependency Graph Design
+
+### Status
+Accepted
+
+### Context
+TASK-003 requires representing task dependencies as a directed graph with prerequisite lookup, dependent lookup, traversal, cycle detection, and deterministic topological ordering.
+
+### Decision
+- **Edge direction**: an edge points from a prerequisite task to a dependent task. `getPrerequisites(t)` returns incoming neighbors; `getDependents(t)` returns outgoing neighbors.
+- **Construction validation**: duplicate task ids and dependency references to unknown tasks are rejected. Repeated dependency entries are deduplicated.
+- **Deterministic ordering**: all lookup and traversal results are returned sorted lexicographically. Topological ordering uses Kahn's algorithm with a lexicographically sorted ready queue, so output is independent of the order tasks are passed in.
+- **Cycle detection**: a task is cyclic if it can reach itself through at least one edge (self-reachability). This yields the precise set of tasks on cycles, excluding tasks merely downstream of a cycle. Topological ordering throws and names the cyclic tasks when a cycle exists.
+- **Representation**: a `DependencyGraph` interface created by a `createDependencyGraph(tasks)` factory, consistent with the existing domain style. No graph library is used, per the project plan's preference for avoiding unnecessary dependencies.
+
+### Consequences
+- Traversal and ordering are fully deterministic and reproducible for identical task sets regardless of input ordering.
+- Cycles are representable in the graph so they can be analyzed and reported; the application layer decides whether to reject them.
+- Repeated single-node BFS/DFS is sufficient for MVP; performance benchmarking is deferred to TASK-014.
+
 ## Pending Decisions
 
 - final product name
