@@ -1,0 +1,12 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "default_agent": "build",
+  "instructions": [
+    "PROJECT_PLAN.md",
+    "docs/architecture.md",
+    "docs/decisions.md",
+    "docs/tasks.md",
+    "docs/handoff.md",
+    "docs/progress.md"
+  ]
+}
