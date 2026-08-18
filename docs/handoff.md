@@ -6,11 +6,11 @@ Phase 1 — Domain foundation
 
 ## Current Task
 
-TASK-004 — Implement scheduling and critical path
+TASK-005 — Implement candidate selection and decision engine
 
 ## State
 
-TASK-003 is complete. The dependency graph is implemented and verified. The next task is to implement scheduling and critical path analysis.
+TASK-004 is complete. Scheduling and critical-path analysis are implemented and verified. The next task is to implement the candidate selection and decision engine.
 
 ## Completed
 
@@ -19,7 +19,7 @@ TASK-003 is complete. The dependency graph is implemented and verified. The next
 - opencode.json (default_agent: builder)
 - agent definitions (builder, tester, reviewer, orchestrator)
 - architecture document
-- decision record (ADR-001 through ADR-005)
+- decision record (ADR-001 through ADR-006)
 - task backlog
 - progress log
 - handoff document
@@ -34,10 +34,11 @@ TASK-003 is complete. The dependency graph is implemented and verified. The next
 - Domain invariant tests (23 domain tests + 1 smoke test = 24 total passing)
 - Dependency graph: prerequisite/dependent lookup, traversal, reachability, cycle detection, deterministic topological ordering
 - Graph tests (34 tests = 58 total passing)
+- Scheduling: forward/backward pass CPM, critical path identification, slack calculation
+- Scheduling tests (13 tests = 71 total passing)
 
 ## Not Yet Started
 
-- scheduling and critical path
 - decision engine
 - explainability
 - scenario simulation
@@ -58,11 +59,11 @@ These are intentionally provisional:
 
 ## Next Recommended Action
 
-Implement TASK-004 — Implement scheduling and critical path.
+Implement TASK-005 — Implement candidate selection and decision engine.
 
 ## Verification
 
-TASK-003 verification is complete. All commands pass: `npm run verify`.
+TASK-004 verification is complete. All commands pass: `npm run verify`.
 
 ## Important Constraint
 

@@ -88,3 +88,30 @@ TASK-003 requires representing task dependencies as a directed graph with prereq
 - whether all proposed scenario types belong in MVP
 - final UI stack
 - benchmark methodology
+
+## ADR-006 — Scheduling and Critical Path Semantics
+
+### Status
+Accepted
+
+### Context
+TASK-004 requires calculating deterministic scheduling information from task durations and dependencies, including critical-path identification.
+
+### Decision
+- **Duration model**: task duration equals `estimatedEffort`. No calendar dates, resource constraints, or variable durations for MVP.
+- **Algorithm**: standard Critical Path Method (CPM) with forward and backward pass over the topological order.
+- **Forward pass**: `earliestStart(t) = max(earliestFinish(p) for p in prerequisites)`, or 0 if no prerequisites. `earliestFinish(t) = earliestStart(t) + duration(t)`.
+- **Backward pass**: `latestFinish(t) = min(latestStart(d) for d in dependents)`, or `projectDuration` if no dependents. `latestStart(t) = latestFinish(t) - duration(t)`.
+- **Slack**: `slack(t) = latestStart(t) - earliestStart(t)`. A task with zero slack is on the critical path.
+- **Critical path**: the set of all tasks with zero slack. Multiple critical paths are possible and all are reported.
+- **Project duration**: the maximum `earliestFinish` across all tasks.
+- **Tie-breaking**: none needed — scheduling is fully deterministic given the topological order.
+- **Cycle handling**: the function delegates to `DependencyGraph.topologicalOrder()` which throws on cycles.
+
+### Consequences
+- Scheduling is deterministic and reproducible for identical inputs.
+- The algorithm runs in O(V + E) time per pass (two passes total).
+- No external scheduling library is used.
+- The domain remains framework-independent.
+- Fractional effort values are supported (e.g., 1.5 days).
+- Result arrays are frozen to prevent accidental mutation.
