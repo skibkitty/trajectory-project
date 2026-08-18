@@ -56,3 +56,20 @@ Domain model:
 - `TaskStatus` — enum with 5 states
 
 Next: TASK-003 — Implement dependency graph.
+
+## 2026-08-16 — Dependency graph implemented (TASK-003)
+
+Completed:
+- Implemented `DependencyGraph` interface with `createDependencyGraph(tasks)` factory
+- Prerequisite and dependent lookup (sorted lexicographically)
+- Transitive traversal (all prerequisites, all dependents)
+- Reachability
+- Precise cycle detection via self-reachability (excludes downstream tasks)
+- Deterministic topological ordering (Kahn's algorithm with sorted ready queue)
+- Construction validation: duplicate task ids and unknown dependency references rejected, repeated entries deduplicated
+- Added ADR-005 documenting graph design (edge direction, determinism, cycle semantics)
+- Added `.gitattributes` to fix CRLF/LF line-ending instability in format checks
+- Wrote 34 graph tests (58 total passing)
+- Verified all commands pass: `npm run verify`
+
+Next: TASK-004 — Implement scheduling and critical path.

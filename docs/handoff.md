@@ -6,11 +6,11 @@ Phase 1 — Domain foundation
 
 ## Current Task
 
-TASK-003 — Implement dependency graph
+TASK-004 — Implement scheduling and critical path
 
 ## State
 
-TASK-002 is complete. Domain model entities (Project, Task, Goal) and invariants are implemented and verified. The next task is to implement the dependency graph.
+TASK-003 is complete. The dependency graph is implemented and verified. The next task is to implement scheduling and critical path analysis.
 
 ## Completed
 
@@ -19,7 +19,7 @@ TASK-002 is complete. Domain model entities (Project, Task, Goal) and invariants
 - opencode.json (default_agent: builder)
 - agent definitions (builder, tester, reviewer, orchestrator)
 - architecture document
-- decision record (ADR-001 through ADR-004)
+- decision record (ADR-001 through ADR-005)
 - task backlog
 - progress log
 - handoff document
@@ -32,11 +32,11 @@ TASK-002 is complete. Domain model entities (Project, Task, Goal) and invariants
 - TaskStatus enum (BACKLOG, TODO, IN_PROGRESS, BLOCKED, DONE)
 - Factory functions with invariant validation
 - Domain invariant tests (23 domain tests + 1 smoke test = 24 total passing)
+- Dependency graph: prerequisite/dependent lookup, traversal, reachability, cycle detection, deterministic topological ordering
+- Graph tests (34 tests = 58 total passing)
 
 ## Not Yet Started
 
-- dependency graph
-- graph algorithms
 - scheduling and critical path
 - decision engine
 - explainability
@@ -58,11 +58,11 @@ These are intentionally provisional:
 
 ## Next Recommended Action
 
-Implement TASK-003 — Implement dependency graph.
+Implement TASK-004 — Implement scheduling and critical path.
 
 ## Verification
 
-TASK-002 verification is complete. All commands pass: `npm run verify`.
+TASK-003 verification is complete. All commands pass: `npm run verify`.
 
 ## Important Constraint
 

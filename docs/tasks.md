@@ -77,7 +77,7 @@ Acceptance criteria:
 
 ## TASK-003 — Implement dependency graph
 
-Status: BACKLOG
+Status: DONE
 
 Goal:
 Represent and analyze task dependencies.

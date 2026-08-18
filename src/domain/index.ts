@@ -9,3 +9,6 @@ export type { Task, CreateTaskInput } from "./task.js";
 
 export { createProject } from "./project.js";
 export type { Project, CreateProjectInput } from "./project.js";
+
+export { createDependencyGraph } from "./graph/dependency-graph.js";
+export type { DependencyGraph } from "./graph/dependency-graph.js";
