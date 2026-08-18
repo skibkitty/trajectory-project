@@ -12,3 +12,6 @@ export type { Project, CreateProjectInput } from "./project.js";
 
 export { createDependencyGraph } from "./graph/dependency-graph.js";
 export type { DependencyGraph } from "./graph/dependency-graph.js";
+
+export { calculateSchedule } from "./scheduling/schedule.js";
+export type { TaskSchedule, ScheduleResult } from "./scheduling/schedule.js";

@@ -73,3 +73,24 @@ Completed:
 - Verified all commands pass: `npm run verify`
 
 Next: TASK-004 — Implement scheduling and critical path.
+
+## 2026-08-18 — Scheduling and critical path implemented (TASK-004)
+
+Completed:
+- Implemented `calculateSchedule(tasks, graph)` in `src/domain/scheduling/schedule.ts`
+- Forward pass: earliest start/finish using topological order
+- Backward pass: latest start/finish using reverse topological order
+- Slack calculation: `slack = latestStart - earliestStart`
+- Critical path identification: all tasks with zero slack
+- Project duration: maximum earliest finish across all tasks
+- Frozen result arrays to prevent accidental mutation
+- Added ADR-006 documenting scheduling semantics (duration model, CPM algorithm, critical-path definition)
+- Wrote 13 scheduling tests covering: empty project, single task, linear chain, diamond with slack, independent tasks, converging paths, multiple critical paths, cycle rejection, fractional effort, determinism, immutability, and large chains
+- Total: 71 tests passing across 7 test files
+- Verified all commands pass: `npm run verify`
+
+Scheduling model:
+- `TaskSchedule` — per-task schedule with ES/EF/LS/LF/slack/critical flag
+- `ScheduleResult` — project duration, all task schedules, critical path
+
+Next: TASK-005 — Implement candidate selection and decision engine.

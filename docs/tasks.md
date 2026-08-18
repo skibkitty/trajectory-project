@@ -95,7 +95,7 @@ Acceptance criteria:
 
 ## TASK-004 — Implement scheduling and critical path
 
-Status: BACKLOG
+Status: DONE
 
 Goal:
 Calculate deterministic scheduling information from task durations and dependencies.
