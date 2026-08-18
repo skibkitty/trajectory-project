@@ -115,3 +115,35 @@ TASK-004 requires calculating deterministic scheduling information from task dur
 - The domain remains framework-independent.
 - Fractional effort values are supported (e.g., 1.5 days).
 - Result arrays are frozen to prevent accidental mutation.
+
+## ADR-007 — Additive Decision Engine Scoring Model
+
+### Status
+Accepted
+
+### Context
+TASK-005 requires a deterministic decision engine that evaluates eligible tasks and recommends the best next task.
+
+### Decision
+- **Scoring model**: additive, not multiplicative. Each factor contributes independently to the final score.
+- **Factors**:
+  - `valueContribution` — normalized task value (0–1 based on max value in project)
+  - `urgencyContribution` — normalized task urgency (0–1 based on max urgency)
+  - `dependencyContribution` — normalized count of direct dependents (0–1 based on max)
+  - `criticalPathContribution` — 1 if task is on the critical path, 0 otherwise
+  - `confidenceContribution` — task confidence (already 0–1)
+  - `effortPenalty` — normalized effort (0–1 based on max effort), subtracted
+- **Weights**: configurable via `ScoringWeights` interface with defaults all equal to 1.
+- **Normalization**: min-max normalization with fallback to 0 when max is 0.
+- **Eligibility**: a task is eligible if it is not DONE and all direct prerequisites are DONE.
+- **Tie-breaking**: lexicographic by task id (deterministic).
+- **Selection policy**: deterministic — always select the highest-ranked candidate.
+- **Factor breakdown**: each factor includes label, contribution, direction, source metric, and explanation.
+- **Immutability**: result arrays and factor arrays are frozen.
+
+### Consequences
+- Scoring is deterministic and reproducible for identical inputs.
+- Individual factor contributions are inspectable and explainable.
+- Weights can be tuned without changing the algorithm structure.
+- The domain remains framework-independent.
+- The engine is independently testable without UI or persistence.

@@ -6,11 +6,11 @@ Phase 1 — Domain foundation
 
 ## Current Task
 
-TASK-005 — Implement candidate selection and decision engine
+TASK-006 — Implement recommendation explainability
 
 ## State
 
-TASK-004 is complete. Scheduling and critical-path analysis are implemented and verified. The next task is to implement the candidate selection and decision engine.
+TASK-005 is complete. The decision engine with candidate selection, additive scoring, and deterministic tie-breaking is implemented and verified. The next task is to implement recommendation explainability.
 
 ## Completed
 
@@ -19,7 +19,7 @@ TASK-004 is complete. Scheduling and critical-path analysis are implemented and 
 - opencode.json (default_agent: builder)
 - agent definitions (builder, tester, reviewer, orchestrator)
 - architecture document
-- decision record (ADR-001 through ADR-006)
+- decision record (ADR-001 through ADR-007)
 - task backlog
 - progress log
 - handoff document
@@ -36,10 +36,11 @@ TASK-004 is complete. Scheduling and critical-path analysis are implemented and 
 - Graph tests (34 tests = 58 total passing)
 - Scheduling: forward/backward pass CPM, critical path identification, slack calculation
 - Scheduling tests (13 tests = 71 total passing)
+- Decision engine: eligibility rules, additive scoring with 6 factors, deterministic tie-breaking, structured factor breakdown
+- Decision engine tests (28 tests = 99 total passing)
 
 ## Not Yet Started
 
-- decision engine
 - explainability
 - scenario simulation
 - persistence
@@ -59,11 +60,11 @@ These are intentionally provisional:
 
 ## Next Recommended Action
 
-Implement TASK-005 — Implement candidate selection and decision engine.
+Implement TASK-006 — Implement recommendation explainability.
 
 ## Verification
 
-TASK-004 verification is complete. All commands pass: `npm run verify`.
+TASK-005 verification is complete. All commands pass: `npm run verify`.
 
 ## Important Constraint
 

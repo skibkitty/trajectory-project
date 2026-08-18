@@ -94,3 +94,27 @@ Scheduling model:
 - `ScheduleResult` — project duration, all task schedules, critical path
 
 Next: TASK-005 — Implement candidate selection and decision engine.
+
+## 2026-08-18 — Decision engine implemented (TASK-005)
+
+Completed:
+- Implemented `evaluateTasks(tasks, graph, schedule, weights?)` in `src/domain/decision/engine.ts`
+- Eligibility: tasks must not be DONE and all direct prerequisites must be DONE
+- Additive scoring model with 6 factors: value, urgency, dependency impact, critical path, confidence, effort penalty
+- Min-max normalization with zero-max fallback
+- Configurable `ScoringWeights` with equal defaults
+- Deterministic tie-breaking by task id (lexicographic)
+- Structured factor breakdown with label, contribution, direction, source metric, explanation
+- Frozen result arrays and factor arrays for immutability
+- Added ADR-007 documenting scoring model (additive, factors, normalization, tie-breaking)
+- Wrote 28 decision engine tests covering: eligibility, scoring factors, tie-breaking, normalization, custom weights, factor breakdown, immutability, and determinism
+- Total: 99 tests passing across 8 test files
+- Verified all commands pass: `npm run verify`
+
+Decision engine model:
+- `EvaluationFactor` — per-factor breakdown with label, contribution, direction, source metric, explanation
+- `TaskEvaluation` — per-task score and factors
+- `EvaluationResult` — ranked candidates and selected task id
+- `ScoringWeights` — configurable factor weights
+
+Next: TASK-006 — Implement recommendation explainability.

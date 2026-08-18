@@ -111,7 +111,7 @@ Acceptance criteria:
 
 ## TASK-005 — Implement candidate selection and decision engine
 
-Status: BACKLOG
+Status: DONE
 
 Goal:
 Recommend the best eligible next task.
