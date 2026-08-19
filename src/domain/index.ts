@@ -15,3 +15,13 @@ export type { DependencyGraph } from "./graph/dependency-graph.js";
 
 export { calculateSchedule } from "./scheduling/schedule.js";
 export type { TaskSchedule, ScheduleResult } from "./scheduling/schedule.js";
+
+export { evaluateTasks, DEFAULT_FACTORS } from "./decision/engine.js";
+export type {
+  EvaluationFactor,
+  TaskEvaluation,
+  EvaluationResult,
+  ScoringFactor,
+  ScoringContext,
+  FactorComputation,
+} from "./decision/engine.js";
