@@ -237,6 +237,46 @@ describe("recommendNextTask — warnings", () => {
     ).toBe(false);
   });
 
+  it("warns when only the dependent-count maximum is zero", () => {
+    const tasks = [
+      task("a", { value: 4, urgency: 2 }),
+      task("b", { value: 2, urgency: 1 }),
+    ];
+    const recommendation = recommend(tasks);
+    const zeroMax = recommendation.warnings.find(
+      (w) => w.id === "zero-maximum-normalization",
+    );
+    expect(zeroMax?.message).toBe(
+      "All tasks share the same dependent count, so normalization for those metrics contributes nothing to scores.",
+    );
+  });
+
+  it("lists multiple zero-maximum metrics with readable formatting", () => {
+    const tasks = [
+      task("a", { value: 0, confidence: 0.9 }),
+      task("b", { value: 0, confidence: 0.2 }),
+    ];
+    const recommendation = recommend(tasks);
+    const zeroMax = recommendation.warnings.find(
+      (w) => w.id === "zero-maximum-normalization",
+    );
+    expect(zeroMax?.message).toBe(
+      "All tasks share the same value, urgency, and dependent count, so normalization for those metrics contributes nothing to scores.",
+    );
+  });
+
+  it("sorts affectedTaskIds when multiple BLOCKED candidates exist", () => {
+    const tasks = [
+      task("z", { status: "BLOCKED", confidence: 0.9 }),
+      task("a", { status: "BLOCKED", confidence: 0.3 }),
+    ];
+    const recommendation = recommend(tasks);
+    const blocked = recommendation.warnings.find(
+      (w) => w.id === "blocked-status-eligible",
+    );
+    expect(blocked?.affectedTaskIds).toEqual(["a", "z"]);
+  });
+
   it("emits multiple warnings in a stable order", () => {
     const tasks = [
       task("b", { status: "BLOCKED", confidence: 0.9 }),
@@ -274,10 +314,24 @@ describe("recommendNextTask — determinism and immutability", () => {
   });
 
   it("returns frozen structures", () => {
-    const recommendation = recommend([task("a", { value: 5 })]);
+    const recommendation = recommend([
+      task("b", { status: "BLOCKED", confidence: 0.9 }),
+      task("a", { status: "BLOCKED" }),
+    ]);
     expect(Object.isFrozen(recommendation)).toBe(true);
     expect(Object.isFrozen(recommendation.factors)).toBe(true);
     expect(Object.isFrozen(recommendation.assumptions)).toBe(true);
     expect(Object.isFrozen(recommendation.warnings)).toBe(true);
+    expect(recommendation.factors.length).toBeGreaterThan(0);
+    expect(recommendation.warnings.length).toBeGreaterThan(0);
+    for (const factor of recommendation.factors) {
+      expect(Object.isFrozen(factor)).toBe(true);
+    }
+    for (const assumption of recommendation.assumptions) {
+      expect(Object.isFrozen(assumption)).toBe(true);
+    }
+    for (const warning of recommendation.warnings) {
+      expect(Object.isFrozen(warning)).toBe(true);
+    }
   });
 });

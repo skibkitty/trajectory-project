@@ -355,6 +355,18 @@ describe("evaluateTasks — immutability", () => {
     expect(Object.isFrozen(result)).toBe(true);
     expect(Object.isFrozen(result.candidates)).toBe(true);
     expect(Object.isFrozen(result.candidates[0].factors)).toBe(true);
+    expect(Object.isFrozen(result.maxValues)).toBe(true);
+  });
+
+  it("freezes every candidate evaluation and factor object", () => {
+    const result = evaluate([task("a", { value: 5 }), task("b")]);
+    expect(result.candidates.length).toBeGreaterThan(0);
+    for (const candidate of result.candidates) {
+      expect(Object.isFrozen(candidate)).toBe(true);
+      for (const factor of candidate.factors) {
+        expect(Object.isFrozen(factor)).toBe(true);
+      }
+    }
   });
 });
 

@@ -137,3 +137,15 @@ Explanation types:
 - `Recommendation`, `Assumption`, `RecommendationWarning`
 
 Next: TASK-007 — Implement scenario simulation.
+
+## 2026-08-23 — TASK-006 review follow-up fixes
+
+Completed:
+- Deep freezing applied to all decision-layer result objects: individual `TaskEvaluation` and `EvaluationFactor` objects (engine) and `Assumption`/`RecommendationWarning` objects (recommendation layer) are now frozen, matching the documented immutability contract; previously only arrays and top-level results were frozen
+- `buildWarnings` now takes `readonly TaskEvaluation[]` instead of an inline structural type
+- Zero-maximum warning message uses readable list formatting for multiple metrics ("value, urgency, and dependent count")
+- Documented in ADR-008: score-derived warnings require at least one candidate (the no-candidates path intentionally centers on `no-eligible-tasks`, with maxima still visible via the `normalization-maxima` assumption); the plan's conceptual `RecommendationFactor` is realized by reusing `EvaluationFactor`
+- Added edge-case tests: element-level freeze assertions for engine and recommendation outputs, dependents-only zero-maximum warning, multi-BLOCKED sorted `affectedTaskIds`
+- Reviewed findings not adopted: exposing the engine's internal task map (would leak internals to save an O(n) loop), renaming factors to a distinct `RecommendationFactor` type (duplicated shape without clarifying invariants), and a zero-effort-maximum test (unreachable — `createTask` enforces effort > 0)
+- Total: 129 tests passing across 9 test files
+- Verified all commands pass: `npm run verify`

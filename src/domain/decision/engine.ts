@@ -194,21 +194,23 @@ function evaluateCandidate(
     const signed =
       factor.direction === "negative" ? -contribution : contribution;
     score += signed;
-    evaluationFactors.push({
-      id: factor.id,
-      label: factor.label,
-      contribution: signed,
-      direction: factor.direction,
-      sourceMetric: result.sourceMetric,
-      explanation: result.explanation,
-    });
+    evaluationFactors.push(
+      Object.freeze({
+        id: factor.id,
+        label: factor.label,
+        contribution: signed,
+        direction: factor.direction,
+        sourceMetric: result.sourceMetric,
+        explanation: result.explanation,
+      }),
+    );
   }
 
-  return {
+  return Object.freeze({
     taskId: task.id,
     score: Math.round(score * 1000) / 1000,
     factors: Object.freeze(evaluationFactors),
-  };
+  });
 }
 
 function sortByScore(a: TaskEvaluation, b: TaskEvaluation): number {

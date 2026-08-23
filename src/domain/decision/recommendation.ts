@@ -6,6 +6,7 @@ import type {
   EvaluationFactor,
   NormalizationMaxima,
   ScoringFactor,
+  TaskEvaluation,
 } from "./engine.js";
 
 export interface Assumption {
@@ -29,7 +30,7 @@ export interface Recommendation {
 }
 
 function buildAssumptions(maxValues: NormalizationMaxima): Assumption[] {
-  return [
+  const assumptions: Assumption[] = [
     {
       id: "additive-model",
       statement:
@@ -62,6 +63,7 @@ function buildAssumptions(maxValues: NormalizationMaxima): Assumption[] {
         "Default factor weights are provisional and must not be treated as objectively correct.",
     },
   ];
+  return assumptions.map((assumption) => Object.freeze(assumption));
 }
 
 const ZERO_MAX_METRICS: ReadonlyArray<{
@@ -74,8 +76,15 @@ const ZERO_MAX_METRICS: ReadonlyArray<{
   { key: "dependents", label: "dependent count" },
 ]);
 
+function formatMetricList(labels: readonly string[]): string {
+  if (labels.length <= 1) {
+    return labels.join("");
+  }
+  return `${labels.slice(0, -1).join(", ")}, and ${labels[labels.length - 1]}`;
+}
+
 function buildWarnings(
-  candidates: readonly { taskId: string; score: number }[],
+  candidates: readonly TaskEvaluation[],
   taskMap: ReadonlyMap<string, Task>,
   maxValues: NormalizationMaxima,
 ): RecommendationWarning[] {
@@ -83,10 +92,12 @@ function buildWarnings(
 
   const top = candidates[0];
   if (!top) {
-    warnings.push({
-      id: "no-eligible-tasks",
-      message: "There are currently no eligible tasks to recommend.",
-    });
+    warnings.push(
+      Object.freeze({
+        id: "no-eligible-tasks",
+        message: "There are currently no eligible tasks to recommend.",
+      }),
+    );
     return warnings;
   }
 
@@ -95,21 +106,25 @@ function buildWarnings(
     .map((c) => c.taskId)
     .sort((a, b) => a.localeCompare(b));
   if (tied.length > 1) {
-    warnings.push({
-      id: "tie-break-applied",
-      message: `${tied.length} candidates tie at score ${top.score}; the recommendation was chosen by the documented tie-breaking policy (ascending task id).`,
-      affectedTaskIds: tied,
-    });
+    warnings.push(
+      Object.freeze({
+        id: "tie-break-applied",
+        message: `${tied.length} candidates tie at score ${top.score}; the recommendation was chosen by the documented tie-breaking policy (ascending task id).`,
+        affectedTaskIds: tied,
+      }),
+    );
   }
 
   const zeroMetrics = ZERO_MAX_METRICS.filter(
     ({ key }) => maxValues[key] === 0,
   ).map(({ label }) => label);
   if (zeroMetrics.length > 0) {
-    warnings.push({
-      id: "zero-maximum-normalization",
-      message: `All tasks share the same ${zeroMetrics.join(" and ")}, so normalization for those metrics contributes nothing to scores.`,
-    });
+    warnings.push(
+      Object.freeze({
+        id: "zero-maximum-normalization",
+        message: `All tasks share the same ${formatMetricList(zeroMetrics)}, so normalization for those metrics contributes nothing to scores.`,
+      }),
+    );
   }
 
   const blockedEligible = candidates
@@ -117,12 +132,14 @@ function buildWarnings(
     .map((c) => c.taskId)
     .sort((a, b) => a.localeCompare(b));
   if (blockedEligible.length > 0) {
-    warnings.push({
-      id: "blocked-status-eligible",
-      message:
-        "Tasks marked BLOCKED satisfy the eligibility rule (all prerequisites DONE) and therefore remain under consideration; the BLOCKED flag does not exclude tasks.",
-      affectedTaskIds: blockedEligible,
-    });
+    warnings.push(
+      Object.freeze({
+        id: "blocked-status-eligible",
+        message:
+          "Tasks marked BLOCKED satisfy the eligibility rule (all prerequisites DONE) and therefore remain under consideration; the BLOCKED flag does not exclude tasks.",
+        affectedTaskIds: blockedEligible,
+      }),
+    );
   }
 
   return warnings;

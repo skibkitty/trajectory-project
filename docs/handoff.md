@@ -41,7 +41,8 @@ TASK-006 is complete and awaiting review/merge on branch feat/006-recommendation
 - ADR-007 documenting eligibility, scoring model, normalization, tie-breaking, and selection policy; ADR-004 marked Accepted
 - Recommendation explainability: `recommendNextTask` with machine-readable factor ids, fixed-order assumptions, ordered conditional warnings, explainable empty state, frozen deterministic output
 - Engine additions: stable factor ids on `EvaluationFactor`, normalization `maxValues` exposed on `EvaluationResult`
-- Recommendation tests (21 tests + 2 new engine tests = 125 total passing across 9 files)
+- Review follow-up: deep freezing applied to all result objects (evaluations, factors, assumptions, warnings), `TaskEvaluation`-typed warning inputs, readable multi-metric warning formatting, additional edge-case tests
+- Recommendation tests (24 tests + 1 new engine test = 129 total passing across 9 files)
 - ADR-008 documenting the explainability representation
 
 ## Not Yet Started
@@ -68,7 +69,7 @@ Implement TASK-007 — Implement scenario simulation.
 
 ## Verification
 
-TASK-006 verification is complete. All commands pass: `npm run verify` (typecheck, 125 tests, lint, format).
+TASK-006 verification is complete. All commands pass: `npm run verify` (typecheck, 129 tests, lint, format).
 
 ## Important Constraint
 
