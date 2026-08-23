@@ -128,7 +128,7 @@ Acceptance criteria:
 
 ## TASK-006 — Implement recommendation explainability
 
-Status: BACKLOG
+Status: DONE
 
 Goal:
 Represent recommendation reasoning as structured data.

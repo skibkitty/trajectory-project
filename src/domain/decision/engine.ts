@@ -3,6 +3,7 @@ import type { DependencyGraph } from "../graph/dependency-graph.js";
 import type { ScheduleResult } from "../scheduling/schedule.js";
 
 export interface EvaluationFactor {
+  readonly id: string;
   readonly label: string;
   readonly contribution: number;
   readonly direction: "positive" | "negative";
@@ -19,6 +20,14 @@ export interface TaskEvaluation {
 export interface EvaluationResult {
   readonly candidates: readonly TaskEvaluation[];
   readonly selectedTaskId: string | null;
+  readonly maxValues: NormalizationMaxima;
+}
+
+export interface NormalizationMaxima {
+  readonly value: number;
+  readonly urgency: number;
+  readonly effort: number;
+  readonly dependents: number;
 }
 
 export interface ScoringContext {
@@ -28,12 +37,7 @@ export interface ScoringContext {
   readonly schedule: ScheduleResult;
   readonly dependentCounts: ReadonlyMap<string, number>;
   readonly criticalPathSet: ReadonlySet<string>;
-  readonly maxValues: {
-    readonly value: number;
-    readonly urgency: number;
-    readonly effort: number;
-    readonly dependents: number;
-  };
+  readonly maxValues: NormalizationMaxima;
 }
 
 export interface FactorComputation {
@@ -190,20 +194,23 @@ function evaluateCandidate(
     const signed =
       factor.direction === "negative" ? -contribution : contribution;
     score += signed;
-    evaluationFactors.push({
-      label: factor.label,
-      contribution: signed,
-      direction: factor.direction,
-      sourceMetric: result.sourceMetric,
-      explanation: result.explanation,
-    });
+    evaluationFactors.push(
+      Object.freeze({
+        id: factor.id,
+        label: factor.label,
+        contribution: signed,
+        direction: factor.direction,
+        sourceMetric: result.sourceMetric,
+        explanation: result.explanation,
+      }),
+    );
   }
 
-  return {
+  return Object.freeze({
     taskId: task.id,
     score: Math.round(score * 1000) / 1000,
     factors: Object.freeze(evaluationFactors),
-  };
+  });
 }
 
 function sortByScore(a: TaskEvaluation, b: TaskEvaluation): number {
@@ -273,5 +280,6 @@ export function evaluateTasks(
   return Object.freeze({
     candidates: Object.freeze(candidates),
     selectedTaskId,
+    maxValues,
   });
 }

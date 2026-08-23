@@ -173,6 +173,29 @@ describe("evaluateTasks — tie-breaking", () => {
 });
 
 describe("evaluateTasks — factor breakdown", () => {
+  it("returns factors with stable machine-readable ids", () => {
+    const result = evaluate([task("a")]);
+    expect(result.candidates[0].factors.map((f) => f.id)).toEqual([
+      "value",
+      "urgency",
+      "dependency",
+      "criticalPath",
+      "confidence",
+      "effort",
+    ]);
+  });
+
+  it("exposes normalization maxima on the result", () => {
+    const result = evaluate([
+      task("a", { value: 8, urgency: 4, estimatedEffort: 2 }),
+      task("b"),
+    ]);
+    expect(result.maxValues.value).toBe(8);
+    expect(result.maxValues.urgency).toBe(4);
+    expect(result.maxValues.effort).toBe(2);
+    expect(Object.isFrozen(result.maxValues)).toBe(true);
+  });
+
   it("returns factors for each candidate", () => {
     const result = evaluate([task("a", { value: 5, urgency: 3 })]);
     expect(result.candidates[0].factors).toHaveLength(6);
@@ -332,6 +355,18 @@ describe("evaluateTasks — immutability", () => {
     expect(Object.isFrozen(result)).toBe(true);
     expect(Object.isFrozen(result.candidates)).toBe(true);
     expect(Object.isFrozen(result.candidates[0].factors)).toBe(true);
+    expect(Object.isFrozen(result.maxValues)).toBe(true);
+  });
+
+  it("freezes every candidate evaluation and factor object", () => {
+    const result = evaluate([task("a", { value: 5 }), task("b")]);
+    expect(result.candidates.length).toBeGreaterThan(0);
+    for (const candidate of result.candidates) {
+      expect(Object.isFrozen(candidate)).toBe(true);
+      for (const factor of candidate.factors) {
+        expect(Object.isFrozen(factor)).toBe(true);
+      }
+    }
   });
 });
 

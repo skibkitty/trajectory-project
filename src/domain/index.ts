@@ -24,4 +24,12 @@ export type {
   ScoringFactor,
   ScoringContext,
   FactorComputation,
+  NormalizationMaxima,
 } from "./decision/engine.js";
+
+export { recommendNextTask } from "./decision/recommendation.js";
+export type {
+  Recommendation,
+  Assumption,
+  RecommendationWarning,
+} from "./decision/recommendation.js";

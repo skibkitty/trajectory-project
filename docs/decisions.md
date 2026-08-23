@@ -134,7 +134,7 @@ TASK-005 requires recommending the best eligible next task with deterministic sc
 - **Tie-breaking**: descending score, then ascending task id (`localeCompare`). Fully deterministic and independent of input ordering.
 - **Selection policy**: evaluation and selection are separated per PROJECT_PLAN §6. `evaluateTasks` ranks all candidates; selection always takes the highest-ranked candidate. `selectedTaskId` is null when there are no candidates. A weighted-random selection policy, if introduced later, must layer on top without altering this ranking.
 - **Composability**: factors implement a `ScoringFactor` interface (`id`, `label`, `direction`, `weight`, `compute`). `DEFAULT_FACTORS` is frozen; callers may reorder, reweight, subset, or extend factors without modifying the engine.
-- **Output**: each candidate carries a frozen array of factors with label, signed contribution, direction, source metric, and explanation. Results are frozen.
+- **Output**: each candidate carries a frozen array of factors with label, signed contribution, direction, source metric, and explanation. Results are deeply frozen — the result object, candidate arrays, each `TaskEvaluation`, and every individual factor object.
 
 ### Alternatives considered
 - Multiplicative scoring (original concept): rejected for MVP per ADR-004 — harder to attribute and explain individual contributions.
@@ -147,3 +147,35 @@ TASK-005 requires recommending the best eligible next task with deterministic sc
 - Weights remain provisional (see ADR-004); they are validated by invariant tests, not claimed optimal.
 - Because normalization uses the maximum of the passed-in task set, callers should pass the full project so scores remain anchored as tasks complete; passing partial subsets yields pool-relative scores instead.
 - Rounding to three decimals can create ties at the displayed precision; the documented tie-breaking policy resolves them deterministically.
+
+## ADR-008 — Recommendation Explainability Representation
+
+### Status
+Accepted
+
+### Context
+TASK-006 requires recommendation reasoning to be structured data: machine-readable factors that retain source metrics, representable assumptions and warnings, and a deterministic explanation. PROJECT_PLAN §7 defines the conceptual shape (`task`, `score`, `factors[]`, `assumptions[]`, `warnings[]`). The engine already returns per-factor breakdowns; this record specifies the explanation layer implemented in `src/domain/decision/recommendation.ts`.
+
+### Decision
+
+- **Layering**: `recommendNextTask(tasks, graph, schedule, factors?)` wraps `evaluateTasks` and derives explanations from its output; scoring logic is not duplicated. Custom factor sets pass through unchanged.
+- **Nullable recommendation**: when no task is eligible, the result carries `taskId: null`, `score: null`, empty factors, plus a `no-eligible-tasks` warning — an explainable empty state instead of a bare null.
+- **Machine-readable factors**: each returned factor carries a stable `id` (`value`, `urgency`, `dependency`, `criticalPath`, `confidence`, `effort`) alongside its human label, signed contribution, direction, source metric string, and explanation. `EvaluationResult` now also exposes the normalization `maxValues` so callers can show what scores were anchored against.
+- **Factor representation**: PROJECT_PLAN §11's conceptual `RecommendationFactor` entity is realized by reusing the engine's `EvaluationFactor` — one shared representation across evaluation and explanation instead of duplicated shapes.
+- **Assumptions**: a fixed-order, always-present list of statements describing model semantics — additive model, default-factor-set normalization (with the actual maxima as `detail`), confidence used directly as [0, 1], CPM-derived critical path, tie-break policy, and provisional weights. Assumptions are constant for a given input and independent of input ordering.
+- **Warnings**: emitted only when their condition holds, in a fixed order: `no-eligible-tasks`, `tie-break-applied`, `zero-maximum-normalization`, `blocked-status-eligible`. Each has a stable id, message, and optional sorted `affectedTaskIds`.
+  - Tie detection compares rounded scores at ranking precision, so the warning and the selection can never disagree; `affectedTaskIds[0]` is always the selected task.
+  - Zero-maximum covers value, urgency, effort, and dependent counts uniformly — including dependent counts, because a flat dependency graph silently deactivates the dependency factor and that is worth surfacing.
+  - Score-derived warnings (`tie-break-applied`, `zero-maximum-normalization`, `blocked-status-eligible`) are emitted only when at least one candidate exists. With no eligible tasks the explanation centers on `no-eligible-tasks`; degenerate normalization remains visible through the `normalization-maxima` assumption detail.
+- **Immutability and determinism**: the recommendation, all of its arrays, and every contained factor/assumption/warning object are frozen; output is a pure function of inputs, verified by JSON-equality tests across repeated and reordered runs.
+
+### Alternatives considered
+- Natural-language prose explanations: rejected — the UI converts structured facts into language, per PROJECT_PLAN §7.
+- Deriving assumptions dynamically from the active factor set: deferred. Assumption statements are worded to describe the default factor set's contract; a caller supplying custom factors owns describing them. Revisit if custom factor sets become a primary use case.
+
+### Consequences
+- The UI can key explanations off stable ids rather than display strings.
+- Empty and degenerate states are self-explanatory through warnings.
+- Adding a new warning type requires assigning it a place in the documented emission order.
+- Tie-breaking continues to rely on `localeCompare` (per ADR-007), which is deterministic on a given runtime but not guaranteed byte-stable across ICU environments; acceptable for MVP, revisit only if cross-machine reproducibility becomes a hard requirement.
+- Explanations inherit engine determinism guarantees; no additional randomness exists in the layer.
