@@ -149,3 +149,20 @@ Completed:
 - Reviewed findings not adopted: exposing the engine's internal task map (would leak internals to save an O(n) loop), renaming factors to a distinct `RecommendationFactor` type (duplicated shape without clarifying invariants), and a zero-effort-maximum test (unreachable — `createTask` enforces effort > 0)
 - Total: 129 tests passing across 9 test files
 - Verified all commands pass: `npm run verify`
+
+## 2026-08-23 — Scenario simulation implemented (TASK-007)
+
+Completed:
+- Implemented `applyScenario(tasks, scenario)` and `simulateScenario(baselineTasks, scenario, factors?)` in `src/domain/simulation/simulation.ts` (branch feat/007-scenario-simulation)
+- Three scenario kinds: `delay-task` (positive effort increase), `change-effort` (effort replacement), `remove-task` (de-scope); deadline-change scenarios deferred until a date model exists (ADR-009)
+- Baseline isolation: scenarios derive new task arrays; only the targeted task is rebuilt via `createTask`, untouched tasks keep object identity; removal strips dependency references from survivors so the projected graph remains constructible
+- Comparisons: baseline vs. projected `projectDuration`, `criticalPath`, `recommendedTaskId`, `recommendedScore`; deltas include rounded duration delta, critical-path change, recommendation change, and `valueRemoved` for de-scopes
+- Affected downstream reporting: target plus transitive dependents whose `[earliestStart, earliestFinish]` window actually changed — reachability alone does not count as impact
+- Reused existing domain layers (`createDependencyGraph`, `calculateSchedule`, `recommendNextTask`) with custom factor-set pass-through; no scheduling or scoring logic duplicated
+- Deterministic and frozen output; `scenarioTasks` sorted by id for order-independent serialization; verified by JSON-equality across repeated and reordered runs
+- Added ADR-009 documenting derivation-over-mutation, affected-downstream semantics, comparison shape, and the cross-side score-comparison caveat
+- Wrote 20 simulation tests covering isolation, delay/effort/removal behavior, affected-downstream filtering, recommendation comparison, determinism, and freezing
+- Total: 149 tests passing across 10 test files
+- Verified all commands pass: `npm run verify`
+
+Next: TASK-008 — Implement local persistence.
