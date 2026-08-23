@@ -48,7 +48,7 @@ The first implementation will use local persistence behind a repository interfac
 ## ADR-004 — Additive Initial Scoring Model
 
 ### Status
-Proposed
+Accepted (implemented in TASK-005; see ADR-007 for the concrete model)
 
 ### Decision
 Begin experimentation with an additive score rather than the multiplicative formula from the original concept.
@@ -115,3 +115,35 @@ TASK-004 requires calculating deterministic scheduling information from task dur
 - The domain remains framework-independent.
 - Fractional effort values are supported (e.g., 1.5 days).
 - Result arrays are frozen to prevent accidental mutation.
+
+## ADR-007 — Candidate Eligibility, Scoring Model, and Tie-Breaking
+
+### Status
+Accepted
+
+### Context
+TASK-005 requires recommending the best eligible next task with deterministic scoring, documented tie-breaking, and a structured factor breakdown. ADR-004 proposed an additive model; this record specifies the concrete model implemented in `src/domain/decision/engine.ts`.
+
+### Decision
+
+- **Eligibility**: a task is a candidate iff its status is not `DONE` and every prerequisite exists and is `DONE`. Blocking is derived from prerequisites, not from the `BLOCKED` status flag — a `BLOCKED` or `IN_PROGRESS` task with satisfied prerequisites remains eligible.
+- **Model**: additive, per ADR-004. `score = Σ (weight × normalized)` where negative-direction factors contribute negatively.
+- **Default factors** (all weights 1): value, urgency, dependency impact (direct dependent count), critical-path membership (binary), confidence, effort penalty (negative).
+- **Normalization**: value, urgency, effort, and dependents are divided by the maximum of that metric across the task set passed to `evaluateTasks`. Confidence is already bounded [0, 1] and used directly. If a maximum is 0, the normalized contribution is 0 (no division by zero).
+- **Rounding**: scores are rounded to three decimal places.
+- **Tie-breaking**: descending score, then ascending task id (`localeCompare`). Fully deterministic and independent of input ordering.
+- **Selection policy**: evaluation and selection are separated per PROJECT_PLAN §6. `evaluateTasks` ranks all candidates; selection always takes the highest-ranked candidate. `selectedTaskId` is null when there are no candidates. A weighted-random selection policy, if introduced later, must layer on top without altering this ranking.
+- **Composability**: factors implement a `ScoringFactor` interface (`id`, `label`, `direction`, `weight`, `compute`). `DEFAULT_FACTORS` is frozen; callers may reorder, reweight, subset, or extend factors without modifying the engine.
+- **Output**: each candidate carries a frozen array of factors with label, signed contribution, direction, source metric, and explanation. Results are frozen.
+
+### Alternatives considered
+- Multiplicative scoring (original concept): rejected for MVP per ADR-004 — harder to attribute and explain individual contributions.
+- Rank-based (Borda-style) scoring: rejected because it discards metric magnitudes and complicates factor-level explanations.
+
+### Consequences
+- Ranking is reproducible for identical inputs and independent of task input order (covered by tests).
+- Per-factor monotonicity and boundary conditions (zero maxima, ties, empty sets) are unit tested.
+- New factors require no engine changes, enabling weight experimentation without touching core logic.
+- Weights remain provisional (see ADR-004); they are validated by invariant tests, not claimed optimal.
+- Because normalization uses the maximum of the passed-in task set, callers should pass the full project so scores remain anchored as tasks complete; passing partial subsets yields pool-relative scores instead.
+- Rounding to three decimals can create ties at the displayed precision; the documented tie-breaking policy resolves them deterministically.

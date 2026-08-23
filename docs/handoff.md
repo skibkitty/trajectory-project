@@ -2,15 +2,15 @@
 
 ## Phase
 
-Phase 1 — Domain foundation
+Domain core complete (Phases 1–4 of the implementation plan: model, graph, scheduling, decision engine)
 
 ## Current Task
 
-TASK-005 — Implement candidate selection and decision engine
+TASK-006 — Implement recommendation explainability
 
 ## State
 
-TASK-004 is complete. Scheduling and critical-path analysis are implemented and verified. The next task is to implement the candidate selection and decision engine.
+TASK-005 is complete and merged to main (PR #4, feat/005b-composable-factors). The deterministic decision engine evaluates eligible candidates with a composable additive scoring model, documented normalization and tie-breaking (ADR-007), and structured per-factor breakdowns. The next task is to deepen explainability into a full recommendation structure with machine-readable factors, assumptions, and warnings.
 
 ## Completed
 
@@ -19,7 +19,7 @@ TASK-004 is complete. Scheduling and critical-path analysis are implemented and 
 - opencode.json (default_agent: builder)
 - agent definitions (builder, tester, reviewer, orchestrator)
 - architecture document
-- decision record (ADR-001 through ADR-006)
+- decision record (ADR-001 through ADR-007)
 - task backlog
 - progress log
 - handoff document
@@ -36,11 +36,13 @@ TASK-004 is complete. Scheduling and critical-path analysis are implemented and 
 - Graph tests (34 tests = 58 total passing)
 - Scheduling: forward/backward pass CPM, critical path identification, slack calculation
 - Scheduling tests (13 tests = 71 total passing)
+- Decision engine: eligibility rules, composable additive scoring (six default factors), deterministic lexicographic tie-breaking, structured factor breakdowns, frozen results
+- Decision engine tests (31 tests = 102 total passing across 8 files)
+- ADR-007 documenting eligibility, scoring model, normalization, tie-breaking, and selection policy; ADR-004 marked Accepted
 
 ## Not Yet Started
 
-- decision engine
-- explainability
+- recommendation assumptions/warnings layer (TASK-006)
 - scenario simulation
 - persistence
 - application services
@@ -59,11 +61,11 @@ These are intentionally provisional:
 
 ## Next Recommended Action
 
-Implement TASK-005 — Implement candidate selection and decision engine.
+Implement TASK-006 — Implement recommendation explainability.
 
 ## Verification
 
-TASK-004 verification is complete. All commands pass: `npm run verify`.
+TASK-005 verification is complete. All commands pass: `npm run verify` (typecheck, 102 tests, lint, format).
 
 ## Important Constraint
 
