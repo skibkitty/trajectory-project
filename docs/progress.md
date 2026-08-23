@@ -116,3 +116,24 @@ Decision model types:
 - `ScoringFactor`, `ScoringContext`, `FactorComputation`, `DEFAULT_FACTORS`
 
 Next: TASK-006 — Implement recommendation explainability.
+
+## 2026-08-22 — Recommendation explainability implemented (TASK-006)
+
+Completed:
+- Implemented `recommendNextTask(tasks, graph, schedule, factors?)` in `src/domain/decision/recommendation.ts`
+- Wraps `evaluateTasks` without duplicating scoring logic; custom factor sets pass through
+- `Recommendation` carries nullable taskId/score with an explainable empty state (`no-eligible-tasks` warning) when nothing is eligible
+- Factors are machine-readable: stable ids (`value`, `urgency`, `dependency`, `criticalPath`, `confidence`, `effort`) alongside labels, signed contributions, directions, source metrics, and explanations
+- Engine additions: stable factor ids on `EvaluationFactor`, normalization `maxValues` exposed on `EvaluationResult`, exported `NormalizationMaxima` type
+- Fixed-order assumption list describing model semantics, including the actual normalization maxima as detail
+- Conditional warnings in a fixed emission order: `tie-break-applied`, `zero-maximum-normalization`, `blocked-status-eligible`; tie detection matches ranking precision so warning and selection cannot disagree
+- All output frozen and deterministic; verified by JSON-equality tests across repeated and reordered runs
+- Added ADR-008 documenting the explainability representation
+- Wrote 21 recommendation tests + 2 engine tests (factor ids, exposed maxima)
+- Total: 125 tests passing across 9 test files
+- Verified all commands pass: `npm run verify`
+
+Explanation types:
+- `Recommendation`, `Assumption`, `RecommendationWarning`
+
+Next: TASK-007 — Implement scenario simulation.

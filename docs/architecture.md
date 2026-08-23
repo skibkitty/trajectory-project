@@ -2,7 +2,7 @@
 
 ## Current Status
 
-Phase 1 — Domain foundation. Project, Task, Goal entities and invariants implemented. Dependency graph with traversal, cycle detection, and deterministic topological ordering implemented. Scheduling and critical-path analysis implemented. Deterministic decision engine with composable additive scoring, candidate eligibility rules, and structured factor breakdowns implemented. This document records the intended architecture and is expected to evolve through documented decisions.
+Phase 1 — Domain foundation. Project, Task, Goal entities and invariants implemented. Dependency graph with traversal, cycle detection, and deterministic topological ordering implemented. Scheduling and critical-path analysis implemented. Deterministic decision engine with composable additive scoring, candidate eligibility rules, and structured factor breakdowns implemented. Recommendation explainability layer with machine-readable factor ids, assumptions, and warnings implemented. This document records the intended architecture and is expected to evolve through documented decisions.
 
 ## Dependency Direction
 

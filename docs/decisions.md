@@ -147,3 +147,33 @@ TASK-005 requires recommending the best eligible next task with deterministic sc
 - Weights remain provisional (see ADR-004); they are validated by invariant tests, not claimed optimal.
 - Because normalization uses the maximum of the passed-in task set, callers should pass the full project so scores remain anchored as tasks complete; passing partial subsets yields pool-relative scores instead.
 - Rounding to three decimals can create ties at the displayed precision; the documented tie-breaking policy resolves them deterministically.
+
+## ADR-008 — Recommendation Explainability Representation
+
+### Status
+Accepted
+
+### Context
+TASK-006 requires recommendation reasoning to be structured data: machine-readable factors that retain source metrics, representable assumptions and warnings, and a deterministic explanation. PROJECT_PLAN §7 defines the conceptual shape (`task`, `score`, `factors[]`, `assumptions[]`, `warnings[]`). The engine already returns per-factor breakdowns; this record specifies the explanation layer implemented in `src/domain/decision/recommendation.ts`.
+
+### Decision
+
+- **Layering**: `recommendNextTask(tasks, graph, schedule, factors?)` wraps `evaluateTasks` and derives explanations from its output; scoring logic is not duplicated. Custom factor sets pass through unchanged.
+- **Nullable recommendation**: when no task is eligible, the result carries `taskId: null`, `score: null`, empty factors, plus a `no-eligible-tasks` warning — an explainable empty state instead of a bare null.
+- **Machine-readable factors**: each returned factor carries a stable `id` (`value`, `urgency`, `dependency`, `criticalPath`, `confidence`, `effort`) alongside its human label, signed contribution, direction, source metric string, and explanation. `EvaluationResult` now also exposes the normalization `maxValues` so callers can show what scores were anchored against.
+- **Assumptions**: a fixed-order, always-present list of statements describing model semantics — additive model, default-factor-set normalization (with the actual maxima as `detail`), confidence used directly as [0, 1], CPM-derived critical path, tie-break policy, and provisional weights. Assumptions are constant for a given input and independent of input ordering.
+- **Warnings**: emitted only when their condition holds, in a fixed order: `no-eligible-tasks`, `tie-break-applied`, `zero-maximum-normalization`, `blocked-status-eligible`. Each has a stable id, message, and optional sorted `affectedTaskIds`.
+  - Tie detection compares rounded scores at ranking precision, so the warning and the selection can never disagree; `affectedTaskIds[0]` is always the selected task.
+  - Zero-maximum covers value, urgency, effort, and dependent counts uniformly — including dependent counts, because a flat dependency graph silently deactivates the dependency factor and that is worth surfacing.
+- **Immutability and determinism**: the recommendation and all arrays are frozen; output is a pure function of inputs, verified by JSON-equality tests across repeated and reordered runs.
+
+### Alternatives considered
+- Natural-language prose explanations: rejected — the UI converts structured facts into language, per PROJECT_PLAN §7.
+- Deriving assumptions dynamically from the active factor set: deferred. Assumption statements are worded to describe the default factor set's contract; a caller supplying custom factors owns describing them. Revisit if custom factor sets become a primary use case.
+
+### Consequences
+- The UI can key explanations off stable ids rather than display strings.
+- Empty and degenerate states are self-explanatory through warnings.
+- Adding a new warning type requires assigning it a place in the documented emission order.
+- Tie-breaking continues to rely on `localeCompare` (per ADR-007), which is deterministic on a given runtime but not guaranteed byte-stable across ICU environments; acceptable for MVP, revisit only if cross-machine reproducibility becomes a hard requirement.
+- Explanations inherit engine determinism guarantees; no additional randomness exists in the layer.

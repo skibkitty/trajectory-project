@@ -6,11 +6,11 @@ Domain core complete (Phases 1–4 of the implementation plan: model, graph, sch
 
 ## Current Task
 
-TASK-006 — Implement recommendation explainability
+TASK-007 — Implement scenario simulation
 
 ## State
 
-TASK-005 is complete and merged to main (PR #4, feat/005b-composable-factors). The deterministic decision engine evaluates eligible candidates with a composable additive scoring model, documented normalization and tie-breaking (ADR-007), and structured per-factor breakdowns. The next task is to deepen explainability into a full recommendation structure with machine-readable factors, assumptions, and warnings.
+TASK-006 is complete and awaiting review/merge on branch feat/006-recommendation-explainability. The recommendation layer (`recommendNextTask`) wraps the deterministic engine with a full explanation structure: machine-readable factor ids, a fixed-order assumption list, condition-triggered warnings with stable ids and emission order (ADR-008), and an explainable empty state when nothing is eligible. The next task is scenario simulation.
 
 ## Completed
 
@@ -19,7 +19,7 @@ TASK-005 is complete and merged to main (PR #4, feat/005b-composable-factors). T
 - opencode.json (default_agent: builder)
 - agent definitions (builder, tester, reviewer, orchestrator)
 - architecture document
-- decision record (ADR-001 through ADR-007)
+- decision record (ADR-001 through ADR-008)
 - task backlog
 - progress log
 - handoff document
@@ -39,10 +39,13 @@ TASK-005 is complete and merged to main (PR #4, feat/005b-composable-factors). T
 - Decision engine: eligibility rules, composable additive scoring (six default factors), deterministic lexicographic tie-breaking, structured factor breakdowns, frozen results
 - Decision engine tests (31 tests = 102 total passing across 8 files)
 - ADR-007 documenting eligibility, scoring model, normalization, tie-breaking, and selection policy; ADR-004 marked Accepted
+- Recommendation explainability: `recommendNextTask` with machine-readable factor ids, fixed-order assumptions, ordered conditional warnings, explainable empty state, frozen deterministic output
+- Engine additions: stable factor ids on `EvaluationFactor`, normalization `maxValues` exposed on `EvaluationResult`
+- Recommendation tests (21 tests + 2 new engine tests = 125 total passing across 9 files)
+- ADR-008 documenting the explainability representation
 
 ## Not Yet Started
 
-- recommendation assumptions/warnings layer (TASK-006)
 - scenario simulation
 - persistence
 - application services
@@ -61,11 +64,11 @@ These are intentionally provisional:
 
 ## Next Recommended Action
 
-Implement TASK-006 — Implement recommendation explainability.
+Implement TASK-007 — Implement scenario simulation.
 
 ## Verification
 
-TASK-005 verification is complete. All commands pass: `npm run verify` (typecheck, 102 tests, lint, format).
+TASK-006 verification is complete. All commands pass: `npm run verify` (typecheck, 125 tests, lint, format).
 
 ## Important Constraint
 
