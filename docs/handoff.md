@@ -2,15 +2,15 @@
 
 ## Phase
 
-Domain core complete (Phases 1–5 of the implementation plan: model, graph, scheduling, decision engine, scenario simulation)
+Domain core complete (Phases 1–5 of the implementation plan: model, graph, scheduling, decision engine, scenario simulation). Persistence implemented.
 
 ## Current Task
 
-TASK-008 — Implement local persistence
+TASK-009 — Build application services
 
 ## State
 
-TASK-007 is implemented on branch feat/007-scenario-simulation (not yet merged). The simulation layer (`applyScenario`, `simulateScenario`) derives projected project state without mutating the baseline: `delay-task`, `change-effort`, and `remove-task` scenarios are supported; deadline-change scenarios are deferred until a date model exists (ADR-009). Results compare baseline vs. projected duration, critical path, and recommended task, and report affected downstream tasks filtered to those whose schedule windows actually changed. The next task is persistence.
+TASK-008 is implemented on branch feat/008-local-persistence. The persistence layer provides a `ProjectRepository` interface in the application layer and a `LocalProjectRepository` implementation in infrastructure, backed by an abstract `StorageProvider` to avoid browser API coupling. Serialization uses a versioned `ProjectData` format with schema validation; invalid or mismatched schema versions are deterministically rejected. All 180 tests pass. The next task is application services.
 
 ## Completed
 
@@ -19,7 +19,7 @@ TASK-007 is implemented on branch feat/007-scenario-simulation (not yet merged).
 - opencode.json (default_agent: builder)
 - agent definitions (builder, tester, reviewer, orchestrator)
 - architecture document
-- decision record (ADR-001 through ADR-008)
+- decision record (ADR-001 through ADR-010)
 - task backlog
 - progress log
 - handoff document
@@ -49,10 +49,12 @@ TASK-007 is implemented on branch feat/007-scenario-simulation (not yet merged).
 - Simulation comparisons: duration delta, critical-path change, recommendation change, value removed on de-scope
 - Affected-downstream reporting filtered to tasks whose schedule windows actually changed
 - Simulation tests (20 tests = 149 total passing across 10 files)
+- Persistence layer: `ProjectRepository` interface, `LocalProjectRepository` implementation, versioned serialization, `StorageProvider` abstraction
+- ADR-010 documenting persistence design
+- Persistence tests (31 tests = 180 total passing across 11 files)
 
 ## Not Yet Started
 
-- persistence
 - application services
 - UI
 
@@ -69,11 +71,11 @@ These are intentionally provisional:
 
 ## Next Recommended Action
 
-Merge feat/007-scenario-simulation, then implement TASK-008 — Implement local persistence.
+Merge feat/008-local-persistence, then implement TASK-009 — Build application services.
 
 ## Verification
 
-TASK-007 verification is complete. All commands pass: `npm run verify` (typecheck, 149 tests, lint, format).
+TASK-008 verification is complete. All commands pass: `npm run verify` (typecheck, 180 tests, lint, format).
 
 ## Important Constraint
 

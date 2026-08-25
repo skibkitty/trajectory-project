@@ -208,3 +208,33 @@ TASK-007 requires comparing a baseline project state with deterministic what-if 
 - Because delay/change-effort rebuild one task, any future task fields added to `CreateTaskInput`/`Task` must be carried through `rebuildTask` or they will be silently reset during those scenarios.
 - Cross-side score comparison is not meaningful when the task pool shrinks; documentation and UI copy must not imply it is.
 - Deadline scenarios remain unimplemented until a date model is decided and approved.
+
+## ADR-010 — Local Persistence Design
+
+### Status
+Accepted
+
+### Context
+TASK-008 requires persisting projects locally behind a repository abstraction. The domain layer must remain independent of browser APIs and persistence implementations. The stored format must be versioned from the first durable implementation.
+
+### Decision
+
+- **Repository interface**: `ProjectRepository` in `src/application/repository.ts` defines `save`, `load`, `list`, and `delete` methods. All methods are async to support future filesystem or network backends, even though the current localStorage-backed implementation is synchronous.
+- **Storage abstraction**: `StorageProvider` in `src/infrastructure/storage.ts` defines `getItem`, `setItem`, `removeItem`, and `keys`. This decouples the repository from any specific storage mechanism (localStorage, Node.js fs, in-memory, etc.) and enables testing without browser APIs.
+- **Concrete implementation**: `LocalProjectRepository` in `src/infrastructure/local-repository.ts` uses a `StorageProvider` to persist projects under prefixed keys (`trajectory:project:{id}`). It serializes to JSON on save and deserializes on load.
+- **Serialization format**: `ProjectData` in `src/infrastructure/serialization.ts` mirrors the domain model with an added `schemaVersion` field. Version 1 is the initial format. Serialized output is deeply frozen.
+- **Schema validation**: deserialization validates `schemaVersion` strictly — older versions are rejected (no implicit migration), newer versions are rejected (data may be incomparable), and the current version proceeds with field validation.
+- **Field validation**: every required field is type-checked; missing optional fields fall back to domain defaults via `createTask`, `createGoal`, and `createProject` factories — the same invariant validation used elsewhere.
+- **Corrupted data handling**: `list()` skips entries that fail JSON parsing or deserialization rather than failing the entire list. `load()` propagates deserialization errors to the caller.
+- **Project summaries**: `list()` returns lightweight `ProjectSummary` objects (id, name, description, task count, goal count) sorted by id, avoiding deserialization of full project graphs when only metadata is needed.
+
+### Alternatives considered
+- Embedding persistence in the domain layer: rejected — violates ADR-002 (domain independence).
+- Using `any` or untyped JSON without schema versioning: rejected — the first durable format must be versioned per PROJECT_PLAN §14.
+- Migrating older schema versions automatically: deferred — the format is young enough that rejection is simpler and safer than migration logic.
+
+### Consequences
+- The repository interface can be implemented by any backend without changing domain or application code.
+- Testing uses an in-memory `StorageProvider` with no filesystem or browser dependency.
+- Schema versioning provides a foundation for future migration logic when the format changes.
+- Serialization round-trips are covered by dedicated tests; repository CRUD, list ordering, and corrupted-entry handling are also tested.
