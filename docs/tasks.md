@@ -144,7 +144,7 @@ Acceptance criteria:
 
 ## TASK-007 — Implement scenario simulation
 
-Status: DONE
+Status: BACKLOG
 
 Goal:
 Compare a baseline project state with deterministic what-if scenarios.

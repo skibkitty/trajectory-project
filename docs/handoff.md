@@ -2,15 +2,15 @@
 
 ## Phase
 
-Domain core complete (Phases 1–5 of the implementation plan: model, graph, scheduling, decision engine, scenario simulation)
+Domain core complete (Phases 1–4 of the implementation plan: model, graph, scheduling, decision engine)
 
 ## Current Task
 
-TASK-008 — Implement local persistence
+TASK-007 — Implement scenario simulation
 
 ## State
 
-TASK-007 is implemented on branch feat/007-scenario-simulation (not yet merged). The simulation layer (`applyScenario`, `simulateScenario`) derives projected project state without mutating the baseline: `delay-task`, `change-effort`, and `remove-task` scenarios are supported; deadline-change scenarios are deferred until a date model exists (ADR-009). Results compare baseline vs. projected duration, critical path, and recommended task, and report affected downstream tasks filtered to those whose schedule windows actually changed. The next task is persistence.
+TASK-006 is complete and awaiting review/merge on branch feat/006-recommendation-explainability. The recommendation layer (`recommendNextTask`) wraps the deterministic engine with a full explanation structure: machine-readable factor ids, a fixed-order assumption list, condition-triggered warnings with stable ids and emission order (ADR-008), and an explainable empty state when nothing is eligible. The next task is scenario simulation.
 
 ## Completed
 
@@ -44,14 +44,10 @@ TASK-007 is implemented on branch feat/007-scenario-simulation (not yet merged).
 - Review follow-up: deep freezing applied to all result objects (evaluations, factors, assumptions, warnings), `TaskEvaluation`-typed warning inputs, readable multi-metric warning formatting, additional edge-case tests
 - Recommendation tests (24 tests + 1 new engine test = 129 total passing across 9 files)
 - ADR-008 documenting the explainability representation
-- Scenario simulation: `applyScenario` and `simulateScenario` deriving projected state without mutating the baseline
-- Three scenario kinds: `delay-task`, `change-effort`, `remove-task`; deadline scenarios deferred until a date model exists (ADR-009)
-- Simulation comparisons: duration delta, critical-path change, recommendation change, value removed on de-scope
-- Affected-downstream reporting filtered to tasks whose schedule windows actually changed
-- Simulation tests (20 tests = 149 total passing across 10 files)
 
 ## Not Yet Started
 
+- scenario simulation
 - persistence
 - application services
 - UI
@@ -69,11 +65,11 @@ These are intentionally provisional:
 
 ## Next Recommended Action
 
-Merge feat/007-scenario-simulation, then implement TASK-008 — Implement local persistence.
+Implement TASK-007 — Implement scenario simulation.
 
 ## Verification
 
-TASK-007 verification is complete. All commands pass: `npm run verify` (typecheck, 149 tests, lint, format).
+TASK-006 verification is complete. All commands pass: `npm run verify` (typecheck, 129 tests, lint, format).
 
 ## Important Constraint
 
