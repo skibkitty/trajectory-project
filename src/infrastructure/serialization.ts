@@ -1,5 +1,10 @@
 import type { Project, Task, Goal, TaskStatus } from "../domain/index.js";
-import { createProject, createTask, createGoal } from "../domain/index.js";
+import {
+  createProject,
+  createTask,
+  createGoal,
+  ALL_TASK_STATUSES,
+} from "../domain/index.js";
 
 export const CURRENT_SCHEMA_VERSION = 1;
 
@@ -172,13 +177,7 @@ function deserializeTask(data: unknown): Task {
   });
 }
 
-const VALID_STATUSES = new Set([
-  "BACKLOG",
-  "TODO",
-  "IN_PROGRESS",
-  "BLOCKED",
-  "DONE",
-]);
+const VALID_STATUSES = new Set<string>(ALL_TASK_STATUSES);
 
 function isValidTaskStatus(value: unknown): value is TaskStatus {
   return typeof value === "string" && VALID_STATUSES.has(value);
