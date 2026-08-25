@@ -166,3 +166,26 @@ Completed:
 - Verified all commands pass: `npm run verify`
 
 Next: TASK-008 — Implement local persistence.
+
+## 2026-08-25 — Local persistence implemented (TASK-008)
+
+Completed:
+- Implemented `ProjectRepository` interface in `src/application/repository.ts` with `save`, `load`, `list`, `delete` methods
+- Implemented `StorageProvider` interface in `src/infrastructure/storage.ts` to abstract away browser API coupling
+- Implemented `LocalProjectRepository` in `src/infrastructure/local-repository.ts` backed by `StorageProvider`
+- Implemented versioned serialization in `src/infrastructure/serialization.ts` with `serialize`/`deserialize` functions
+- Serialization format (`ProjectData`) includes `schemaVersion` field; version 1 is the initial format
+- Deserialization validates schema version (rejects older and newer), validates all fields, and falls back to domain defaults for missing optional fields
+- Deserialization rejects corrupted or malformed data deterministically with descriptive errors
+- `list()` returns project summaries sorted by id, skipping any corrupted entries
+- Barrel exports added for `src/application` and `src/infrastructure`
+- Added ADR-010 documenting persistence design (StorageProvider abstraction, serialization format, schema versioning, rejection strategy)
+- Wrote 31 persistence tests covering: round-trip serialization, schema version validation, field validation, default values, frozen output, repository CRUD operations, list sorting, corrupted entry handling, and JSON round-trip through storage
+- Total: 180 tests passing across 11 test files
+- Verified all commands pass: `npm run verify`
+
+Persistence architecture:
+- `ProjectRepository` (application layer) — the persistence contract
+- `StorageProvider` (infrastructure) — abstracts key-value storage
+- `LocalProjectRepository` (infrastructure) — concrete implementation
+- `ProjectData` — versioned serialization format with schema validation

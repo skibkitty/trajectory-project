@@ -161,7 +161,7 @@ Acceptance criteria:
 
 ## TASK-008 — Implement local persistence
 
-Status: BACKLOG
+Status: DONE
 
 Goal:
 Persist projects behind a repository abstraction.
