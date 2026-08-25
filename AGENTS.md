@@ -54,7 +54,8 @@ After implementation:
 5. Update `docs/handoff.md`.
 6. Append meaningful information to `docs/progress.md`.
 7. Commit only when the task is ready.
-8. If the task was implemented on a feature branch, remind the human to merge or push the branch. If on `main`, remind the human to create a feature branch for future tasks.
+8. Push the feature branch (`git push -u origin feat/NNN-task-slug`).
+9. **Do not merge to `main` directly.** Create a pull request on GitHub and wait for human review before merging. This applies even if the branch is ready and all checks pass.
 
 ## Branching Workflow
 

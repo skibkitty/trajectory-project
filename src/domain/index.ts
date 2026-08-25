@@ -33,3 +33,13 @@ export type {
   Assumption,
   RecommendationWarning,
 } from "./decision/recommendation.js";
+
+export { applyScenario, simulateScenario } from "./simulation/simulation.js";
+export type {
+  Scenario,
+  DelayTaskScenario,
+  ChangeEffortScenario,
+  RemoveTaskScenario,
+  SimulationSide,
+  SimulationResult,
+} from "./simulation/simulation.js";
