@@ -28,22 +28,6 @@ export class RecommendationService {
       throw new Error(`Project not found: ${projectId}`);
     }
 
-    if (project.tasks.length === 0) {
-      return {
-        taskId: null,
-        score: null,
-        factors: [],
-        assumptions: [],
-        warnings: [
-          {
-            id: "no-eligible-tasks",
-            message: "No tasks available for recommendation",
-            affectedTaskIds: [],
-          },
-        ],
-      };
-    }
-
     const graph = createDependencyGraph(project.tasks);
     const schedule = calculateSchedule(project.tasks, graph);
 

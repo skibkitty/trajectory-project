@@ -1,5 +1,9 @@
 import type { Task, CreateTaskInput } from "../domain/index.js";
-import { createTask, createProject } from "../domain/index.js";
+import {
+  createTask,
+  createProject,
+  createDependencyGraph,
+} from "../domain/index.js";
 import type { ProjectRepository } from "./repository.js";
 
 function toCreateTaskInput(task: Task): CreateTaskInput {
@@ -39,6 +43,13 @@ export class DependencyService {
       throw new Error(`Task not found: ${taskId}`);
     }
 
+    const prerequisiteExists = project.tasks.some(
+      (t) => t.id === prerequisiteId,
+    );
+    if (!prerequisiteExists) {
+      throw new Error(`Task not found: ${prerequisiteId}`);
+    }
+
     const existingTask = project.tasks[taskIndex];
 
     if (existingTask.dependencies.includes(prerequisiteId)) {
@@ -52,6 +63,13 @@ export class DependencyService {
 
     const updatedTasks = [...project.tasks];
     updatedTasks[taskIndex] = updatedTask;
+
+    const projectedGraph = createDependencyGraph(updatedTasks);
+    if (projectedGraph.hasCycle()) {
+      throw new Error(
+        `Adding dependency "${prerequisiteId}" -> "${taskId}" would create a cycle`,
+      );
+    }
 
     const updatedProject = createProject({
       ...project,
