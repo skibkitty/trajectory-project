@@ -2,15 +2,15 @@
 
 ## Phase
 
-Domain core complete (Phases 1–5 of the implementation plan: model, graph, scheduling, decision engine, scenario simulation). Persistence implemented.
+Domain core complete (Phases 1–5 of the implementation plan: model, graph, scheduling, decision engine, scenario simulation). Persistence implemented. Application services implemented.
 
 ## Current Task
 
-TASK-009 — Build application services
+TASK-009 — Build application services (in review on feat/009-application-services)
 
 ## State
 
-TASK-008 is implemented on branch feat/008-local-persistence. The persistence layer provides a `ProjectRepository` interface in the application layer and a `LocalProjectRepository` implementation in infrastructure, backed by an abstract `StorageProvider` to avoid browser API coupling. Serialization uses a versioned `ProjectData` format with schema validation; invalid or mismatched schema versions are deterministically rejected. All 180 tests pass. The next task is application services.
+TASK-009 implements application services that connect domain operations to persistence through explicit use cases. Six services are provided: `ProjectService`, `TaskService`, `GoalService`, `DependencyService`, `RecommendationService`, and `ScenarioService`. All use dependency injection via the `ProjectRepository` interface. All 213 tests pass.
 
 ## Completed
 
@@ -52,10 +52,13 @@ TASK-008 is implemented on branch feat/008-local-persistence. The persistence la
 - Persistence layer: `ProjectRepository` interface, `LocalProjectRepository` implementation, versioned serialization, `StorageProvider` abstraction
 - ADR-010 documenting persistence design
 - Persistence tests (31 tests = 180 total passing across 11 files)
+- Application services: `ProjectService`, `TaskService`, `GoalService`, `DependencyService`, `RecommendationService`, `ScenarioService`
+- Services use dependency injection via `ProjectRepository` interface
+- Services are independently testable with stub repositories
+- Application service tests (33 tests = 213 total passing across 17 files)
 
 ## Not Yet Started
 
-- application services
 - UI
 
 ## Human Decisions Still Needed
@@ -71,11 +74,11 @@ These are intentionally provisional:
 
 ## Next Recommended Action
 
-Merge feat/008-local-persistence, then implement TASK-009 — Build application services.
+Review and merge feat/009-application-services, then implement TASK-010 — Build recommendation dashboard.
 
 ## Verification
 
-TASK-008 verification is complete. All commands pass: `npm run verify` (typecheck, 180 tests, lint, format).
+TASK-009 verification is complete. All commands pass: `npm run verify` (typecheck, 213 tests, lint, format).
 
 ## Important Constraint
 

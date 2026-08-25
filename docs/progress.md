@@ -189,3 +189,30 @@ Persistence architecture:
 - `StorageProvider` (infrastructure) — abstracts key-value storage
 - `LocalProjectRepository` (infrastructure) — concrete implementation
 - `ProjectData` — versioned serialization format with schema validation
+
+## 2026-08-25 — Application services implemented (TASK-009)
+
+Completed:
+- Implemented six application services: `ProjectService`, `TaskService`, `GoalService`, `DependencyService`, `RecommendationService`, `ScenarioService`
+- All services use dependency injection via the `ProjectRepository` interface
+- `ProjectService` — create, get, update, delete, and list projects
+- `TaskService` — add, update status, remove, and get tasks within a project
+- `GoalService` — add and remove goals within a project
+- `DependencyService` — add and remove task prerequisite dependencies
+- `RecommendationService` — get recommendations and project graph/schedule data
+- `ScenarioService` — run what-if scenarios against a project
+- `toCreateTaskInput` helper to bridge Task (with `goalId: string | null`) to CreateTaskInput (with `goalId?: string`)
+- Barrel exports added for all application services
+- Wrote 33 application service tests covering: CRUD operations, idempotency, error handling, and integration with domain logic
+- Total: 213 tests passing across 17 files
+- Verified all commands pass: `npm run verify`
+
+Service architecture:
+- `ProjectService` — project lifecycle management
+- `TaskService` — task CRUD with dependency reference cleanup on removal
+- `GoalService` — goal CRUD
+- `DependencyService` — dependency graph management at the service level
+- `RecommendationService` — wraps domain recommendation and graph/schedule computation
+- `ScenarioService` — wraps domain scenario simulation
+
+Next: TASK-010 — Build recommendation dashboard.

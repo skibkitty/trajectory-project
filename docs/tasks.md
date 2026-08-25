@@ -177,13 +177,24 @@ Acceptance criteria:
 
 ## TASK-009 — Build application services
 
-Status: BACKLOG
+Status: REVIEW
 
 Goal:
 Connect domain operations to persistence through explicit use cases.
 
 Prerequisites:
 TASK-005, TASK-007, TASK-008
+
+Acceptance criteria:
+- application services coordinate domain logic with persistence
+- project CRUD service exists
+- task CRUD service exists
+- goal CRUD service exists
+- dependency management service exists
+- recommendation service exists
+- scenario service exists
+- services use dependency injection (repository interface)
+- services are independently testable with stub repositories
 
 ## TASK-010 — Build recommendation dashboard
 
