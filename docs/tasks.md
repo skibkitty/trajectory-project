@@ -177,7 +177,7 @@ Acceptance criteria:
 
 ## TASK-009 — Build application services
 
-Status: REVIEW
+Status: DONE
 
 Goal:
 Connect domain operations to persistence through explicit use cases.
@@ -198,7 +198,7 @@ Acceptance criteria:
 
 ## TASK-010 — Build recommendation dashboard
 
-Status: BACKLOG
+Status: IN_PROGRESS
 
 Goal:
 Create the primary product demonstration surface.

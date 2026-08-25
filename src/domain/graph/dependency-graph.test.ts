@@ -284,27 +284,27 @@ describe("immutability", () => {
   it("returns fresh copies so callers cannot corrupt internal state", () => {
     const g = graph(task("a", ["b"]), task("b"));
     expect(g.taskIds).toEqual(["a", "b"]);
-    const ids = g.taskIds;
+    const ids = g.taskIds as string[];
     ids.push("corrupted");
     expect(g.taskIds).toEqual(["a", "b"]);
 
     expect(g.getPrerequisites("a")).toEqual(["b"]);
-    const prereqs = g.getPrerequisites("a");
+    const prereqs = g.getPrerequisites("a") as string[];
     prereqs.push("corrupted");
     expect(g.getPrerequisites("a")).toEqual(["b"]);
 
     expect(g.getAllDependents("b")).toEqual(["a"]);
-    const dependents = g.getAllDependents("b");
+    const dependents = g.getAllDependents("b") as string[];
     dependents.push("corrupted");
     expect(g.getAllDependents("b")).toEqual(["a"]);
 
     expect(g.getCyclicTaskIds()).toEqual([]);
-    const cyclic = g.getCyclicTaskIds();
+    const cyclic = g.getCyclicTaskIds() as string[];
     cyclic.push("corrupted");
     expect(g.getCyclicTaskIds()).toEqual([]);
 
     expect(g.topologicalOrder()).toEqual(["b", "a"]);
-    const order = g.topologicalOrder();
+    const order = g.topologicalOrder() as string[];
     order.push("corrupted");
     expect(g.topologicalOrder()).toEqual(["b", "a"]);
   });
