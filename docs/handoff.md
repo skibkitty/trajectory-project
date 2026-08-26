@@ -2,15 +2,15 @@
 
 ## Phase
 
-Domain core complete (Phases 1–5 of the implementation plan: model, graph, scheduling, decision engine, scenario simulation). Persistence implemented. Application services implemented.
+Domain core complete (Phases 1–5 of the implementation plan: model, graph, scheduling, decision engine, scenario simulation). Persistence implemented. Application services implemented. UI foundation started.
 
 ## Current Task
 
-TASK-009 — Build application services (in review on feat/009-application-services)
+TASK-010 — Build recommendation dashboard (in progress on feat/010-recommendation-dashboard)
 
 ## State
 
-TASK-009 implements application services that connect domain operations to persistence through explicit use cases. Six services are provided: `ProjectService`, `TaskService`, `GoalService`, `DependencyService`, `RecommendationService`, and `ScenarioService`. All use dependency injection via the `ProjectRepository` interface. All 213 tests pass.
+TASK-010 introduces React + Vite as the UI framework and implements the recommendation dashboard. The dashboard displays the recommended task with its scoring factors, warnings, assumptions, and a full project task table. 236 tests pass.
 
 ## Completed
 
@@ -56,10 +56,16 @@ TASK-009 implements application services that connect domain operations to persi
 - Services use dependency injection via `ProjectRepository` interface
 - Services are independently testable with stub repositories
 - Application service tests (33 tests = 213 total passing across 17 files)
+- React + Vite UI framework introduced (first runtime dependency)
+- UI components: `Dashboard`, `ProjectSelector`, `RecommendationPanel`, `FactorBreakdown`, `WarningsPanel`, `TaskList`
+- `DashboardContext` for dependency injection of services
+- Component tests using Vitest + React Testing Library + jsdom
+- 23 component tests (236 total passing across 23 files)
 
 ## Not Yet Started
 
-- UI
+- Dependency visualization (TASK-011)
+- Scenario comparison UI (TASK-012)
 
 ## Human Decisions Still Needed
 
@@ -68,17 +74,16 @@ These are intentionally provisional:
 1. Final product name and availability.
 2. Exact decision-engine weights.
 3. Exact scheduling/calendar semantics.
-4. Final UI technology selection.
-5. Final MVP scenario scope.
-6. Benchmark methodology.
+4. Final MVP scenario scope.
+5. Benchmark methodology.
 
 ## Next Recommended Action
 
-Review and merge feat/009-application-services, then implement TASK-010 — Build recommendation dashboard.
+Complete TASK-010 (fix review issues, merge to main), then implement TASK-011 — Build dependency visualization.
 
 ## Verification
 
-TASK-009 verification is complete. All commands pass: `npm run verify` (typecheck, 213 tests, lint, format).
+TASK-010 verification is complete. All commands pass: `npm run verify` (typecheck, 236 tests, lint, format).
 
 ## Important Constraint
 
