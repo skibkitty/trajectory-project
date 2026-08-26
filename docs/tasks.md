@@ -198,7 +198,7 @@ Acceptance criteria:
 
 ## TASK-010 — Build recommendation dashboard
 
-Status: IN_PROGRESS
+Status: DONE
 
 Goal:
 Create the primary product demonstration surface.
@@ -211,15 +211,51 @@ Acceptance criteria:
 - explanation factors are visible
 - user can inspect why a task was selected
 
-## TASK-011 — Build dependency visualization
+## TASK-010.5 — Add application entry points
+
+Status: DONE
+
+Goal:
+Make the application runnable in a browser.
+
+Prerequisites:
+TASK-010
+
+Acceptance criteria:
+- index.html exists at project root with a mount point
+- main.tsx renders the Dashboard into that mount point
+- App.tsx provides the top-level layout
+- `npm run dev` starts the dev server without errors
+- the dashboard is visible in the browser
+
+Verification:
+- npm run dev starts successfully
+- browser shows the Trajectory dashboard
+
+## TASK-011 — Build project editor, CRUD UI, sample data, and dependency visualization
 
 Status: BACKLOG
 
 Goal:
-Visually demonstrate graph and critical-path analysis.
+Let the user create and manage projects/tasks through the UI, provide sample data for demoing, and visually demonstrate graph and critical-path analysis.
 
 Prerequisites:
 TASK-010
+
+Acceptance criteria:
+- user can create a new project from the UI
+- user can add tasks to a project with metadata (title, value, urgency, effort, confidence, status)
+- user can add/remove task dependencies from the UI
+- a sample project with realistic tasks and dependencies is seeded on first load (or available via a button)
+- dependency graph is rendered visually (nodes = tasks, edges = dependencies)
+- critical path is visually distinguished from non-critical tasks
+- task status and metadata are visible on the graph
+- cycle detection errors are shown in the UI when they occur
+- recommendation updates live as project state changes
+
+Verification:
+- npm run dev → create project → add tasks → add dependencies → see graph update
+- sample project loads and shows recommendation, graph, and critical path
 
 ## TASK-012 — Build scenario comparison
 
@@ -260,6 +296,14 @@ Make the application polished and demonstrable.
 
 Prerequisites:
 TASK-013
+
+Acceptance criteria:
+- visual design: consistent spacing, typography, color palette, and layout across all views
+- keyboard navigation works for all interactive elements
+- ARIA labels and roles on interactive components
+- responsive behavior at common viewport widths
+- loading and empty states are styled, not just text
+- focus management is correct on route/state changes
 
 ## TASK-016 — CI/CD
 

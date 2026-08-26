@@ -216,3 +216,25 @@ Service architecture:
 - `ScenarioService` — wraps domain scenario simulation
 
 Next: TASK-010 — Build recommendation dashboard.
+
+## 2026-08-26 — Recommendation dashboard implemented (TASK-010)
+
+Completed:
+- Introduced React + Vite as the UI framework (first runtime dependency)
+- UI components: `Dashboard`, `ProjectSelector`, `RecommendationPanel`, `FactorBreakdown`, `WarningsPanel`, `TaskList`
+- Component tests using Vitest + React Testing Library + jsdom
+- 21 component tests across 7 test files
+- Verified all commands pass: `npm run verify`
+
+## 2026-08-26 — Application entry points added (TASK-010.5)
+
+Completed:
+- Created `index.html` at project root with a `#root` mount point
+- Created `src/main.tsx` rendering `<App />` inside `<StrictMode>`
+- Created `src/App.tsx` wiring up `LocalProjectRepository` with `createLocalStorageProvider` and passing services to `<Dashboard />`
+- Created `src/infrastructure/local-storage.ts` — `createLocalStorageProvider` adapter bridging `StorageProvider` to browser `localStorage`
+- Added `createLocalStorageProvider` to infrastructure barrel export
+- Application is runnable via `npm run dev`; build succeeds with `npm run build`
+- Verified all commands pass: `npm run verify` (typecheck, 234 tests, lint, format)
+
+Next: TASK-011 — Build dependency visualization.
