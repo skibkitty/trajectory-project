@@ -2,15 +2,15 @@
 
 ## Phase
 
-Domain core complete (Phases 1–5 of the implementation plan: model, graph, scheduling, decision engine, scenario simulation). Persistence implemented. Application services implemented. UI foundation complete.
+Domain core complete (Phases 1–5 of the implementation plan: model, graph, scheduling, decision engine, scenario simulation). Persistence implemented. Application services implemented. UI foundation complete. CRUD UI and dependency visualization in progress.
 
 ## Current Task
 
-TASK-010.5 — Add application entry points (DONE on feat/010.5-entry-points)
+TASK-011 — Build project editor, CRUD UI, sample data, and dependency visualization (in progress on feat/011-crud-ui-and-visualization)
 
 ## State
 
-TASK-010 introduced React + Vite as the UI framework and implements the recommendation dashboard. TASK-010.5 adds the entry point files so the application is runnable in a browser with `npm run dev`. 234 tests pass.
+TASK-011 adds CRUD forms (create project, add tasks, manage dependencies), sample data seeding, and an SVG dependency graph visualization with critical-path highlighting. 253 tests pass.
 
 ## Completed
 
@@ -63,10 +63,14 @@ TASK-010 introduced React + Vite as the UI framework and implements the recommen
 - Application entry points: `index.html`, `src/main.tsx`, `src/App.tsx`
 - `createLocalStorageProvider` adapter bridging `StorageProvider` to browser localStorage
 - Application is runnable via `npm run dev`
+- CRUD UI: `ProjectForm`, `TaskForm`, `DependencyEditor` components
+- Sample data: `createSampleProject` with realistic tasks, dependencies, and goals
+- Dependency graph visualization: SVG-based with topological layout, critical-path highlighting, status colors, and legend
+- Graph layout utility: `computeLayout` with deterministic layer assignment
+- 19 new component tests (253 total passing across 27 files)
 
 ## Not Yet Started
 
-- Dependency visualization (TASK-011)
 - Scenario comparison UI (TASK-012)
 
 ## Human Decisions Still Needed
@@ -81,11 +85,11 @@ These are intentionally provisional:
 
 ## Next Recommended Action
 
-Merge feat/010.5-entry-points to main, then implement TASK-011 — Build dependency visualization.
+Complete TASK-011 review, merge to main, then implement TASK-012 — Build scenario comparison.
 
 ## Verification
 
-TASK-010.5 verification is complete. All commands pass: `npm run verify` (typecheck, 234 tests, lint, format). Build succeeds: `npm run build`. Dev server starts: `npm run dev`.
+TASK-011 verification is complete. All commands pass: `npm run verify` (typecheck, 253 tests, lint, format). Build succeeds: `npm run build`. Dev server starts: `npm run dev`.
 
 ## Important Constraint
 
