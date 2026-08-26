@@ -16,15 +16,27 @@ export function RecommendationPanel({
   const [recommendation, setRecommendation] = useState<Recommendation | null>(
     null,
   );
+  const [taskTitles, setTaskTitles] = useState<ReadonlyMap<string, string>>(
+    new Map(),
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const loadRecommendation = useCallback(async () => {
+    setRecommendation(null);
     setLoading(true);
     setError(null);
     try {
-      const rec = await recommendationService.getRecommendation(projectId);
+      const [rec, graphData] = await Promise.all([
+        recommendationService.getRecommendation(projectId),
+        recommendationService.getGraph(projectId),
+      ]);
       setRecommendation(rec);
+      const titles = new Map<string, string>();
+      for (const task of graphData.tasks) {
+        titles.set(task.id, task.title);
+      }
+      setTaskTitles(titles);
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Failed to load recommendation",
@@ -81,7 +93,15 @@ export function RecommendationPanel({
       <h2>Recommendation</h2>
       <div className="recommendation-card" data-testid="recommendation-card">
         <div className="recommendation-task">
-          <h3>{recommendation.taskId}</h3>
+          <h3>
+            {recommendation.taskId}
+            {taskTitles.get(recommendation.taskId) && (
+              <span className="task-title">
+                {" — "}
+                {taskTitles.get(recommendation.taskId)}
+              </span>
+            )}
+          </h3>
           <span className="recommendation-score">
             Score: {recommendation.score}
           </span>

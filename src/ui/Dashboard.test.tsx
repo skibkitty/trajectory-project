@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import { Dashboard } from "./Dashboard.js";
-import { DashboardProvider } from "./DashboardContext.js";
 import { ProjectService } from "../application/project-service.js";
 import { RecommendationService } from "../application/recommendation-service.js";
 import type { ProjectRepository } from "../application/repository.js";
@@ -76,15 +75,10 @@ describe("Dashboard", () => {
 
   it("renders the Trajectory heading", () => {
     render(
-      <DashboardProvider
+      <Dashboard
         projectService={projectService}
         recommendationService={recommendationService}
-      >
-        <Dashboard
-          projectService={projectService}
-          recommendationService={recommendationService}
-        />
-      </DashboardProvider>,
+      />,
     );
     expect(screen.getByText("Trajectory")).toBeInTheDocument();
   });
@@ -102,15 +96,10 @@ describe("Dashboard", () => {
     vi.mocked(repository.list).mockResolvedValue([summary]);
 
     render(
-      <DashboardProvider
+      <Dashboard
         projectService={projectService}
         recommendationService={recommendationService}
-      >
-        <Dashboard
-          projectService={projectService}
-          recommendationService={recommendationService}
-        />
-      </DashboardProvider>,
+      />,
     );
 
     await waitFor(() => {
@@ -132,15 +121,10 @@ describe("Dashboard", () => {
     vi.mocked(repository.load).mockResolvedValue(project);
 
     render(
-      <DashboardProvider
+      <Dashboard
         projectService={projectService}
         recommendationService={recommendationService}
-      >
-        <Dashboard
-          projectService={projectService}
-          recommendationService={recommendationService}
-        />
-      </DashboardProvider>,
+      />,
     );
 
     await waitFor(() => {
@@ -169,15 +153,10 @@ describe("Dashboard", () => {
     vi.mocked(repository.load).mockResolvedValue(project);
 
     render(
-      <DashboardProvider
+      <Dashboard
         projectService={projectService}
         recommendationService={recommendationService}
-      >
-        <Dashboard
-          projectService={projectService}
-          recommendationService={recommendationService}
-        />
-      </DashboardProvider>,
+      />,
     );
 
     await waitFor(() => {

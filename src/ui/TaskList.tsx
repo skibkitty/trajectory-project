@@ -14,6 +14,8 @@ export function TaskList({ projectId, recommendationService }: TaskListProps) {
   const [error, setError] = useState<string | null>(null);
 
   const loadGraph = useCallback(async () => {
+    setTasks([]);
+    setSchedule(null);
     setLoading(true);
     setError(null);
     try {

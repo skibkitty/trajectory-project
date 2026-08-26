@@ -10,5 +10,3 @@ export { WarningsPanel } from "./WarningsPanel.js";
 export type { WarningsPanelProps } from "./WarningsPanel.js";
 export { TaskList } from "./TaskList.js";
 export type { TaskListProps } from "./TaskList.js";
-export { DashboardProvider, useDashboardContext } from "./DashboardContext.js";
-export type { DashboardContextValue } from "./DashboardContext.js";
