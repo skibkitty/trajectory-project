@@ -198,7 +198,7 @@ Acceptance criteria:
 
 ## TASK-010 — Build recommendation dashboard
 
-Status: IN_PROGRESS
+Status: DONE
 
 Goal:
 Create the primary product demonstration surface.
@@ -210,6 +210,27 @@ Acceptance criteria:
 - recommendation is immediately visible
 - explanation factors are visible
 - user can inspect why a task was selected
+
+## TASK-010.5 — Add application entry points
+
+Status: DONE
+
+Goal:
+Make the application runnable in a browser.
+
+Prerequisites:
+TASK-010
+
+Acceptance criteria:
+- index.html exists at project root with a mount point
+- main.tsx renders the Dashboard into that mount point
+- App.tsx provides the top-level layout
+- `npm run dev` starts the dev server without errors
+- the dashboard is visible in the browser
+
+Verification:
+- npm run dev starts successfully
+- browser shows the Trajectory dashboard
 
 ## TASK-011 — Build dependency visualization
 
