@@ -7,6 +7,9 @@ export interface PositionedNode {
   readonly x: number;
   readonly y: number;
   readonly layer: number;
+  readonly isCritical: boolean;
+  readonly status: string;
+  readonly title: string;
 }
 
 export interface GraphEdge {
@@ -34,8 +37,7 @@ export function computeNodePositions(
   tasks: readonly Task[],
   graph: DependencyGraph,
   schedule: ScheduleResult,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-): any[] {
+): PositionedNode[] {
   const topologicalOrder = graph.topologicalOrder();
   const layers = new Map<string, number>();
 
@@ -60,8 +62,7 @@ export function computeNodePositions(
   }
 
   const maxLayer = Math.max(...layers.values(), 0);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const positioned: any[] = [];
+  const positioned: PositionedNode[] = [];
 
   for (let layerIdx = 0; layerIdx <= maxLayer; layerIdx++) {
     const group = layerGroups.get(layerIdx) ?? [];
@@ -86,12 +87,10 @@ export function computeNodePositions(
 }
 
 export function computeEdges(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  positioned: readonly any[],
+  positioned: readonly PositionedNode[],
   graph: DependencyGraph,
 ): GraphEdge[] {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const nodeMap = new Map<string, any>();
+  const nodeMap = new Map<string, PositionedNode>();
   for (const node of positioned) {
     nodeMap.set(node.taskId, node);
   }
