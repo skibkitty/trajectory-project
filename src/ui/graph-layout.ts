@@ -1,15 +1,10 @@
-import type { Task } from "../domain/index.js";
 import type { DependencyGraph } from "../domain/index.js";
-import type { ScheduleResult } from "../domain/index.js";
 
 export interface PositionedNode {
   readonly taskId: string;
   readonly x: number;
   readonly y: number;
   readonly layer: number;
-  readonly isCritical: boolean;
-  readonly status: string;
-  readonly title: string;
 }
 
 export interface GraphEdge {
@@ -33,11 +28,7 @@ const NODE_HEIGHT = 60;
 const LAYER_SPACING = 120;
 const NODE_SPACING = 40;
 
-export function computeNodePositions(
-  tasks: readonly Task[],
-  graph: DependencyGraph,
-  schedule: ScheduleResult,
-): PositionedNode[] {
+export function computeNodePositions(graph: DependencyGraph): PositionedNode[] {
   const topologicalOrder = graph.topologicalOrder();
   const layers = new Map<string, number>();
 
@@ -68,17 +59,11 @@ export function computeNodePositions(
     const group = layerGroups.get(layerIdx) ?? [];
     for (let i = 0; i < group.length; i++) {
       const taskId = group[i];
-      const taskSchedule = schedule.taskSchedules.find(
-        (s) => s.taskId === taskId,
-      );
       positioned.push({
         taskId,
         x: layerIdx * (NODE_WIDTH + LAYER_SPACING),
         y: i * (NODE_HEIGHT + NODE_SPACING),
         layer: layerIdx,
-        isCritical: taskSchedule?.isCritical ?? false,
-        status: tasks.find((t) => t.id === taskId)?.status ?? "BACKLOG",
-        title: tasks.find((t) => t.id === taskId)?.title ?? taskId,
       });
     }
   }
@@ -116,12 +101,8 @@ export function computeEdges(
   return edges;
 }
 
-export function computeLayout(
-  tasks: readonly Task[],
-  graph: DependencyGraph,
-  schedule: ScheduleResult,
-): GraphLayout {
-  const positioned = computeNodePositions(tasks, graph, schedule);
+export function computeLayout(graph: DependencyGraph): GraphLayout {
+  const positioned = computeNodePositions(graph);
   const edges = computeEdges(positioned, graph);
 
   const maxX =

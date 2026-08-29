@@ -1,7 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { createTask } from "../domain/index.js";
 import { createDependencyGraph } from "../domain/index.js";
-import { calculateSchedule } from "../domain/index.js";
 import { computeLayout } from "./graph-layout.js";
 
 describe("graph-layout", () => {
@@ -12,8 +11,7 @@ describe("graph-layout", () => {
       createTask({ id: "c", title: "C", dependencies: ["b"] }),
     ];
     const graph = createDependencyGraph(tasks);
-    const schedule = calculateSchedule(tasks, graph);
-    const layout = computeLayout(tasks, graph, schedule);
+    const layout = computeLayout(graph);
 
     expect(layout.nodes).toHaveLength(3);
     expect(layout.edges).toHaveLength(2);
@@ -33,8 +31,7 @@ describe("graph-layout", () => {
       createTask({ id: "b", title: "B" }),
     ];
     const graph = createDependencyGraph(tasks);
-    const schedule = calculateSchedule(tasks, graph);
-    const layout = computeLayout(tasks, graph, schedule);
+    const layout = computeLayout(graph);
 
     const nodeA = layout.nodes.find((n) => n.taskId === "a");
     const nodeB = layout.nodes.find((n) => n.taskId === "b");
@@ -44,10 +41,8 @@ describe("graph-layout", () => {
   });
 
   it("returns empty layout for empty tasks", () => {
-    const tasks: ReturnType<typeof createTask>[] = [];
-    const graph = createDependencyGraph(tasks);
-    const schedule = calculateSchedule(tasks, graph);
-    const layout = computeLayout(tasks, graph, schedule);
+    const graph = createDependencyGraph([]);
+    const layout = computeLayout(graph);
 
     expect(layout.nodes).toHaveLength(0);
     expect(layout.edges).toHaveLength(0);

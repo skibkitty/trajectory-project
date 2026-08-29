@@ -23,10 +23,7 @@ export function DependencyGraphVisualization({
   graph,
   schedule,
 }: DependencyGraphProps) {
-  const layout = useMemo(
-    () => computeLayout(tasks, graph, schedule),
-    [tasks, graph, schedule],
-  );
+  const layout = useMemo(() => computeLayout(graph), [graph]);
 
   const criticalPathSet = useMemo(() => {
     const set = new Set<string>();
