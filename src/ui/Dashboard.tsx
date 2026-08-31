@@ -58,11 +58,31 @@ export function Dashboard({
       )}
 
       {selectedProjectId && !loading && !error && (
-        <RecommendationPanel
-          projectId={selectedProjectId}
-          recommendationService={recommendationService}
-        />
-      )}
+        <section data-testid="project-workspace">
+          <RecommendationPanel
+            projectId={selectedProjectId}
+            recommendationService={recommendationService}
+            refreshToken={refreshKey}
+          />
+
+          <TaskForm
+            existingTaskIds={graphTasks.map((t) => t.id)}
+            onSubmit={handleAddTask}
+          />
+
+          <DependencyEditor
+            tasks={graphTasks}
+            onAddDependency={handleAddDependency}
+            onRemoveDependency={handleRemoveDependency}
+          />
+
+          {graph && schedule && (
+            <DependencyGraphVisualization
+              tasks={graphTasks}
+              graph={graph}
+              schedule={schedule}
+            />
+          )}
 
       {selectedProjectId && !loading && !error && (
         <TaskList

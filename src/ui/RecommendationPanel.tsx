@@ -7,11 +7,13 @@ import { WarningsPanel } from "./WarningsPanel.js";
 export interface RecommendationPanelProps {
   projectId: string;
   recommendationService: RecommendationService;
+  refreshToken?: number;
 }
 
 export function RecommendationPanel({
   projectId,
   recommendationService,
+  refreshToken,
 }: RecommendationPanelProps) {
   const [recommendation, setRecommendation] = useState<Recommendation | null>(
     null,
@@ -47,8 +49,8 @@ export function RecommendationPanel({
   }, [projectId, recommendationService]);
 
   useEffect(() => {
-    loadRecommendation();
-  }, [loadRecommendation]);
+    void loadRecommendation();
+  }, [loadRecommendation, refreshToken]);
 
   if (loading) {
     return (
