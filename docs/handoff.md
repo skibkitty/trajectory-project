@@ -2,15 +2,15 @@
 
 ## Phase
 
-Domain core complete (Phases 1–5 of the implementation plan: model, graph, scheduling, decision engine, scenario simulation). Persistence implemented. Application services implemented. UI foundation complete. CRUD UI and dependency visualization complete. Scenario comparison in progress.
+Domain core complete (Phases 1–5 of the implementation plan: model, graph, scheduling, decision engine, scenario simulation). Persistence implemented. Application services implemented. UI foundation complete. CRUD UI and dependency visualization complete. Scenario comparison complete. Integration coverage in progress.
 
 ## Current Task
 
-TASK-012 — Build scenario comparison (implemented on feat/012-scenario-comparison; awaiting review and merge)
+TASK-013 — Add integration and E2E coverage (in progress; implemented on feat/013-integration-coverage) — scoped to integration tests for this pass; browser E2E deferred to TASK-016
 
 ## State
 
-TASK-012 adds a scenario builder UI so the user can run what-if scenarios (delay task, change effort, remove task) against the current project state and see a side-by-side comparison of baseline vs. projected results. Implemented via `ScenarioPanel`, wired through `ScenarioService` into the Dashboard and App. 261 tests pass (255 prior + 6 new scenario panel tests).
+TASK-013 adds integration tests that protect the primary user workflow across the real stack. Tests in `src/integration/` drive the application services (`ProjectService`, `GoalService`, `TaskService`, `DependencyService`, `RecommendationService`, `ScenarioService`) against a real `LocalProjectRepository` backed by an in-memory `StorageProvider` — i.e. crossing application + domain + infrastructure/serialization boundaries rather than using stub repositories. 274 tests pass (261 prior + 13 new integration tests).
 
 ## Completed
 
@@ -72,10 +72,16 @@ TASK-012 adds a scenario builder UI so the user can run what-if scenarios (delay
 - Scenario comparison UI: `ScenarioPanel` component (scenario kind, target task, and effort inputs; baseline vs. projected comparison table; affected-downstream and value-removed reporting; inline validation errors)
 - `ScenarioService` wired through `App.tsx` and `Dashboard.tsx`; `ScenarioPanel` exported from the UI barrel
 - 6 new scenario panel component tests (261 total passing across 28 files)
+- Integration coverage: `src/integration/primary-workflow.test.ts` and `src/integration/recommendation-scenario.test.ts`
+- Integration tests drive all six application services against a real `LocalProjectRepository` (in-memory `StorageProvider` that round-trips through actual serialization), crossing application + domain + infrastructure boundaries instead of stubbing the repository
+- Primary workflow covered: create/open project → add goals/tasks → add dependencies → recommendation + factor inspection → run scenario → compare result
+- Persistence isolation verified: running a scenario leaves the persisted baseline unchanged; rich task metadata round-trips intact
+- Cross-service state sharing through one repository, project summaries (task/goal counts), cycle rejection across the persistence boundary, and sample-project analysis are all covered
+- 13 new integration tests (274 total passing across 30 files)
 
 ## Not Yet Started
 
-- Integration and E2E coverage (TASK-013)
+- Browser-level E2E coverage (deferred to TASK-016 CI/CD)
 
 ## Human Decisions Still Needed
 
@@ -89,11 +95,11 @@ These are intentionally provisional:
 
 ## Next Recommended Action
 
-Merge TASK-012 to main, then implement TASK-013 — Add integration and E2E coverage.
+Merge TASK-013 to main, then proceed to TASK-014 — Benchmark algorithms.
 
 ## Verification
 
-TASK-012 verification is complete. All commands pass: `npm run verify` (typecheck, 261 tests, lint, format). Build succeeds: `npm run build`. Dev server starts: `npm run dev`.
+TASK-013 verification is complete. All commands pass: `npm run verify` (typecheck, 274 tests, lint, format). Build succeeds: `npm run build`.
 
 ## Important Constraint
 

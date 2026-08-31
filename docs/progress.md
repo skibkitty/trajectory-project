@@ -283,3 +283,20 @@ Completed:
 - Verified all commands pass: `npm run verify` (typecheck, 261 tests, lint, format); build succeeds
 
 Next: TASK-013 â€” Add integration and E2E coverage.
+
+## 2026-08-31 — Integration coverage added (TASK-013)
+
+Completed:
+- Added integration test suites in `src/integration/`: `primary-workflow.test.ts` and `recommendation-scenario.test.ts`
+- Integration tests drive all six application services (`ProjectService`, `GoalService`, `TaskService`, `DependencyService`, `RecommendationService`, `ScenarioService`) against a real `LocalProjectRepository` backed by an in-memory `StorageProvider`, crossing application + domain + infrastructure/serialization boundaries rather than stubbing the repository
+- Primary user workflow covered: create/open project -> add goals/tasks -> add dependencies -> view recommendation + inspect factor source metrics -> run scenario -> compare result
+- Persistence isolation verified: running a scenario leaves the persisted baseline unchanged in the repository
+- Rich task metadata (value, urgency, effort, confidence, status, goal) round-trips intact through serialization
+- Cross-service state sharing through one repository, project summaries (task/goal counts), cycle rejection across the persistence boundary, and sample-project analysis are all covered
+- Scenario comparison through the real stack: baseline vs. projected duration delta, affected downstream, and removed value on de-scope
+- Browser-level E2E (Playwright) deferred to TASK-016 (CI/CD); TASK-013 scoped to integration coverage
+- 13 new integration tests (274 total passing across 30 files)
+- Added acceptance criteria and verification for TASK-013 in docs/tasks.md
+- Verified all commands pass: `npm run verify` (typecheck, 274 tests, lint, format); build succeeds
+
+Next: TASK-014 — Benchmark algorithms.
