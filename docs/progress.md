@@ -238,3 +238,34 @@ Completed:
 - Verified all commands pass: `npm run verify` (typecheck, 234 tests, lint, format)
 
 Next: TASK-011 — Build dependency visualization.
+
+## 2026-08-26 — CRUD UI and dependency visualization implemented (TASK-011)
+
+Completed:
+- CRUD UI components: `ProjectForm`, `TaskForm`, `DependencyEditor`
+- `ProjectForm` — create new projects with name and description
+- `TaskForm` — add tasks with metadata (title, value, urgency, effort, confidence, status), validation for duplicate IDs
+- `DependencyEditor` — add/remove task dependencies, shows current dependency list
+- Sample data: `createSampleProject` with 8 realistic tasks, 2 goals, and multiple dependencies for demoing
+- Dependency graph visualization: SVG-based with topological layer layout
+- `graph-layout.ts` — deterministic layout algorithm using topological order for layer assignment
+- Critical-path nodes visually distinguished with bold borders
+- Status-colored nodes (DONE=green, IN_PROGRESS=blue, TODO=amber, BACKLOG=gray, BLOCKED=red)
+- Arrow markers on edges showing dependency direction
+- Legend explaining node colors and critical-path indicator
+- Dashboard updated to integrate all CRUD forms, graph, and sample data button
+- App.tsx updated to pass `TaskService` and `DependencyService` to Dashboard
+- 19 new component tests across 5 test files (253 total passing across 27 files)
+- Verified all commands pass: `npm run verify`
+
+Next: TASK-012 — Build scenario comparison.
+
+## 2026-08-31 — TASK-011 merged to main (with recovery)
+
+Completed:
+- TASK-011 merged to main and marked DONE.
+- During a pre-TASK-012 check, main was found to be in a broken, non-compiling state: the CRUD UI branch (feat/011) had been reverted via PR #12 and only partially re-added, leaving `Dashboard.tsx` referencing components that no longer existed.
+- Recovered by restoring the verified-good CRUD UI tree (2026-08-26 TASK-011 work plus the recommendation-refresh fix) onto main from the clean branch tip, and re-confirming the full state compiles and all 255 tests pass across 27 files.
+- Docs updated: TASK-011 DONE, handoff moved to TASK-012.
+
+Next: TASK-012 — Build scenario comparison.
