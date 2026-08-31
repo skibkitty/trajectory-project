@@ -205,6 +205,7 @@ export function Dashboard({
           <RecommendationPanel
             projectId={selectedProjectId}
             recommendationService={recommendationService}
+            refreshToken={refreshKey}
           />
 
           <TaskForm
