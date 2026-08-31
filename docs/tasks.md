@@ -234,7 +234,7 @@ Verification:
 
 ## TASK-011 — Build project editor, CRUD UI, sample data, and dependency visualization
 
-Status: IN_PROGRESS
+Status: BACKLOG
 
 Goal:
 Let the user create and manage projects/tasks through the UI, provide sample data for demoing, and visually demonstrate graph and critical-path analysis.

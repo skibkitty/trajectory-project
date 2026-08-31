@@ -3,8 +3,6 @@ import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import { Dashboard } from "./Dashboard.js";
 import { ProjectService } from "../application/project-service.js";
 import { RecommendationService } from "../application/recommendation-service.js";
-import { TaskService } from "../application/task-service.js";
-import { DependencyService } from "../application/dependency-service.js";
 import type { ProjectRepository } from "../application/repository.js";
 import type { ProjectSummary } from "../application/repository.js";
 import type { Project } from "../domain/index.js";
@@ -68,15 +66,11 @@ describe("Dashboard", () => {
   let repository: ProjectRepository;
   let projectService: ProjectService;
   let recommendationService: RecommendationService;
-  let taskService: TaskService;
-  let dependencyService: DependencyService;
 
   beforeEach(() => {
     repository = createStubRepository();
     projectService = new ProjectService(repository);
     recommendationService = new RecommendationService(repository);
-    taskService = new TaskService(repository);
-    dependencyService = new DependencyService(repository);
   });
 
   it("renders the Trajectory heading", () => {
@@ -84,8 +78,6 @@ describe("Dashboard", () => {
       <Dashboard
         projectService={projectService}
         recommendationService={recommendationService}
-        taskService={taskService}
-        dependencyService={dependencyService}
       />,
     );
     expect(screen.getByText("Trajectory")).toBeInTheDocument();
@@ -107,8 +99,6 @@ describe("Dashboard", () => {
       <Dashboard
         projectService={projectService}
         recommendationService={recommendationService}
-        taskService={taskService}
-        dependencyService={dependencyService}
       />,
     );
 
@@ -134,8 +124,6 @@ describe("Dashboard", () => {
       <Dashboard
         projectService={projectService}
         recommendationService={recommendationService}
-        taskService={taskService}
-        dependencyService={dependencyService}
       />,
     );
 
@@ -168,8 +156,6 @@ describe("Dashboard", () => {
       <Dashboard
         projectService={projectService}
         recommendationService={recommendationService}
-        taskService={taskService}
-        dependencyService={dependencyService}
       />,
     );
 
