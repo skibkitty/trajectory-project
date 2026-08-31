@@ -238,24 +238,3 @@ Completed:
 - Verified all commands pass: `npm run verify` (typecheck, 234 tests, lint, format)
 
 Next: TASK-011 — Build dependency visualization.
-
-## 2026-08-26 — CRUD UI and dependency visualization implemented (TASK-011)
-
-Completed:
-- CRUD UI components: `ProjectForm`, `TaskForm`, `DependencyEditor`
-- `ProjectForm` — create new projects with name and description
-- `TaskForm` — add tasks with metadata (title, value, urgency, effort, confidence, status), validation for duplicate IDs
-- `DependencyEditor` — add/remove task dependencies, shows current dependency list
-- Sample data: `createSampleProject` with 8 realistic tasks, 2 goals, and multiple dependencies for demoing
-- Dependency graph visualization: SVG-based with topological layer layout
-- `graph-layout.ts` — deterministic layout algorithm using topological order for layer assignment
-- Critical-path nodes visually distinguished with bold borders
-- Status-colored nodes (DONE=green, IN_PROGRESS=blue, TODO=amber, BACKLOG=gray, BLOCKED=red)
-- Arrow markers on edges showing dependency direction
-- Legend explaining node colors and critical-path indicator
-- Dashboard updated to integrate all CRUD forms, graph, and sample data button
-- App.tsx updated to pass `TaskService` and `DependencyService` to Dashboard
-- 19 new component tests across 5 test files (253 total passing across 27 files)
-- Verified all commands pass: `npm run verify`
-
-Next: TASK-012 — Build scenario comparison.
