@@ -184,4 +184,141 @@ describe("Dashboard", () => {
       expect(screen.getByTestId("factor-breakdown")).toBeInTheDocument();
     });
   });
+
+  it("shows a cycle detection error in the UI when a cycle is created", async () => {
+    const project = createProject({
+      id: "proj-cycles",
+      name: "Cycle Project",
+      description: "For cycle demo",
+      tasks: [
+        createTask({
+          id: "t1",
+          title: "Subtask",
+          status: "TODO",
+          value: 3,
+        }),
+        createTask({
+          id: "t2",
+          title: "Parent",
+          status: "TODO",
+          value: 8,
+          dependencies: ["t1"],
+        }),
+      ],
+    });
+    const summary: ProjectSummary = {
+      id: project.id,
+      name: project.name,
+      description: project.description,
+      taskCount: project.tasks.length,
+      goalCount: project.goals.length,
+    };
+
+    vi.mocked(repository.list).mockResolvedValue([summary]);
+    vi.mocked(repository.load).mockResolvedValue(project);
+
+    render(
+      <Dashboard
+        projectService={projectService}
+        recommendationService={recommendationService}
+        taskService={taskService}
+        dependencyService={dependencyService}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText(/Cycle Project/)).toBeInTheDocument();
+    });
+
+    fireEvent.change(screen.getByRole("combobox"), {
+      target: { value: "proj-cycles" },
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId("dependency-editor")).toBeInTheDocument();
+    });
+
+    fireEvent.change(screen.getByTestId("dep-task-select"), {
+      target: { value: "t1" },
+    });
+    fireEvent.change(screen.getByTestId("dep-prerequisite-select"), {
+      target: { value: "t2" },
+    });
+    fireEvent.click(screen.getByTestId("add-dependency-button"));
+
+    await waitFor(() => {
+      expect(screen.getByRole("alert")).toHaveTextContent(
+        /Adding dependency "t2" -> "t1" would create a cycle/,
+      );
+    });
+  });
+
+  it("updates the recommendation live when project state changes", async () => {
+    const project = createProject({
+      id: "proj-live",
+      name: "Live Project",
+      description: "For live updates",
+      tasks: [
+        createTask({
+          id: "t1",
+          title: "Done task",
+          status: "DONE",
+          value: 5,
+        }),
+      ],
+    });
+    const summary: ProjectSummary = {
+      id: project.id,
+      name: project.name,
+      description: project.description,
+      taskCount: project.tasks.length,
+      goalCount: project.goals.length,
+    };
+
+    let currentProject = project;
+    vi.mocked(repository.list).mockResolvedValue([summary]);
+    vi.mocked(repository.load).mockImplementation(async () => currentProject);
+    vi.mocked(repository.save).mockImplementation(async (p) => {
+      currentProject = p;
+    });
+
+    render(
+      <Dashboard
+        projectService={projectService}
+        recommendationService={recommendationService}
+        taskService={taskService}
+        dependencyService={dependencyService}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText(/Live Project/)).toBeInTheDocument();
+    });
+
+    fireEvent.change(screen.getByRole("combobox"), {
+      target: { value: "proj-live" },
+    });
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(/No eligible tasks to recommend/),
+      ).toBeInTheDocument();
+    });
+
+    fireEvent.change(screen.getByTestId("task-id-input"), {
+      target: { value: "t2" },
+    });
+    fireEvent.change(screen.getByTestId("task-title-input"), {
+      target: { value: "New eligible task" },
+    });
+    fireEvent.change(screen.getByTestId("task-status-input"), {
+      target: { value: "BACKLOG" },
+    });
+    fireEvent.click(screen.getByTestId("add-task-button"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("recommendation-card")).toBeInTheDocument();
+    });
+    expect(screen.getByTestId("recommendation-card")).toHaveTextContent("t2");
+  });
 });
