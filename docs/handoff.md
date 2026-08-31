@@ -6,11 +6,11 @@ Domain core complete (Phases 1–5 of the implementation plan: model, graph, sch
 
 ## Current Task
 
-TASK-012 — Build scenario comparison (in progress)
+TASK-012 — Build scenario comparison (implemented on feat/012-scenario-comparison; awaiting review and merge)
 
 ## State
 
-TASK-012 adds a scenario builder UI so the user can run what-if scenarios (delay task, change effort, remove task) against the current project state and see a side-by-side comparison of baseline vs. projected results. TASK-011 (CRUD UI, sample data, dependency graph visualization) is complete and merged. 255 tests pass.
+TASK-012 adds a scenario builder UI so the user can run what-if scenarios (delay task, change effort, remove task) against the current project state and see a side-by-side comparison of baseline vs. projected results. Implemented via `ScenarioPanel`, wired through `ScenarioService` into the Dashboard and App. 261 tests pass (255 prior + 6 new scenario panel tests).
 
 ## Completed
 
@@ -69,10 +69,13 @@ TASK-012 adds a scenario builder UI so the user can run what-if scenarios (delay
 - Graph layout utility: `computeLayout` with deterministic layer assignment
 - 19 new component tests (253 total passing across 27 files)
 - TASK-011 merged to main and marked DONE; main restored to the verified-good CRUD UI state after a partial revert caused a broken merge (255 tests passing across 27 files)
+- Scenario comparison UI: `ScenarioPanel` component (scenario kind, target task, and effort inputs; baseline vs. projected comparison table; affected-downstream and value-removed reporting; inline validation errors)
+- `ScenarioService` wired through `App.tsx` and `Dashboard.tsx`; `ScenarioPanel` exported from the UI barrel
+- 6 new scenario panel component tests (261 total passing across 28 files)
 
 ## Not Yet Started
 
-- Scenario comparison UI (TASK-012)
+- Integration and E2E coverage (TASK-013)
 
 ## Human Decisions Still Needed
 
@@ -86,11 +89,11 @@ These are intentionally provisional:
 
 ## Next Recommended Action
 
-Complete TASK-011 review, merge to main, then implement TASK-012 — Build scenario comparison.
+Merge TASK-012 to main, then implement TASK-013 — Add integration and E2E coverage.
 
 ## Verification
 
-TASK-011 verification is complete. All commands pass: `npm run verify` (typecheck, 255 tests, lint, format). Build succeeds: `npm run build`. Dev server starts: `npm run dev`.
+TASK-012 verification is complete. All commands pass: `npm run verify` (typecheck, 261 tests, lint, format). Build succeeds: `npm run build`. Dev server starts: `npm run dev`.
 
 ## Important Constraint
 

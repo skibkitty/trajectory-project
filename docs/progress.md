@@ -269,3 +269,17 @@ Completed:
 - Docs updated: TASK-011 DONE, handoff moved to TASK-012.
 
 Next: TASK-012 — Build scenario comparison.
+
+## 2026-08-31 — Scenario comparison UI implemented (TASK-012)
+
+Completed:
+- `ScenarioPanel` component: scenario kind selector (delay-task, change-effort, remove-task), target task selector, effort input (where applicable), and a Run Scenario button
+- Inline validation errors: task required, positive effort required; service errors surfaced with `role="alert"`
+- Baseline vs. projected comparison table: project duration, critical path, recommended task, with duration delta and changed/unchanged indicators
+- Affected downstream tasks and removed value (de-scope) reporting, with task-id→title resolution from the current project tasks
+- Baseline isolation: scenarios run purely through `ScenarioService.runScenario` (which delegates to immutable domain `simulateScenario`), so user data is never mutated
+- `ScenarioService` wired into `App.tsx` and `Dashboard.tsx`; `ScenarioPanel` exported from the `src/ui` barrel
+- 6 new scenario panel component tests (261 total passing across 28 files)
+- Verified all commands pass: `npm run verify` (typecheck, 261 tests, lint, format); build succeeds
+
+Next: TASK-013 — Add integration and E2E coverage.

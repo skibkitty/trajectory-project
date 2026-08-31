@@ -4,6 +4,7 @@ import { ProjectService } from "./application/project-service.js";
 import { RecommendationService } from "./application/recommendation-service.js";
 import { TaskService } from "./application/task-service.js";
 import { DependencyService } from "./application/dependency-service.js";
+import { ScenarioService } from "./application/scenario-service.js";
 import { Dashboard } from "./ui/Dashboard.js";
 
 const repository = new LocalProjectRepository(createLocalStorageProvider());
@@ -11,6 +12,7 @@ const projectService = new ProjectService(repository);
 const recommendationService = new RecommendationService(repository);
 const taskService = new TaskService(repository);
 const dependencyService = new DependencyService(repository);
+const scenarioService = new ScenarioService(repository);
 
 export function App() {
   return (
@@ -19,6 +21,7 @@ export function App() {
       recommendationService={recommendationService}
       taskService={taskService}
       dependencyService={dependencyService}
+      scenarioService={scenarioService}
     />
   );
 }

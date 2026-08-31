@@ -18,3 +18,5 @@ export { DependencyEditor } from "./DependencyEditor.js";
 export type { DependencyEditorProps } from "./DependencyEditor.js";
 export { DependencyGraphVisualization } from "./DependencyGraph.js";
 export type { DependencyGraphProps } from "./DependencyGraph.js";
+export { ScenarioPanel } from "./ScenarioPanel.js";
+export type { ScenarioPanelProps } from "./ScenarioPanel.js";

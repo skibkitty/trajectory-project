@@ -259,13 +259,26 @@ Verification:
 
 ## TASK-012 — Build scenario comparison
 
-Status: BACKLOG
+Status: IN_PROGRESS
 
 Goal:
 Let the user run and compare a scenario against baseline.
 
 Prerequisites:
 TASK-011
+
+Acceptance criteria:
+- user can choose a scenario kind (delay task, change effort, remove task)
+- user can select the target task
+- user can supply the scenario parameter (additional/new effort where applicable)
+- running a scenario does not mutate the baseline project
+- side-by-side comparison shows duration, critical path, and recommended task for baseline vs. projected
+- affected downstream tasks and removed value (for de-scope) are reported
+- errors are shown in the UI when they occur
+
+Verification:
+- npm run dev → open project → run a scenario → see baseline vs. projected comparison
+- confirm baseline project state is unchanged after running a scenario
 
 ## TASK-013 — Add integration and E2E coverage
 
