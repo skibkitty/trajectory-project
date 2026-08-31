@@ -10,6 +10,7 @@ import { ProjectForm } from "./ProjectForm.js";
 import { TaskForm } from "./TaskForm.js";
 import { DependencyEditor } from "./DependencyEditor.js";
 import { DependencyGraphVisualization } from "./DependencyGraph.js";
+import { ScenarioPanel } from "./ScenarioPanel.js";
 import { createSampleProject } from "./sample-data.js";
 
 export interface DashboardProps {
@@ -17,6 +18,7 @@ export interface DashboardProps {
   recommendationService: import("../application/recommendation-service.js").RecommendationService;
   taskService: import("../application/task-service.js").TaskService;
   dependencyService: import("../application/dependency-service.js").DependencyService;
+  scenarioService: import("../application/scenario-service.js").ScenarioService;
 }
 
 export function Dashboard({
@@ -24,6 +26,7 @@ export function Dashboard({
   recommendationService,
   taskService,
   dependencyService,
+  scenarioService,
 }: DashboardProps) {
   const [projects, setProjects] = useState<readonly ProjectSummary[]>([]);
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(
@@ -226,6 +229,12 @@ export function Dashboard({
               schedule={schedule}
             />
           )}
+
+          <ScenarioPanel
+            projectId={selectedProjectId}
+            scenarioService={scenarioService}
+            tasks={graphTasks}
+          />
 
           <TaskList
             projectId={selectedProjectId}

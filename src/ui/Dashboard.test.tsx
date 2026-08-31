@@ -5,6 +5,7 @@ import { ProjectService } from "../application/project-service.js";
 import { RecommendationService } from "../application/recommendation-service.js";
 import { TaskService } from "../application/task-service.js";
 import { DependencyService } from "../application/dependency-service.js";
+import { ScenarioService } from "../application/scenario-service.js";
 import type { ProjectRepository } from "../application/repository.js";
 import type { ProjectSummary } from "../application/repository.js";
 import type { Project } from "../domain/index.js";
@@ -70,6 +71,7 @@ describe("Dashboard", () => {
   let recommendationService: RecommendationService;
   let taskService: TaskService;
   let dependencyService: DependencyService;
+  let scenarioService: ScenarioService;
 
   beforeEach(() => {
     repository = createStubRepository();
@@ -77,6 +79,7 @@ describe("Dashboard", () => {
     recommendationService = new RecommendationService(repository);
     taskService = new TaskService(repository);
     dependencyService = new DependencyService(repository);
+    scenarioService = new ScenarioService(repository);
   });
 
   it("renders the Trajectory heading", () => {
@@ -86,6 +89,7 @@ describe("Dashboard", () => {
         recommendationService={recommendationService}
         taskService={taskService}
         dependencyService={dependencyService}
+        scenarioService={scenarioService}
       />,
     );
     expect(screen.getByText("Trajectory")).toBeInTheDocument();
@@ -109,6 +113,7 @@ describe("Dashboard", () => {
         recommendationService={recommendationService}
         taskService={taskService}
         dependencyService={dependencyService}
+        scenarioService={scenarioService}
       />,
     );
 
@@ -136,6 +141,7 @@ describe("Dashboard", () => {
         recommendationService={recommendationService}
         taskService={taskService}
         dependencyService={dependencyService}
+        scenarioService={scenarioService}
       />,
     );
 
@@ -170,6 +176,7 @@ describe("Dashboard", () => {
         recommendationService={recommendationService}
         taskService={taskService}
         dependencyService={dependencyService}
+        scenarioService={scenarioService}
       />,
     );
 
@@ -223,6 +230,7 @@ describe("Dashboard", () => {
         recommendationService={recommendationService}
         taskService={taskService}
         dependencyService={dependencyService}
+        scenarioService={scenarioService}
       />,
     );
 
@@ -288,6 +296,7 @@ describe("Dashboard", () => {
         recommendationService={recommendationService}
         taskService={taskService}
         dependencyService={dependencyService}
+        scenarioService={scenarioService}
       />,
     );
 
