@@ -341,3 +341,33 @@ Completed:
 - Verified: `npm run verify` passes (typecheck, 279 tests, lint, format); `npm run benchmark` passes (6 tests, table printed + written); `npm run build` succeeds
 
 
+## 2026-08-31 — Accessibility and UX hardening implemented (TASK-015)
+
+Completed:
+- Added a design system in `src/ui/styles.css` (imported via `main.tsx`): consistent spacing/typography/color palette via CSS custom properties, reusable card/panel surfaces, focus-visible rings, a styled loading spinner, styled empty states, tables with clear headings, warning/error surfaces, and a responsive layout (grid for scenario controls, auto-horizontal-scroll for tables, header/side adjustment) below 768px
+- Added a skip link (`Skip to main content`) visible only on keyboard focus that targets the `#main-content` landmark; the app now uses a semantic `<main>` landmark
+- ARIA improvements: project actions and project workspace wrapped in labeled `region`s; the SVG dependency graph marked `role=img` with a descriptive aria-label; loading states use `role=status` + `aria-live=polite`; dependency remove buttons carry explicit accessible names
+- Focus management: when a project is opened, focus moves to the workspace heading so keyboard/screen-reader users land on the newly rendered content
+- Added `src/vite-env.d.ts` referencing `vite/client` so the `styles.css` side-effect import type-checks
+- Added `src/ui/accessibility.test.tsx` with 6 tests covering the skip link, main landmark, labeled regions, styled empty state, live status region, SVG image semantics, and remove-button accessible names
+- All changes confined to the UI layer; domain/application/infrastructure untouched
+- Verified: `npm run verify` passes (typecheck, 285 tests, lint, format); `npm run build` succeeds
+
+## 2026-09-01 — TASK-015 PR review remediation (on feat/015-accessibility-ux)
+
+Completed:
+- Fixed two CSS contrast bugs raised in PR #17 review: the Trajectory heading on the dark page background was invisible (`--color-text` and `--color-bg-soft` both resolve to `#1e293b`), and table headers had a 1:1 contrast ratio for the same reason. The header heading/subtitle now use light colors on the dark background, and table headers now use a light background (`#e2e8f0`) with dark text.
+- Fixed a focus-management regression in `Dashboard.tsx`: the move-focus-to-workspace effect previously fired on any `loading`/`error` change, so any refresh (e.g. adding a task) would steal keyboard focus from the control the user was using. It now only moves focus on an actual project-selection transition (tracked via a `previousProjectIdRef`).
+- Added a regression test that verifies focus moves to the workspace on project selection but is not stolen by a subsequent refresh.
+- Docs updated: handoff/progress note the remediation. 6 new accessibility tests + 1 new regression test (286 total passing).
+- Verified: `npm run verify` passes (typecheck, 286 tests, lint, format); `npm run build` succeeds
+
+## 2026-09-01 — TASK-015 PR follow-up: fix missing card surfaces (on feat/015-accessibility-ux)
+
+Completed:
+- Reviewer follow-up reported that form/dependency text ("Add Task", "ID", "Title", "Current Dependencies", dependency rows) blended into the page background, appearing as floating fields/buttons.
+- Root cause: `TaskForm`, `ProjectForm`, and `DependencyEditor` rendered without their surface `className` (`task-form`/`project-form`/`dependency-editor`), so the card background CSS rules targeted these classes but never matched. The components sat transparent on the dark `#1e293b` page background while inheriting dark `#1e293b` text — effectively invisible.
+- Fixed by adding the matching `className` to each component's root element; removed the unused `.section-card` selector from the shared surface rule.
+- Also fixed the same bug for the `workspace-heading`: `Dashboard.tsx` renders an `h2.workspace-heading` directly on the dark page background, inheriting dark `#1e293b` text — added a `.workspace-heading { color: #f1f5f9 }` rule so "Project Workspace" is visible.
+- Wrapped the dependency-graph SVG in a scrollable region (`.graph-scroll`, `overflow: auto` + `role="region"`) so long graphs scroll inside the white card instead of overflowing past its edge; heading and legend stay fixed. New regression test (287 total passing).
+- Verified: `npm run verify` passes (typecheck, 287 tests, lint, format); `npm run build` succeeds.

@@ -41,7 +41,7 @@ export function DependencyEditor({
   }
 
   return (
-    <div data-testid="dependency-editor">
+    <div className="dependency-editor" data-testid="dependency-editor">
       <h3>Dependencies</h3>
       {error && (
         <div className="error" role="alert" data-testid="dep-error">
@@ -104,6 +104,7 @@ export function DependencyEditor({
                 <button
                   type="button"
                   onClick={() => onRemoveDependency(task.id, depId)}
+                  aria-label={`Remove dependency: ${depId} is prerequisite for ${task.id}`}
                   data-testid={`remove-dependency-${task.id}-${depId}`}
                 >
                   Remove

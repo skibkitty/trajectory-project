@@ -329,7 +329,7 @@ Verification:
 
 ## TASK-015 — Accessibility and UX hardening
 
-Status: BACKLOG
+Status: READY
 
 Goal:
 Make the application polished and demonstrable.
@@ -344,6 +344,10 @@ Acceptance criteria:
 - responsive behavior at common viewport widths
 - loading and empty states are styled, not just text
 - focus management is correct on route/state changes
+
+Verification:
+- npm run verify passes (typecheck, 286 tests, lint, format)
+- npm run build succeeds
 
 ## TASK-016 — CI/CD
 
