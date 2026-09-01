@@ -108,7 +108,7 @@ Create a PR for feat/016-ci-cd (TASK-016), review, and merge to main. Once merge
 
 ## Verification
 
-TASK-016 verification is complete locally: `npm run verify` (typecheck, 287 tests, lint, format), `npm run build`, `npm run benchmark` (6 tests), and `npm run test:e2e` (2 Playwright specs, requires Chromium installed via `npx playwright install chromium`) all pass. CI itself must be verified by pushing to GitHub and observing the workflow run on the PR.
+TASK-016 verification is complete locally and in CI. Locally: `npm run verify` (typecheck, 287 tests, lint, format), `npm run build`, `npm run benchmark` (6 tests), and `npm run test:e2e` (2 Playwright specs, requires Chromium installed via `npx playwright install chromium`) all pass. CI on PR #18 observed green: the `CI` workflow's `verify`, `benchmark`, `build`, and `e2e` jobs all pass. The remaining acceptance item — blocking merge on required status checks — needs the GitHub repository-setup branch-protection action by a human.
 
 ## Important Constraint
 
