@@ -129,6 +129,22 @@ export function Dashboard({
       refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to add task");
+      throw err;
+    }
+  }
+
+  async function handleUpdateTaskStatus(
+    taskId: string,
+    status: import("../domain/index.js").TaskStatus,
+  ) {
+    if (!selectedProjectId) return;
+    try {
+      await taskService.updateTaskStatus(selectedProjectId, taskId, status);
+      refresh();
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Failed to update task status",
+      );
     }
   }
 
@@ -239,6 +255,8 @@ export function Dashboard({
           <TaskList
             projectId={selectedProjectId}
             recommendationService={recommendationService}
+            refreshToken={refreshKey}
+            onUpdateTaskStatus={handleUpdateTaskStatus}
           />
         </section>
       )}

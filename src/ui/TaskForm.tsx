@@ -19,7 +19,7 @@ export interface TaskFormProps {
     estimatedEffort: number;
     confidence: number;
     status: TaskStatus;
-  }) => void;
+  }) => Promise<void> | void;
 }
 
 export function TaskForm({ existingTaskIds, onSubmit }: TaskFormProps) {
@@ -32,7 +32,7 @@ export function TaskForm({ existingTaskIds, onSubmit }: TaskFormProps) {
   const [status, setStatus] = useState<TaskStatus>("BACKLOG");
   const [error, setError] = useState<string | null>(null);
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
 
@@ -46,15 +46,20 @@ export function TaskForm({ existingTaskIds, onSubmit }: TaskFormProps) {
       return;
     }
 
-    onSubmit({
-      id: id.trim(),
-      title: title.trim(),
-      value,
-      urgency,
-      estimatedEffort,
-      confidence,
-      status,
-    });
+    try {
+      await onSubmit({
+        id: id.trim(),
+        title: title.trim(),
+        value,
+        urgency,
+        estimatedEffort,
+        confidence,
+        status,
+      });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to add task");
+      return;
+    }
 
     setId("");
     setTitle("");
