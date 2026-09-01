@@ -8,3 +8,4 @@ coverage/
 !.env.example
 tsconfig.tsbuildinfo
 tsconfig.app.tsbuildinfo
+benchmark/results.txt

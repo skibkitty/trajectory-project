@@ -29,9 +29,9 @@ The project is designed to demonstrate:
 
 ## Status
 
-Phase 1 — Domain foundation. TypeScript project initialized.
+Domain core complete (model, dependency graph, scheduling and critical path, decision engine, scenario simulation). Persistence, application services, a React/Vite UI (recommendation dashboard, project/task/dependency editor, graph visualization, scenario comparison), integration coverage, and algorithm benchmarks are implemented and passing.
 
-Do not treat provisional product decisions as final until they are reviewed.
+Core architecture, decision-engine weights, scheduling/calendar semantics, and final product naming remain under human review. Do not treat provisional product decisions as final until they are reviewed.
 
 ## Engineering Principle
 

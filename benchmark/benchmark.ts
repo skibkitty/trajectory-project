@@ -52,7 +52,8 @@ function iterationsFor(count: number): number {
   // time while keeping every reported mean based on a meaningful sample.
   if (count <= 100) return 50;
   if (count <= 1000) return 20;
-  return 5;
+  if (count <= 5000) return 5;
+  return 2;
 }
 
 /**
@@ -128,6 +129,28 @@ function buildContext(count: number, seed: number): BenchmarkContext {
   return { count, tasks, graph, schedule };
 }
 
+/**
+ * Pick the task with the most dependents (tie-broken by lowest id). The
+ * dependent-based benchmarks need a task that is actually a prerequisite for
+ * others, otherwise they would measure the empty case.
+ */
+function pickDependentHub(
+  graph: ReturnType<typeof createDependencyGraph>,
+): string {
+  let hub: string | null = null;
+  let max = -1;
+  for (const id of graph.taskIds) {
+    const dependents = graph.getDependents(id);
+    if (dependents.length > max) {
+      max = dependents.length;
+      hub = id;
+    }
+  }
+  // The dataset guarantees at least one prerequisite edge for count > 1, so a
+  // hub always exists; fall back to the first id defensively.
+  return hub ?? graph.taskIds[0];
+}
+
 interface NamedOperation {
   readonly name: string;
   readonly fn: () => unknown;
@@ -137,14 +160,15 @@ function collectOperations(ctx: BenchmarkContext): readonly NamedOperation[] {
   const { tasks, graph, schedule } = ctx;
   const first = tasks[0].id;
   const last = tasks[tasks.length - 1].id;
+  const hub = pickDependentHub(graph);
 
   const ops: NamedOperation[] = [
     { name: "graph-construction", fn: () => createDependencyGraph(tasks) },
     { name: "topological-order", fn: () => graph.topologicalOrder() },
     { name: "cycle-detection", fn: () => graph.hasCycle() },
     { name: "prerequisite-lookup", fn: () => graph.getPrerequisites(first) },
-    { name: "dependent-lookup", fn: () => graph.getDependents(last) },
-    { name: "transitive-dependents", fn: () => graph.getAllDependents(first) },
+    { name: "dependent-lookup", fn: () => graph.getDependents(hub) },
+    { name: "transitive-dependents", fn: () => graph.getAllDependents(hub) },
     {
       name: "transitive-prerequisites",
       fn: () => graph.getAllPrerequisites(last),

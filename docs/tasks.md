@@ -355,6 +355,19 @@ Automate verification and deployment.
 Prerequisites:
 TASK-013
 
+Acceptance criteria:
+- a CI workflow runs on every push/PR to main and the default branch
+- the workflow runs the full local verification gate (typecheck, tests, lint, format) equivalent to `npm run verify`
+- the workflow runs the benchmark suite (or CI-friendly subset) so regressions in the benchmark harness are caught
+- the production build is verified (`npm run build`) in CI
+- failing checks block merge (via GitHub branch protection or required status checks)
+- test artifacts (e.g. the benchmark results report) are available for inspection
+- E2E coverage (Playwright) is introduced here if and when scheduled
+
+Verification:
+- CI passes on a pushed feature branch and on a merge to main
+- a deliberate breaking change fails CI on the affected check
+
 ## TASK-017 — Architecture case study and final documentation
 
 Status: BACKLOG
@@ -364,3 +377,16 @@ Document decisions, algorithms, testing, and measured performance for recruiter/
 
 Prerequisites:
 TASK-014, TASK-015, TASK-016
+
+Acceptance criteria:
+- an architecture case study explains the core problem, the deterministic decision engine, dependency-graph and critical-path analysis, explainability, and scenario simulation at a level a technical interviewer can follow
+- documented decisions (docs/decisions.md) reflect the implemented system
+- algorithm descriptions match the implemented code, including documented tradeoffs and open options
+- measured performance is reported from the actual benchmark suite (see TASK-014), with methodology and machine context, and no unmeasured claims are made
+- testing strategy is documented, including unit/integration/component coverage and how to run each suite
+- project naming and availability decisions are resolved
+- the resume story (PROJECT_PLAN §24) is updated only with measurements actually produced
+
+Verification:
+- review the case study and supporting docs for accuracy against the code
+- confirm every performance claim traces to a benchmark result in the repo

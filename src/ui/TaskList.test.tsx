@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import { TaskList } from "./TaskList.js";
 import { RecommendationService } from "../application/recommendation-service.js";
 import type { ProjectRepository } from "../application/repository.js";
@@ -58,6 +58,7 @@ describe("TaskList", () => {
       <TaskList
         projectId="proj-1"
         recommendationService={recommendationService}
+        onUpdateTaskStatus={vi.fn()}
       />,
     );
 
@@ -66,6 +67,95 @@ describe("TaskList", () => {
     });
 
     expect(screen.getByText(/Build feature/)).toBeInTheDocument();
+  });
+
+  it("renders a status control per task row", async () => {
+    const task = createTask({ id: "t1", title: "A", status: "TODO" });
+    const project = createProject({
+      id: "proj-1",
+      name: "Test",
+      tasks: [task],
+    });
+    vi.mocked(repository.load).mockResolvedValue(project);
+
+    render(
+      <TaskList
+        projectId="proj-1"
+        recommendationService={recommendationService}
+        onUpdateTaskStatus={vi.fn()}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("task-status-t1")).toBeInTheDocument();
+    });
+    expect(screen.getByTestId("task-status-t1")).toHaveValue("TODO");
+  });
+
+  it("calls onUpdateTaskStatus when row status changes", async () => {
+    const task = createTask({ id: "t1", title: "A", status: "TODO" });
+    const project = createProject({
+      id: "proj-1",
+      name: "Test",
+      tasks: [task],
+    });
+    vi.mocked(repository.load).mockResolvedValue(project);
+    const onUpdateTaskStatus = vi.fn();
+
+    render(
+      <TaskList
+        projectId="proj-1"
+        recommendationService={recommendationService}
+        onUpdateTaskStatus={onUpdateTaskStatus}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("task-status-t1")).toBeInTheDocument();
+    });
+
+    fireEvent.change(screen.getByTestId("task-status-t1"), {
+      target: { value: "DONE" },
+    });
+    expect(onUpdateTaskStatus).toHaveBeenCalledWith("t1", "DONE");
+  });
+
+  it("reloads tasks when refreshToken changes", async () => {
+    const project = createProject({
+      id: "proj-1",
+      name: "Test",
+      tasks: [createTask({ id: "t1", title: "A", status: "TODO" })],
+    });
+    vi.mocked(repository.load).mockResolvedValue(project);
+
+    const { rerender } = render(
+      <TaskList
+        projectId="proj-1"
+        recommendationService={recommendationService}
+        onUpdateTaskStatus={vi.fn()}
+        refreshToken={0}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("task-row-t1")).toBeInTheDocument();
+    });
+
+    const { load } = repository;
+    const callsBefore = vi.mocked(load).mock.calls.length;
+
+    rerender(
+      <TaskList
+        projectId="proj-1"
+        recommendationService={recommendationService}
+        onUpdateTaskStatus={vi.fn()}
+        refreshToken={1}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(vi.mocked(load).mock.calls.length).toBeGreaterThan(callsBefore);
+    });
   });
 
   it("shows critical path status from schedule", async () => {
@@ -96,6 +186,7 @@ describe("TaskList", () => {
       <TaskList
         projectId="proj-1"
         recommendationService={recommendationService}
+        onUpdateTaskStatus={vi.fn()}
       />,
     );
 
@@ -120,6 +211,7 @@ describe("TaskList", () => {
       <TaskList
         projectId="bad-id"
         recommendationService={recommendationService}
+        onUpdateTaskStatus={vi.fn()}
       />,
     );
 

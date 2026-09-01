@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { TaskForm } from "./TaskForm.js";
 
 describe("TaskForm", () => {
@@ -55,5 +55,41 @@ describe("TaskForm", () => {
     fireEvent.submit(screen.getByTestId("task-form"));
 
     expect(screen.getByTestId("task-form-error")).toBeInTheDocument();
+  });
+
+  it("does not clear fields when onSubmit fails", async () => {
+    const onSubmit = vi.fn().mockRejectedValue(new Error("boom"));
+    render(<TaskForm existingTaskIds={[]} onSubmit={onSubmit} />);
+
+    fireEvent.change(screen.getByTestId("task-id-input"), {
+      target: { value: "t1" },
+    });
+    fireEvent.change(screen.getByTestId("task-title-input"), {
+      target: { value: "My Task" },
+    });
+    fireEvent.click(screen.getByTestId("add-task-button"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("task-form-error")).toHaveTextContent("boom");
+    });
+    expect(screen.getByTestId("task-id-input")).toHaveValue("t1");
+    expect(screen.getByTestId("task-title-input")).toHaveValue("My Task");
+  });
+
+  it("clears fields after a successful asynchronous submit", async () => {
+    const onSubmit = vi.fn().mockResolvedValue(undefined);
+    render(<TaskForm existingTaskIds={[]} onSubmit={onSubmit} />);
+
+    fireEvent.change(screen.getByTestId("task-id-input"), {
+      target: { value: "t1" },
+    });
+    fireEvent.change(screen.getByTestId("task-title-input"), {
+      target: { value: "My Task" },
+    });
+    fireEvent.click(screen.getByTestId("add-task-button"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("task-id-input")).toHaveValue("");
+    });
   });
 });

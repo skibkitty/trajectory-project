@@ -1,13 +1,31 @@
 import { useState, useEffect, useCallback } from "react";
 import type { RecommendationService } from "../application/recommendation-service.js";
-import type { Task, ScheduleResult } from "../domain/index.js";
+import type { Task, ScheduleResult, TaskStatus } from "../domain/index.js";
+
+const STATUS_OPTIONS: readonly TaskStatus[] = [
+  "BACKLOG",
+  "TODO",
+  "IN_PROGRESS",
+  "BLOCKED",
+  "DONE",
+];
 
 export interface TaskListProps {
   projectId: string;
   recommendationService: RecommendationService;
+  onUpdateTaskStatus: (
+    taskId: string,
+    status: TaskStatus,
+  ) => Promise<void> | void;
+  refreshToken?: number;
 }
 
-export function TaskList({ projectId, recommendationService }: TaskListProps) {
+export function TaskList({
+  projectId,
+  recommendationService,
+  onUpdateTaskStatus,
+  refreshToken,
+}: TaskListProps) {
   const [tasks, setTasks] = useState<readonly Task[]>([]);
   const [schedule, setSchedule] = useState<ScheduleResult | null>(null);
   const [loading, setLoading] = useState(false);
@@ -31,7 +49,7 @@ export function TaskList({ projectId, recommendationService }: TaskListProps) {
 
   useEffect(() => {
     loadGraph();
-  }, [loadGraph]);
+  }, [loadGraph, refreshToken]);
 
   if (loading) {
     return <div className="loading">Loading tasks...</div>;
@@ -88,7 +106,22 @@ export function TaskList({ projectId, recommendationService }: TaskListProps) {
                     <span className="task-title"> — {task.title}</span>
                   )}
                 </td>
-                <td>{task.status}</td>
+                <td>
+                  <select
+                    value={task.status}
+                    onChange={(e) =>
+                      onUpdateTaskStatus(task.id, e.target.value as TaskStatus)
+                    }
+                    aria-label={`Status for ${task.id}`}
+                    data-testid={`task-status-${task.id}`}
+                  >
+                    {STATUS_OPTIONS.map((s) => (
+                      <option key={s} value={s}>
+                        {s}
+                      </option>
+                    ))}
+                  </select>
+                </td>
                 <td>{task.value}</td>
                 <td>{task.urgency}</td>
                 <td>{task.estimatedEffort}</td>

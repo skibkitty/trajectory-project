@@ -324,3 +324,20 @@ Completed:
 - TASK-013 merged to main via feat/013-integration-coverage (branch merged, marked DONE)
 - TASK-014 implemented on feat/014-benchmark-algorithms
 
+## 2026-08-31 — PR #16 review remediation (on feat/014-benchmark-algorithms)
+
+Completed:
+- Benchmark report is now an explicit output artifact: `npm run benchmark` prints a results table AND writes it to `benchmark/results.txt` (git-ignored) via a new `benchmark/report.ts` (format + persist table), emitted from the coverage test rather than a separate Node runner that could not resolve `.js`-specifier imports under Node type stripping
+- Dataset sizes extended to 100/1000/5000/10000 tasks (PROJECT_PLAN §16); iteration thresholds documented (50/20/5/2)
+- Dependent and transitive-dependents benchmarks now target a dependent hub (task with the most dependents, tie by lowest id) instead of a leaf, so the measurements are non-trivial — covered by a regression test
+- Deactivated the dead `idx !== i` guard in the dataset generator (dataset determinism unchanged)
+- UI finding #2: `TaskList` now accepts a `refreshToken` prop and reloads when project state changes (wired from `Dashboard`'s `refreshKey`), so the task table refreshes after each edit
+- UI finding #3: each task row in `TaskList` now renders a status `<select>` that calls a new `onUpdateTaskStatus` prop -> `TaskService.updateTaskStatus`, and refreshes the graph/recommendation
+- UI finding #4: `TaskForm.onSubmit` is awaited; fields are cleared only after a successful save (rejects leave the form intact). `Dashboard.handleAddTask` rethrows after surfacing the error so the form knows
+- Docs finding #7: README `Status` and `docs/architecture.md` `Current Status` updated from "Phase 1" to the full current state (persistence, application services, UI, integration, benchmarks)
+- Docs finding #8: added acceptance criteria and verification checklists to TASK-016 (CI/CD) and TASK-017 (architecture case study) in `docs/tasks.md`
+- ADR-011 updated to reflect the 10,000-task dataset, documented iteration thresholds, dependent-hub targeting, and the explicit report output mechanism
+- 6 new TaskList/TaskForm UI tests added (279 total correctness/component/integration tests passing across 30 files)
+- Verified: `npm run verify` passes (typecheck, 279 tests, lint, format); `npm run benchmark` passes (6 tests, table printed + written); `npm run build` succeeds
+
+

@@ -72,6 +72,7 @@ export function createDataset(count: number, seed = 42): BenchmarkDataset {
 
 export const DEFAULT_SEED = 42;
 
-export const DATASET_SIZES = [100, 1000, 5000] as const;
+// PROJECT_PLAN §16 specifies 100, 1000, 5000, and 10,000 task datasets.
+export const DATASET_SIZES = [100, 1000, 5000, 10000] as const;
 
 export const SCENARIO_TASK_ID = "t00000";

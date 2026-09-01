@@ -6,11 +6,13 @@ Domain core complete (Phases 1–5 of the implementation plan: model, graph, sch
 
 ## Current Task
 
-TASK-014 — Benchmark algorithms (implemented on feat/014-benchmark-algorithms) — measures key domain algorithms at 100, 1000, and 5000 tasks via a deterministic dataset generator and a wall-clock best-of-N harness, run as a separate npm script.
+TASK-014 — Benchmark algorithms (implemented on feat/014-benchmark-algorithms) — measures the key domain algorithms at 100, 1000, 5000, and 10,000 tasks via a deterministic dataset generator and a wall-clock best-of-N harness, run as a separate npm script. The PR (#16) review findings are being addressed on this same branch before merge.
 
 ## State
 
-TASK-014 adds `benchmark/datasets.ts` (seeded LCG task-DAG generator), `benchmark/benchmark.ts` (best-of-N wall-clock harness reporting mean + min ms per operation per dataset size), and `benchmark/benchmark.test.ts` (dataset reproducibility, domain-result determinism, scenario input non-mutation, and required-coverage checks that also print the timing table). It runs via `npm run benchmark` under `vitest.benchmark.config.ts` + `tsconfig.benchmark.json`; it is NOT part of `npm test`. Only the public domain API is exercised; the only new dev dependency is `@types/node` (type-only). ADR-011 documents the methodology. 274 correctness tests pass plus 6 benchmark tests.
+TASK-014 adds `benchmark/datasets.ts` (seeded LCG task-DAG generator at 100/1000/5000/10000 tasks), `benchmark/benchmark.ts` (best-of-N wall-clock harness reporting mean + min ms per operation per dataset size), `benchmark/report.ts` (formats and writes the results table), and `benchmark/benchmark.test.ts` (dataset reproducibility, domain-result determinism, scenario input non-mutation, dependent-hub regression, and required-coverage checks that also emit the report). `npm run benchmark` runs `tsc --noEmit -p tsconfig.benchmark.json && vitest run --config vitest.benchmark.config.ts`; it is NOT part of `npm test`. Only the public domain API is exercised; the only new dev dependency is `@types/node` (type-only). ADR-011 documents the methodology. `npm run benchmark` prints the results table AND writes it to `benchmark/results.txt` (git-ignored). 279 correctness/component/integration tests pass plus 6 benchmark tests.
+
+PR #16 review findings remediated on this branch: benchmark report explicitly emitted (table printed + written to `benchmark/results.txt`); deactivated `idx !== i` guard in the dataset generator (determinism unchanged); dataset sizes extended to include 10,000 and iteration thresholds documented (2 for 10k); dependent/transitive-dependents benchmarks now target a dependent hub rather than a leaf ($pickDependentHub); task-list refreshes when project state changes (refreshToken from Dashboard); per-row task status `<select>` wired through `TaskService.updateTaskStatus`; `TaskForm.onSubmit` is awaitable and clears fields only after a successful save.
 
 ## Completed
 
@@ -78,10 +80,11 @@ TASK-014 adds `benchmark/datasets.ts` (seeded LCG task-DAG generator), `benchmar
 - Persistence isolation verified: running a scenario leaves the persisted baseline unchanged; rich task metadata round-trips intact
 - Cross-service state sharing through one repository, project summaries (task/goal counts), cycle rejection across the persistence boundary, and sample-project analysis are all covered
 - 13 new integration tests (274 total passing across 30 files)
-- Algorithm benchmarks: `benchmark/datasets.ts` (seeded LCG task-DAG generator), `benchmark/benchmark.ts` (best-of-N wall-clock harness), `benchmark/benchmark.test.ts` (determinism, coverage, timing table)
-- Benchmark covers graph construction, cycle detection, topological ordering, prerequisite/dependent lookup, transitive traversal, reachability, critical-path analysis, decision scoring, recommendation, and scenario simulation at 100/1000/5000 tasks
+- Algorithm benchmarks: `benchmark/datasets.ts` (seeded LCG task-DAG generator), `benchmark/benchmark.ts` (best-of-N wall-clock harness), `benchmark/report.ts` (format + persist table), `benchmark/benchmark.test.ts` (determinism, coverage, dependent-hub regression, report emission)
+- Benchmark covers graph construction, cycle detection, topological ordering, prerequisite/dependent lookup, transitive traversal, reachability, critical-path analysis, decision scoring, recommendation, and scenario simulation at 100/1000/5000/10000 tasks
 - Benchmarks run only via `npm run benchmark` (dedicated `vitest.benchmark.config.ts` + `tsconfig.benchmark.json`), not `npm test`; new dev deps: `@types/node` (type-only)
-- ADR-011 documenting benchmark methodology (deterministic datasets, best-of-N timing, determinism interpretation, separation from correctness tests)
+- `npm run benchmark` prints the results table and writes it to `benchmark/results.txt` (git-ignored)
+- ADR-011 documenting benchmark methodology (deterministic datasets, best-of-N timing, determinism interpretation, report output, separation from correctness tests)
 - 6 benchmark tests (6/6 pass under `npm run benchmark`)
 
 ## Not Yet Started
@@ -100,11 +103,11 @@ These are intentionally provisional:
 
 ## Next Recommended Action
 
-Merge TASK-014 to main, then proceed to TASK-015 — Accessibility and UX hardening.
+Address the outstanding findings in the PR #16 review before merging TASK-014. Once the branch is merged to main, proceed to TASK-015 — Accessibility and UX hardening.
 
 ## Verification
 
-TASK-014 verification is complete. All commands pass: `npm run verify` (typecheck, 274 tests, lint, format). `npm run benchmark` produces a results table (6 benchmark tests pass). Build succeeds: `npm run build`.
+TASK-014 verification is complete. All commands pass: `npm run verify` (typecheck, 279 tests, lint, format). `npm run benchmark` prints a results table and writes `benchmark/results.txt` (6 benchmark tests pass). Build succeeds: `npm run build`.
 
 ## Important Constraint
 
