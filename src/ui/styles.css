@@ -286,6 +286,13 @@ button.primary:hover:not(:disabled) {
   font-weight: 400;
 }
 
+.graph-scroll {
+  overflow: auto;
+  max-width: 100%;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
 .graph-legend {
   display: flex;
   flex-wrap: wrap;

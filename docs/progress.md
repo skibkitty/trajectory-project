@@ -368,4 +368,6 @@ Completed:
 - Reviewer follow-up reported that form/dependency text ("Add Task", "ID", "Title", "Current Dependencies", dependency rows) blended into the page background, appearing as floating fields/buttons.
 - Root cause: `TaskForm`, `ProjectForm`, and `DependencyEditor` rendered without their surface `className` (`task-form`/`project-form`/`dependency-editor`), so the card background CSS rules targeted these classes but never matched. The components sat transparent on the dark `#1e293b` page background while inheriting dark `#1e293b` text — effectively invisible.
 - Fixed by adding the matching `className` to each component's root element; removed the unused `.section-card` selector from the shared surface rule.
-- Verified: `npm run verify` passes (typecheck, 286 tests, lint, format); `npm run build` succeeds.
+- Also fixed the same bug for the `workspace-heading`: `Dashboard.tsx` renders an `h2.workspace-heading` directly on the dark page background, inheriting dark `#1e293b` text — added a `.workspace-heading { color: #f1f5f9 }` rule so "Project Workspace" is visible.
+- Wrapped the dependency-graph SVG in a scrollable region (`.graph-scroll`, `overflow: auto` + `role="region"`) so long graphs scroll inside the white card instead of overflowing past its edge; heading and legend stay fixed. New regression test (287 total passing).
+- Verified: `npm run verify` passes (typecheck, 287 tests, lint, format); `npm run build` succeeds.

@@ -45,6 +45,26 @@ describe("DependencyGraphVisualization", () => {
     expect(screen.getAllByTestId("graph-edge")).toHaveLength(1);
   });
 
+  it("wraps the svg in a scrollable region", () => {
+    const tasks = [createTask({ id: "a", title: "A" })];
+    const graph = createDependencyGraph(tasks);
+    const schedule = calculateSchedule(tasks, graph);
+
+    render(
+      <DependencyGraphVisualization
+        tasks={tasks}
+        graph={graph}
+        schedule={schedule}
+      />,
+    );
+
+    const scroll = screen.getByTestId("graph-scroll");
+    expect(scroll).toHaveAttribute("role", "region");
+    expect(scroll.querySelector("svg")).not.toBeNull();
+    expect(scroll.querySelector('[data-testid="graph-legend"]')).toBeNull();
+    expect(screen.getByTestId("graph-legend")).toBeInTheDocument();
+  });
+
   it("marks critical path nodes", () => {
     const tasks = [
       createTask({ id: "a", title: "A", estimatedEffort: 3 }),
