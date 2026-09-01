@@ -10,7 +10,7 @@ TASK-015 — Accessibility and UX hardening (implemented on feat/015-accessibili
 
 ## State
 
-TASK-015 adds a design system in `src/ui/styles.css` (CSS custom properties for a consistent palette/spacing/typography, reusable card surfaces, focus-visible rings, styled loading spinner and empty states, table styling, warning/error surfaces, and a responsive layout with media queries below 768px), imported via `main.tsx`. It adds a keyboard-visible skip link and a semantic `<main>` landmark (`#main-content`), labels the project-actions and project-workspace regions, marks the dependency graph SVG as `role=img` with a descriptive aria-label, exposes loading states as `role=status` + `aria-live=polite`, gives dependency remove buttons explicit accessible names, and moves focus to the workspace heading when a project is opened. `src/vite-env.d.ts` (referencing `vite/client`) makes the CSS side-effect import type-check. 6 accessibility tests added in `src/ui/accessibility.test.tsx`. All changes are confined to the UI layer; domain/application/infrastructure are untouched. 285 correctness/component/integration tests pass (279 prior + 6 new), and `npm run build` succeeds.
+TASK-015 adds a design system in `src/ui/styles.css` (CSS custom properties for a consistent palette/spacing/typography, reusable card surfaces, focus-visible rings, styled loading spinner and empty states, table styling, warning/error surfaces, and a responsive layout with media queries below 768px), imported via `main.tsx`. It adds a keyboard-visible skip link and a semantic `<main>` landmark (`#main-content`), labels the project-actions and project-workspace regions, marks the dependency graph SVG as `role=img` with a descriptive aria-label, exposes loading states as `role=status` + `aria-live=polite`, gives dependency remove buttons explicit accessible names, and moves focus to the workspace heading when a project is opened. `src/vite-env.d.ts` (referencing `vite/client`) makes the CSS side-effect import type-check. 7 accessibility tests added in `src/ui/accessibility.test.tsx` (6 initial + 1 focus-regression test added during PR #17 review remediation). All changes are confined to the UI layer; domain/application/infrastructure are untouched. 286 correctness/component/integration tests pass (279 prior + 7 new), and `npm run build` succeeds.
 
 ## Completed
 
@@ -84,7 +84,8 @@ TASK-015 adds a design system in `src/ui/styles.css` (CSS custom properties for 
 - `npm run benchmark` prints the results table and writes it to `benchmark/results.txt` (git-ignored)
 - ADR-011 documenting benchmark methodology (deterministic datasets, best-of-N timing, determinism interpretation, report output, separation from correctness tests)
 - 6 benchmark tests (6/6 pass under `npm run benchmark`)
-- Accessibility and UX hardening (TASK-015): design system in `src/ui/styles.css` imported via `main.tsx` (CSS custom properties, card surfaces, focus-visible rings, styled loading/empty states, responsive layout below 768px); keyboard-visible skip link targeting a semantic `<main>` landmark; labeled project-actions and project-workspace regions; dependency-graph SVG marked `role=img` with aria-label; loading states as `role=status` + `aria-live=polite`; accessible names on dependency remove buttons; focus moved to the workspace heading when a project is opened; `src/vite-env.d.ts` referencing `vite/client`; 6 new accessibility tests in `src/ui/accessibility.test.tsx`
+- Accessibility and UX hardening (TASK-015): design system in `src/ui/styles.css` imported via `main.tsx` (CSS custom properties, card surfaces, focus-visible rings, styled loading/empty states, responsive layout below 768px); keyboard-visible skip link targeting a semantic `<main>` landmark; labeled project-actions and project-workspace regions; dependency-graph SVG marked `role=img` with aria-label; loading states as `role=status` + `aria-live=polite`; accessible names on dependency remove buttons; focus moved to the workspace heading when a project is opened (restricted to project-selection transitions); `src/vite-env.d.ts` referencing `vite/client`; 7 accessibility tests in `src/ui/accessibility.test.tsx`
+- PR #17 review remediation on feat/015: fixed invisible Trajectory heading and 1:1 table-header contrast in `styles.css` (light colors on the dark page background / light header background); fixed focus-steal regression in `Dashboard.tsx` (focus now only moves on an actual project-selection transition via `previousProjectIdRef`), with a regression test
 
 ## Not Yet Started
 
@@ -106,7 +107,7 @@ Create a PR for feat/015-accessibility-ux (TASK-015), review, and merge to main.
 
 ## Verification
 
-TASK-015 verification is complete. All commands pass: `npm run verify` (typecheck, 285 tests, lint, format). Build succeeds: `npm run build`.
+TASK-015 verification is complete. All commands pass: `npm run verify` (typecheck, 286 tests, lint, format). Build succeeds: `npm run build`.
 
 ## Important Constraint
 

@@ -352,3 +352,12 @@ Completed:
 - Added `src/ui/accessibility.test.tsx` with 6 tests covering the skip link, main landmark, labeled regions, styled empty state, live status region, SVG image semantics, and remove-button accessible names
 - All changes confined to the UI layer; domain/application/infrastructure untouched
 - Verified: `npm run verify` passes (typecheck, 285 tests, lint, format); `npm run build` succeeds
+
+## 2026-09-01 — TASK-015 PR review remediation (on feat/015-accessibility-ux)
+
+Completed:
+- Fixed two CSS contrast bugs raised in PR #17 review: the Trajectory heading on the dark page background was invisible (`--color-text` and `--color-bg-soft` both resolve to `#1e293b`), and table headers had a 1:1 contrast ratio for the same reason. The header heading/subtitle now use light colors on the dark background, and table headers now use a light background (`#e2e8f0`) with dark text.
+- Fixed a focus-management regression in `Dashboard.tsx`: the move-focus-to-workspace effect previously fired on any `loading`/`error` change, so any refresh (e.g. adding a task) would steal keyboard focus from the control the user was using. It now only moves focus on an actual project-selection transition (tracked via a `previousProjectIdRef`).
+- Added a regression test that verifies focus moves to the workspace on project selection but is not stolen by a subsequent refresh.
+- Docs updated: handoff/progress note the remediation. 6 new accessibility tests + 1 new regression test (286 total passing).
+- Verified: `npm run verify` passes (typecheck, 286 tests, lint, format); `npm run build` succeeds

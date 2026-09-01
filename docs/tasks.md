@@ -346,7 +346,7 @@ Acceptance criteria:
 - focus management is correct on route/state changes
 
 Verification:
-- npm run verify passes (typecheck, 285 tests, lint, format)
+- npm run verify passes (typecheck, 286 tests, lint, format)
 - npm run build succeeds
 
 ## TASK-016 — CI/CD

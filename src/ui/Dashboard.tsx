@@ -40,9 +40,17 @@ export function Dashboard({
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
   const workspaceHeadingRef = useRef<HTMLHeadingElement | null>(null);
+  const previousProjectIdRef = useRef<string | null>(null);
 
   useEffect(() => {
-    if (selectedProjectId && !loading && !error) {
+    const prevProjectId = previousProjectIdRef.current;
+    previousProjectIdRef.current = selectedProjectId;
+    if (
+      selectedProjectId !== null &&
+      selectedProjectId !== prevProjectId &&
+      !loading &&
+      !error
+    ) {
       workspaceHeadingRef.current?.focus();
     }
   }, [selectedProjectId, loading, error]);
@@ -257,6 +265,7 @@ export function Dashboard({
               ref={workspaceHeadingRef}
               tabIndex={-1}
               className="workspace-heading"
+              data-testid="workspace-heading"
             >
               Project Workspace
             </h2>

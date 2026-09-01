@@ -153,8 +153,12 @@ button.primary:hover:not(:disabled) {
   text-align: center;
 }
 
+.dashboard-header h1 {
+  color: #f1f5f9;
+}
+
 .dashboard-subtitle {
-  color: var(--color-text-muted);
+  color: #cbd5e1;
   margin-bottom: 0;
 }
 
@@ -269,7 +273,7 @@ button.primary:hover:not(:disabled) {
 .task-table th,
 .factor-table th,
 .scenario-table th {
-  background: var(--color-bg-soft);
+  background: #e2e8f0;
   color: var(--color-text);
   font-weight: 700;
 }

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import { Dashboard } from "./Dashboard.js";
 import { ProjectService } from "../application/project-service.js";
 import { RecommendationService } from "../application/recommendation-service.js";
@@ -196,5 +196,59 @@ describe("Accessibility and UX", () => {
         name: "Remove dependency: t1 is prerequisite for t2",
       }),
     ).toBeInTheDocument();
+  });
+
+  it("moves focus to the workspace on project selection but not on a subsequent refresh", async () => {
+    const project = makeTestProject();
+    const summary: ProjectSummary = {
+      id: project.id,
+      name: project.name,
+      description: project.description,
+      taskCount: project.tasks.length,
+      goalCount: project.goals.length,
+    };
+    let currentProject = project;
+    const repository = createStubRepository({
+      list: vi.fn().mockResolvedValue([summary]),
+      load: vi.fn().mockResolvedValue(currentProject),
+      save: vi
+        .fn()
+        .mockImplementation(async (p: Project) => (currentProject = p)),
+    });
+    renderDashboard(repository);
+
+    await waitFor(() => {
+      expect(screen.getByText(/Test Project/)).toBeInTheDocument();
+    });
+
+    fireEvent.change(screen.getByRole("combobox"), {
+      target: { value: "proj-1" },
+    });
+
+    await waitFor(() => {
+      expect(document.activeElement).toHaveAttribute(
+        "data-testid",
+        "workspace-heading",
+      );
+    });
+
+    const addButton = screen.getByTestId("add-task-button");
+    addButton.focus();
+    expect(document.activeElement).toBe(addButton);
+
+    fireEvent.change(screen.getByTestId("task-id-input"), {
+      target: { value: "t9" },
+    });
+    fireEvent.change(screen.getByTestId("task-title-input"), {
+      target: { value: "New task" },
+    });
+    fireEvent.click(addButton);
+
+    await waitFor(() => {
+      expect(document.activeElement).not.toHaveAttribute(
+        "data-testid",
+        "workspace-heading",
+      );
+    });
   });
 });
