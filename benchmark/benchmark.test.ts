@@ -8,7 +8,7 @@ import {
   simulateScenario,
   applyScenario,
 } from "../src/domain/index.js";
-import { runBenchmark } from "./benchmark.js";
+import { runBenchmark, OPERATION_NAMES } from "./benchmark.js";
 
 /**
  * These tests verify the benchmark harness's own guarantees: deterministic,
@@ -97,26 +97,23 @@ describe("benchmark operation determinism", () => {
 
 describe("benchmark harness output", () => {
   it("covers every dataset size and required operation", () => {
-    const results = runBenchmark([100, 1000], DEFAULT_SEED);
-    const operations = [
-      "graph-construction",
-      "topological-order",
-      "cycle-detection",
-      "transitive-dependents",
-      "critical-path",
-      "decision-scoring",
-      "scenario-simulation",
-    ];
-    for (const op of operations) {
-      const matches = results.filter((r) => r.operation === op);
-      expect(matches.map((m) => m.taskCount)).toEqual([100, 1000]);
+    const results = runBenchmark(DATASET_SIZES, DEFAULT_SEED);
+
+    // Every operation in the canonical list is measured, at every dataset size.
+    for (const name of OPERATION_NAMES) {
+      const matches = results.filter((r) => r.operation === name);
+      expect(matches.map((m) => m.taskCount)).toEqual([...DATASET_SIZES]);
       for (const m of matches) {
         expect(m.meanMs).toBeGreaterThanOrEqual(0);
         expect(m.minMs).toBeGreaterThanOrEqual(0);
         expect(m.iterations).toBeGreaterThan(0);
       }
     }
-  });
+
+    // No operation outside the canonical list is reported.
+    const reported = new Set(results.map((r) => r.operation));
+    expect(reported.size).toBe(OPERATION_NAMES.length);
+  }, 120_000);
 });
 
 describe("benchmark timing report", () => {

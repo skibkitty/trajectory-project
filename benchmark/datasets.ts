@@ -44,8 +44,9 @@ export function createDataset(count: number, seed = 42): BenchmarkDataset {
       const prereqCount = Math.floor(rand() * 3); // 0..2 prerequisites
       const seen = new Set<number>();
       for (let p = 0; p < prereqCount && dependencies.length < 2; p += 1) {
+        // idx is in [0, i - 1], so a task can never depend on itself here.
         const idx = Math.floor(rand() * i);
-        if (idx !== i && !seen.has(idx)) {
+        if (!seen.has(idx)) {
           seen.add(idx);
           dependencies.push(`t${String(idx).padStart(5, "0")}`);
         }

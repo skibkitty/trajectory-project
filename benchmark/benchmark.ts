@@ -47,10 +47,32 @@ function bestOf<T>(
 }
 
 function iterationsFor(count: number): number {
+  // More iterations for smaller graphs, fewer for larger ones: the cost of a
+  // single iteration grows with the graph size, so we trade stability for wall
+  // time while keeping every reported mean based on a meaningful sample.
   if (count <= 100) return 50;
   if (count <= 1000) return 20;
   return 5;
 }
+
+/**
+ * Canonical list of the operations the harness measures. Exported so the
+ * runner and the coverage test cannot drift apart.
+ */
+export const OPERATION_NAMES = [
+  "graph-construction",
+  "topological-order",
+  "cycle-detection",
+  "prerequisite-lookup",
+  "dependent-lookup",
+  "transitive-dependents",
+  "transitive-prerequisites",
+  "reachability",
+  "critical-path",
+  "decision-scoring",
+  "recommendation",
+  "scenario-simulation",
+] as const;
 
 /**
  * Measure every named operation against a deterministic dataset.
@@ -128,7 +150,7 @@ function collectOperations(ctx: BenchmarkContext): readonly NamedOperation[] {
       fn: () => graph.getAllPrerequisites(last),
     },
     {
-      name: "reachability (all to first)",
+      name: "reachability",
       fn: () => {
         for (const task of tasks) graph.isReachable(task.id, first);
       },
