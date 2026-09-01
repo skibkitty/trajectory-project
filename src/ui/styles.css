@@ -162,6 +162,10 @@ button.primary:hover:not(:disabled) {
   margin-bottom: 0;
 }
 
+.workspace-heading {
+  color: #f1f5f9;
+}
+
 .project-selector,
 .recommendation-panel,
 .task-list,
