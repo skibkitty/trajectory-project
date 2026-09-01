@@ -2,15 +2,15 @@
 
 ## Phase
 
-Domain core complete (Phases 1–5 of the implementation plan: model, graph, scheduling, decision engine, scenario simulation). Persistence implemented. Application services implemented. UI foundation complete. CRUD UI and dependency visualization complete. Scenario comparison complete. Integration coverage complete. Algorithm benchmarks implemented.
+Domain core complete (Phases 1–5 of the implementation plan: model, graph, scheduling, decision engine, scenario simulation). Persistence implemented. Application services implemented. UI foundation complete. CRUD UI and dependency visualization complete. Scenario comparison complete. Integration coverage complete. Algorithm benchmarks implemented. Accessibility and UX hardening complete.
 
 ## Current Task
 
-TASK-015 — Accessibility and UX hardening (implemented on feat/015-accessibility-ux) — makes the application polished and demonstrable with a consistent visual design, keyboard/ARIA accessibility, responsive behavior, styled loading/empty states, and focus management. Implemented and verified on this branch, pending PR review and merge.
+TASK-016 — CI/CD (implemented on feat/016-ci-cd) — automate verification and deployment via GitHub Actions. Adds a CI workflow that runs the full local verification gate (`npm run verify`), the benchmark suite (`npm run benchmark`), and the production build (`npm run build`) on every push/PR to main, and uploads the benchmark report as an artifact. Pending PR review and merge; branch protection for required status checks must be configured in the GitHub repository settings by a human.
 
 ## State
 
-TASK-015 adds a design system in `src/ui/styles.css` (CSS custom properties for a consistent palette/spacing/typography, reusable card surfaces, focus-visible rings, styled loading spinner and empty states, table styling, warning/error surfaces, and a responsive layout with media queries below 768px), imported via `main.tsx`. It adds a keyboard-visible skip link and a semantic `<main>` landmark (`#main-content`), labels the project-actions and project-workspace regions, marks the dependency graph SVG as `role=img` with a descriptive aria-label, exposes loading states as `role=status` + `aria-live=polite`, gives dependency remove buttons explicit accessible names, and moves focus to the workspace heading when a project is opened. `src/vite-env.d.ts` (referencing `vite/client`) makes the CSS side-effect import type-check. 7 accessibility tests added in `src/ui/accessibility.test.tsx` (6 initial + 1 focus-regression test added during PR #17 review remediation). All changes are confined to the UI layer; domain/application/infrastructure are untouched. 286 correctness/component/integration tests pass (279 prior + 7 new), and `npm run build` succeeds.
+TASK-016 adds `.github/workflows/ci.yml` with three independent jobs: `verify` (typecheck, tests, lint, format via `npm run verify`), `benchmark` (runs `npm run benchmark` and uploads `benchmark/results.txt` as a `benchmark-results` artifact with `if-no-files-found: warn`), and `build` (production `vite build`). All jobs run on `ubuntu-latest` with Node 24 and `npm ci` (npm cache enabled via `actions/setup-node`). Workflow triggers on push and pull_request to `main`. No production code changes — this is purely infrastructure configuration. TASK-015 is merged to main (PR #17) and marked DONE; 287 correctness/component/integration tests pass locally, `npm run build` succeeds, and `npm run benchmark` passes (6 tests) and writes `benchmark/results.txt`.
 
 ## Completed
 
@@ -103,11 +103,11 @@ These are intentionally provisional:
 
 ## Next Recommended Action
 
-Create a PR for feat/015-accessibility-ux (TASK-015), review, and merge to main. Once merged, proceed to TASK-016 — CI/CD.
+Create a PR for feat/016-ci-cd (TASK-016), review, and merge to main. Once merged, proceed to TASK-017 — Architecture case study and final documentation.
 
 ## Verification
 
-TASK-015 verification is complete. All commands pass: `npm run verify` (typecheck, 286 tests, lint, format). Build succeeds: `npm run build`.
+TASK-016 verification is complete locally: `npm run verify` (typecheck, 287 tests, lint, format), `npm run build`, and `npm run benchmark` (6 tests) all pass. CI itself must be verified by pushing to GitHub and observing the workflow run on the PR.
 
 ## Important Constraint
 

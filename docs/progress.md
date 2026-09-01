@@ -371,3 +371,18 @@ Completed:
 - Also fixed the same bug for the `workspace-heading`: `Dashboard.tsx` renders an `h2.workspace-heading` directly on the dark page background, inheriting dark `#1e293b` text — added a `.workspace-heading { color: #f1f5f9 }` rule so "Project Workspace" is visible.
 - Wrapped the dependency-graph SVG in a scrollable region (`.graph-scroll`, `overflow: auto` + `role="region"`) so long graphs scroll inside the white card instead of overflowing past its edge; heading and legend stay fixed. New regression test (287 total passing).
 - Verified: `npm run verify` passes (typecheck, 287 tests, lint, format); `npm run build` succeeds.
+
+## 2026-09-01 -- CI/CD implemented (TASK-016)
+
+Completed:
+- Added `.github/workflows/ci.yml` with three independent GitHub Actions jobs running on every push/PR to main
+- `verify` job: runs the full local verification gate (typecheck, tests, lint, format) via `npm run verify`
+- `benchmark` job: runs `npm run benchmark` and uploads `benchmark/results.txt` as a `benchmark-results` artifact (`if-no-files-found: warn`)
+- `build` job: runs the production build (`npm run build`)
+- All jobs use `ubuntu-latest`, Node 24, and `npm ci` with npm cache enabled via `actions/setup-node`
+- No production code changes; this is purely infrastructure configuration
+- TASK-015 marked DONE (merged to main via PR #17)
+- Verified locally: `npm run verify` (typecheck, 287 tests, lint, format), `npm run build`, and `npm run benchmark` (6 tests) all pass
+- CI itself must be verified by pushing the branch and observing the workflow run on the PR; required status checks must be configured in GitHub branch protection by a human
+
+Next: TASK-017 -- Architecture case study and final documentation.
