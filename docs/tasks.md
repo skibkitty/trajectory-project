@@ -259,7 +259,7 @@ Verification:
 
 ## TASK-012 — Build scenario comparison
 
-Status: IN_PROGRESS
+Status: DONE
 
 Goal:
 Let the user run and compare a scenario against baseline.
@@ -282,7 +282,7 @@ Verification:
 
 ## TASK-013 — Add integration and E2E coverage
 
-Status: IN_PROGRESS
+Status: DONE
 
 Goal:
 Protect the primary user workflow.
@@ -306,13 +306,26 @@ Verification:
 
 ## TASK-014 — Benchmark algorithms
 
-Status: BACKLOG
+Status: READY
 
 Goal:
 Measure algorithm performance at meaningful graph sizes.
 
 Prerequisites:
 TASK-013
+
+Acceptance criteria:
+- benchmark tests exercise the key domain algorithms (graph construction, cycle detection, topological ordering, dependency traversal, critical-path analysis, decision-engine scoring, scenario simulation)
+- benchmark datasets include at least 100, 1000, and 5000 tasks
+- benchmarks report wall-clock time for each operation at each dataset size
+- benchmark results are deterministic (same input produces same time-ordered results)
+- benchmarks run as a separate npm script, not as part of the default test suite
+- domain code has no benchmark-specific dependencies
+- all verification commands continue to pass
+
+Verification:
+- npm run benchmark produces a results table
+- npm run verify passes (typecheck, tests, lint, format)
 
 ## TASK-015 — Accessibility and UX hardening
 
