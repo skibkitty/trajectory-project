@@ -9,3 +9,7 @@ coverage/
 tsconfig.tsbuildinfo
 tsconfig.app.tsbuildinfo
 benchmark/results.txt
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/

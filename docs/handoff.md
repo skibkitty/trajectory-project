@@ -6,11 +6,11 @@ Domain core complete (Phases 1–5 of the implementation plan: model, graph, sch
 
 ## Current Task
 
-TASK-016 — CI/CD (implemented on feat/016-ci-cd) — automate verification and deployment via GitHub Actions. Adds a CI workflow that runs the full local verification gate (`npm run verify`), the benchmark suite (`npm run benchmark`), and the production build (`npm run build`) on every push/PR to main, and uploads the benchmark report as an artifact. Pending PR review and merge; branch protection for required status checks must be configured in the GitHub repository settings by a human.
+TASK-016 — CI/CD (implemented on feat/016-ci-cd) — automate verification and deployment via GitHub Actions. Adds a CI workflow that runs the full local verification gate (`npm run verify`), the benchmark suite (`npm run benchmark`), and the production build (`npm run build`) on every push/PR to main, uploads the benchmark report as an artifact, and adds Playwright E2E coverage of the primary user journey with its own CI job. Pending PR review and merge; branch protection for required status checks must be configured in the GitHub repository settings by a human.
 
 ## State
 
-TASK-016 adds `.github/workflows/ci.yml` with three independent jobs: `verify` (typecheck, tests, lint, format via `npm run verify`), `benchmark` (runs `npm run benchmark` and uploads `benchmark/results.txt` as a `benchmark-results` artifact with `if-no-files-found: warn`), and `build` (production `vite build`). All jobs run on `ubuntu-latest` with Node 24 and `npm ci` (npm cache enabled via `actions/setup-node`). Workflow triggers on push and pull_request to `main`. No production code changes — this is purely infrastructure configuration. TASK-015 is merged to main (PR #17) and marked DONE; 287 correctness/component/integration tests pass locally, `npm run build` succeeds, and `npm run benchmark` passes (6 tests) and writes `benchmark/results.txt`.
+TASK-016 adds `.github/workflows/ci.yml` with four independent jobs: `verify` (typecheck, tests, lint, format via `npm run verify`), `benchmark` (runs `npm run benchmark` and uploads `benchmark/results.txt` as a `benchmark-results` artifact with `if-no-files-found: warn`), `e2e` (installs Chromium via `npx playwright install --with-deps chromium`, runs `npm run test:e2e`, and uploads the Playwright HTML report on failure), and `build` (production `vite build`). All jobs run on `ubuntu-latest` with Node 24 and `npm ci` (npm cache enabled via `actions/setup-node`). Workflow triggers on push and pull_request to `main`. E2E coverage uses `playwright.config.ts` (single Chromium project, self-managed dev server via `webServer`, CI-specific retries/serial workers), `tsconfig.e2e.json` (type-checks e2e specs before running), and two specs in `e2e/`: `primary-journey.spec.ts` (create project → add tasks → add dependencies → view recommendation → inspect factors → run delay scenario → compare → de-scope → verify baseline unchanged) and `sample-project.spec.ts` (sample project recommendation, factor breakdown, dependency graph with critical path). E2E specs are excluded from the Vitest suite by its `include` glob and run only via `npm run test:e2e`. No production code changes — CI/E2E are purely infrastructure/testing configuration. TASK-015 is merged to main (PR #17) and marked DONE; 287 correctness/component/integration tests and 2 E2E specs pass locally, `npm run build` succeeds, and `npm run benchmark` passes (6 tests) and writes `benchmark/results.txt`.
 
 ## Completed
 
@@ -86,10 +86,11 @@ TASK-016 adds `.github/workflows/ci.yml` with three independent jobs: `verify` (
 - 6 benchmark tests (6/6 pass under `npm run benchmark`)
 - Accessibility and UX hardening (TASK-015): design system in `src/ui/styles.css` imported via `main.tsx` (CSS custom properties, card surfaces, focus-visible rings, styled loading/empty states, responsive layout below 768px); keyboard-visible skip link targeting a semantic `<main>` landmark; labeled project-actions and project-workspace regions; dependency-graph SVG marked `role=img` with aria-label; loading states as `role=status` + `aria-live=polite`; accessible names on dependency remove buttons; focus moved to the workspace heading when a project is opened (restricted to project-selection transitions); `src/vite-env.d.ts` referencing `vite/client`; 7 accessibility tests in `src/ui/accessibility.test.tsx`
 - PR #17 review remediation on feat/015: fixed invisible Trajectory heading and 1:1 table-header contrast in `styles.css` (light colors on the dark page background / light header background); fixed focus-steal regression in `Dashboard.tsx` (focus now only moves on an actual project-selection transition via `previousProjectIdRef`), with a regression test; fixed missing card surfaces after reviewer follow-up — `TaskForm`/`ProjectForm`/`DependencyEditor` now carry their surface `className` (`task-form`/`project-form`/`dependency-editor`) so the card background CSS actually matches, and the unused `.section-card` selector was removed; the `workspace-heading` ("Project Workspace") — also a direct child of the dark page background — is now styled `#f1f5f9`; the dependency-graph SVG is wrapped in a scrollable region (`.graph-scroll`, `overflow: auto`, `role=region`) so long graphs scroll inside the white card while the heading and legend stay fixed
+- Playwright E2E coverage (TASK-016): `@playwright/test` dev dependency, `playwright.config.ts` (single Chromium project, self-managed dev server, CI-specific retries/serial workers), `tsconfig.e2e.json`, and two specs under `e2e/` covering the primary user journey and the sample-project demo; `npm run test:e2e` type-checks the specs then runs Playwright; Playwright artifacts git-ignored; a fourth `e2e` CI job installs Chromium and uploads the report on failure; ADR-012 documents the CI/CD + E2E design
 
 ## Not Yet Started
 
-- Browser-level E2E coverage (deferred to TASK-016 CI/CD)
+- Branch protection / required status checks on GitHub (human repository-settings action, not a repo-file change)
 
 ## Human Decisions Still Needed
 
@@ -107,7 +108,7 @@ Create a PR for feat/016-ci-cd (TASK-016), review, and merge to main. Once merge
 
 ## Verification
 
-TASK-016 verification is complete locally: `npm run verify` (typecheck, 287 tests, lint, format), `npm run build`, and `npm run benchmark` (6 tests) all pass. CI itself must be verified by pushing to GitHub and observing the workflow run on the PR.
+TASK-016 verification is complete locally: `npm run verify` (typecheck, 287 tests, lint, format), `npm run build`, `npm run benchmark` (6 tests), and `npm run test:e2e` (2 Playwright specs, requires Chromium installed via `npx playwright install chromium`) all pass. CI itself must be verified by pushing to GitHub and observing the workflow run on the PR.
 
 ## Important Constraint
 

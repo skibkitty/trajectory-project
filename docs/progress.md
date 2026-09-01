@@ -386,3 +386,20 @@ Completed:
 - CI itself must be verified by pushing the branch and observing the workflow run on the PR; required status checks must be configured in GitHub branch protection by a human
 
 Next: TASK-017 -- Architecture case study and final documentation.
+
+## 2026-09-01 -- Playwright E2E coverage added (TASK-016, part 2)
+
+Completed:
+- Added `@playwright/test` as a dev dependency (1.62.1)
+- Added `playwright.config.ts`: single Chromium project, `fullyParallel` locally, self-managed dev server via `webServer` (`npm run dev`, `reuseExistingServer: !CI`), CI-specific settings (`forbidOnly`, `retries: 2`, `workers: 1`, HTML reporter), baseURL on port 5173
+- Added `tsconfig.e2e.json` so E2E specs and the Playwright config are type-checked; `npm run test:e2e` runs `tsc` first, then `playwright test`
+- Added two specs under `e2e/` (excluded from the Vitest suite by its `include` glob):
+- `primary-journey.spec.ts` - the PROJECT_PLAN §15 journey: create project -> add tasks -> add dependency -> view recommendation -> inspect factor breakdown -> run a delay scenario (asserts `+1` duration delta and affected downstream) -> de-scope a task (asserts value removed `5` and the projected recommendation changing) -> verify the baseline project is unchanged
+  - `sample-project.spec.ts` - seeds the sample project; asserts the deterministic `t4` recommendation, all six factor rows, the SVG dependency graph (`role=img`, 8 edges), critical-path marking (t8 critical, t6 not), and the legend
+- Playwright artifacts (`test-results/`, `playwright-report/`, `blob-report/`, `playwright/.cache/`) added to `.gitignore`
+- Added a fourth `e2e` job to `.github/workflows/ci.yml`: installs Chromium via `npx playwright install --with-deps chromium`, runs `npm run test:e2e`, and uploads `playwright-report` as an artifact on failure (`retention-days: 14`)
+- Added ADR-012 documenting the CI/CD workflow and Playwright E2E design (job split, Playwright config, E2E/unit-test separation, report artifacts, branch protection as a human action)
+- E2E learning: `<option>` elements are not "visible" to Playwright (wait with `state: "attached"`), and SVG `<line>` edges count as hidden (assert edge count instead); the sample project's critical path is t1/t2/t4/t5/t8, so t6 (slack 2) is the non-critical node to assert
+- Verified locally: `npm run test:e2e` (2 specs pass), `npm run verify` (typecheck incl. e2e via its own script, 287 tests, lint, format), and `npm run build` all pass
+
+Next: TASK-017 -- Architecture case study and final documentation.
