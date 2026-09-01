@@ -361,3 +361,11 @@ Completed:
 - Added a regression test that verifies focus moves to the workspace on project selection but is not stolen by a subsequent refresh.
 - Docs updated: handoff/progress note the remediation. 6 new accessibility tests + 1 new regression test (286 total passing).
 - Verified: `npm run verify` passes (typecheck, 286 tests, lint, format); `npm run build` succeeds
+
+## 2026-09-01 — TASK-015 PR follow-up: fix missing card surfaces (on feat/015-accessibility-ux)
+
+Completed:
+- Reviewer follow-up reported that form/dependency text ("Add Task", "ID", "Title", "Current Dependencies", dependency rows) blended into the page background, appearing as floating fields/buttons.
+- Root cause: `TaskForm`, `ProjectForm`, and `DependencyEditor` rendered without their surface `className` (`task-form`/`project-form`/`dependency-editor`), so the card background CSS rules targeted these classes but never matched. The components sat transparent on the dark `#1e293b` page background while inheriting dark `#1e293b` text — effectively invisible.
+- Fixed by adding the matching `className` to each component's root element; removed the unused `.section-card` selector from the shared surface rule.
+- Verified: `npm run verify` passes (typecheck, 286 tests, lint, format); `npm run build` succeeds.

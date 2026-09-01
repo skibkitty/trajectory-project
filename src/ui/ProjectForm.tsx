@@ -18,7 +18,11 @@ export function ProjectForm({ onSubmit }: ProjectFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} data-testid="project-form">
+    <form
+      onSubmit={handleSubmit}
+      className="project-form"
+      data-testid="project-form"
+    >
       <h2>Create Project</h2>
       <div>
         <label htmlFor="project-name">Name</label>

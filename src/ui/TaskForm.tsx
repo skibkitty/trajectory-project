@@ -71,7 +71,7 @@ export function TaskForm({ existingTaskIds, onSubmit }: TaskFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} data-testid="task-form">
+    <form onSubmit={handleSubmit} className="task-form" data-testid="task-form">
       <h3>Add Task</h3>
       {error && (
         <div className="error" role="alert" data-testid="task-form-error">
