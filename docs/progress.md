@@ -284,7 +284,7 @@ Completed:
 
 Next: TASK-013 — Add integration and E2E coverage.
 
-## 2026-08-31 � Integration coverage added (TASK-013)
+## 2026-08-31 � Integration coverage added (TASK-013)
 
 Completed:
 - Added integration test suites in `src/integration/`: `primary-workflow.test.ts` and `recommendation-scenario.test.ts`
@@ -299,4 +299,28 @@ Completed:
 - Added acceptance criteria and verification for TASK-013 in docs/tasks.md
 - Verified all commands pass: `npm run verify` (typecheck, 274 tests, lint, format); build succeeds
 
-Next: TASK-014 � Benchmark algorithms.
+Next: TASK-014 � Benchmark algorithms.
+
+## 2026-08-31 � Benchmark algorithms implemented (TASK-014)
+
+Completed:
+- Added `benchmark/` directory (outside `src/`) with deterministic benchmark datasets and a wall-clock measurement harness
+- `benchmark/datasets.ts`: seeded LCG task-DAG generator — a given seed always yields the identical task set (id, metadata, dependencies); tasks depend only on earlier tasks so the graph is a guaranteed acyclic DAG
+- `benchmark/benchmark.ts`: measures each key domain operation via a best-of-N loop (`process.hrtime.bigint()`), reporting mean + min wall-clock ms and iteration count
+- Covered operations: graph construction, cycle detection, topological ordering, prerequisite/dependent lookup, transitive traversal, full-graph reachability, critical-path analysis, decision-engine scoring, recommendation explainability, and scenario simulation
+- Datasets at 100, 1000, and 5000 tasks as required by TASK-014 acceptance criteria
+- Determinism verified by tests: identical `topologicalOrder`/`criticalPath`/evaluation/recommendation across repeated runs, and scenario application leaves the input unmutated
+- Benchmarks run as a separate npm script (`npm run benchmark`) with a dedicated Vitest config (`vitest.benchmark.config.ts`) and `tsconfig.benchmark.json`; they do not run as part of `npm test`
+- Domain code is untouched — only the public domain API is exercised; the only new dev dependency is `@types/node` (type-only)
+- Added ADR-011 documenting the benchmark methodology, determinism interpretation, and separation from correctness tests
+- 6 new benchmark tests (validates dataset reproducibility, validity, operation determinism, and harness output)
+- Verified: `npm run benchmark` prints a results table; `npm run verify` passes (typecheck, 274 tests, lint, format); `npm run build` succeeds
+
+Next: TASK-015 — Accessibility and UX hardening.
+
+## 2026-08-31 — Handoff update
+
+Completed:
+- TASK-013 merged to main via feat/013-integration-coverage (branch merged, marked DONE)
+- TASK-014 implemented on feat/014-benchmark-algorithms
+

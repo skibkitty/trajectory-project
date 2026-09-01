@@ -306,7 +306,7 @@ Verification:
 
 ## TASK-014 — Benchmark algorithms
 
-Status: READY
+Status: DONE
 
 Goal:
 Measure algorithm performance at meaningful graph sizes.

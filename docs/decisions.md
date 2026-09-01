@@ -238,3 +238,32 @@ TASK-008 requires persisting projects locally behind a repository abstraction. T
 - Testing uses an in-memory `StorageProvider` with no filesystem or browser dependency.
 - Schema versioning provides a foundation for future migration logic when the format changes.
 - Serialization round-trips are covered by dedicated tests; repository CRUD, list ordering, and corrupted-entry handling are also tested.
+
+## ADR-011 — Benchmark Methodology
+
+### Status
+Accepted
+
+### Context
+TASK-014 requires measuring the key domain algorithms at meaningful graph sizes without claiming unmeasured performance. PROJECT_PLAN §16 requires measuring only operations that matter, benchmarking after correctness exists, and supporting at least 100, 1000, 5000, and 10,000 task datasets (this task implements at least 100/1000/5000). PROJECT_PLAN §16 also forbids inventing performance claims.
+
+### Decision
+
+- **Location and separation**: benchmarks live in `benchmark/` outside `src/`, and run under a dedicated Vitest config (`vitest.benchmark.config.ts`) via `npm run benchmark`. The default `npm run test` (which targets `src/**`) does not run benchmarks — they stay out of CI's fast feedback loop. A separate `tsconfig.benchmark.json` type-checks the benchmark sources (it must compile like any other code).
+- **No benchmark-specific domain code**: only the public domain API (`createDependencyGraph`, `calculateSchedule`, `evaluateTasks`, `recommendNextTask`, `applyScenario`/`simulateScenario`) is exercised. No benchmark code is added to `src/domain`. The only new runtime dependency type is `@types/node` for the benchmark harness (Node's `process.hrtime`), a dev-only type package — the domain remains dependency-free.
+- **Deterministic datasets**: `benchmark/datasets.ts` generates reproducible task DAGs from a seeded linear-congruential generator. A given `seed` always yields the identical task set (id, metadata, dependencies). Tasks depend only on earlier tasks, so the graph is a guaranteed acyclic DAG with a non-trivial structure; each task may have 0–2 prerequisites, and value/urgency/effort/confidence vary across a deterministic stream.
+- **Measurement methodology**: a given operation is timed over several iterations (best-of-N: 50 for ≤100 tasks, 20 for ≤1000, 5 for a full 5000-task run) using `process.hrtime.bigint()`. Both mean and minimum wall-clock milliseconds are reported, plus the iteration count, so the reader can judge stability. The methodology is fixed and documented; raw timings are inherently machine-dependent and are not presented as a cross-machine claim.
+- **Covered operations**: graph construction, cycle detection, topological ordering, prerequisite/dependent lookup, transitive (all-prerequisite / all-dependent) traversal, reachability across all nodes, critical-path analysis, decision-engine scoring, recommendation explainability, and scenario simulation — each reported at each dataset size.
+- **Determinism guarantee**: because datasets are deterministic and the domain algorithms are deterministic (ADR-005/006/007), repeated and reordered runs of the harness produce identical *domain results*. The benchmark tests verify this (identical `topologicalOrder`, `criticalPath`, evaluation, and recommendation across runs; scenario application leaves input unmutated) rather than asserting that wall-clock nanoseconds are bit-identical, which would be meaningless.
+
+### Alternatives considered
+- Using a dedicated benchmarking library (e.g. `benny` or `tinybench`): rejected — a hand-rolled best-of-N loop is transparent, has no dependencies, and is more than sufficient for coarse wall-clock comparisons.
+- Running benchmarks as part of `npm test`: rejected — it would slow the default suite and conflate correctness with performance feedback.
+- Publishing absolute timings as performance claims: rejected — timings are machine-dependent; the task and this record treat them as relative signals for future optimization, per PROJECT_PLAN §16's "optimization must follow measurement".
+
+### Consequences
+- `npm run benchmark` type-checks and runs the benchmark suite, printing a results table grouped by operation and dataset size.
+- Correctness tests and benchmarks are cleanly separated in both tooling and source layout.
+- The seeded-dataset generator and harness can grow to 10,000 tasks (PROJECT_PLAN §16) later without changing the methodology.
+- No performance claims are added to the resume story until measurements are actually produced and placed in context.
+

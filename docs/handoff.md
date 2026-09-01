@@ -2,15 +2,15 @@
 
 ## Phase
 
-Domain core complete (Phases 1–5 of the implementation plan: model, graph, scheduling, decision engine, scenario simulation). Persistence implemented. Application services implemented. UI foundation complete. CRUD UI and dependency visualization complete. Scenario comparison complete. Integration coverage in progress.
+Domain core complete (Phases 1–5 of the implementation plan: model, graph, scheduling, decision engine, scenario simulation). Persistence implemented. Application services implemented. UI foundation complete. CRUD UI and dependency visualization complete. Scenario comparison complete. Integration coverage complete. Algorithm benchmarks implemented.
 
 ## Current Task
 
-TASK-013 — Add integration and E2E coverage (in progress; implemented on feat/013-integration-coverage) — scoped to integration tests for this pass; browser E2E deferred to TASK-016
+TASK-014 — Benchmark algorithms (implemented on feat/014-benchmark-algorithms) — measures key domain algorithms at 100, 1000, and 5000 tasks via a deterministic dataset generator and a wall-clock best-of-N harness, run as a separate npm script.
 
 ## State
 
-TASK-013 adds integration tests that protect the primary user workflow across the real stack. Tests in `src/integration/` drive the application services (`ProjectService`, `GoalService`, `TaskService`, `DependencyService`, `RecommendationService`, `ScenarioService`) against a real `LocalProjectRepository` backed by an in-memory `StorageProvider` — i.e. crossing application + domain + infrastructure/serialization boundaries rather than using stub repositories. 274 tests pass (261 prior + 13 new integration tests).
+TASK-014 adds `benchmark/datasets.ts` (seeded LCG task-DAG generator), `benchmark/benchmark.ts` (best-of-N wall-clock harness reporting mean + min ms per operation per dataset size), and `benchmark/benchmark.test.ts` (dataset reproducibility, domain-result determinism, scenario input non-mutation, and required-coverage checks that also print the timing table). It runs via `npm run benchmark` under `vitest.benchmark.config.ts` + `tsconfig.benchmark.json`; it is NOT part of `npm test`. Only the public domain API is exercised; the only new dev dependency is `@types/node` (type-only). ADR-011 documents the methodology. 274 correctness tests pass plus 6 benchmark tests.
 
 ## Completed
 
@@ -78,6 +78,11 @@ TASK-013 adds integration tests that protect the primary user workflow across th
 - Persistence isolation verified: running a scenario leaves the persisted baseline unchanged; rich task metadata round-trips intact
 - Cross-service state sharing through one repository, project summaries (task/goal counts), cycle rejection across the persistence boundary, and sample-project analysis are all covered
 - 13 new integration tests (274 total passing across 30 files)
+- Algorithm benchmarks: `benchmark/datasets.ts` (seeded LCG task-DAG generator), `benchmark/benchmark.ts` (best-of-N wall-clock harness), `benchmark/benchmark.test.ts` (determinism, coverage, timing table)
+- Benchmark covers graph construction, cycle detection, topological ordering, prerequisite/dependent lookup, transitive traversal, reachability, critical-path analysis, decision scoring, recommendation, and scenario simulation at 100/1000/5000 tasks
+- Benchmarks run only via `npm run benchmark` (dedicated `vitest.benchmark.config.ts` + `tsconfig.benchmark.json`), not `npm test`; new dev deps: `@types/node` (type-only)
+- ADR-011 documenting benchmark methodology (deterministic datasets, best-of-N timing, determinism interpretation, separation from correctness tests)
+- 6 benchmark tests (6/6 pass under `npm run benchmark`)
 
 ## Not Yet Started
 
@@ -95,11 +100,11 @@ These are intentionally provisional:
 
 ## Next Recommended Action
 
-Merge TASK-013 to main, then proceed to TASK-014 — Benchmark algorithms.
+Merge TASK-014 to main, then proceed to TASK-015 — Accessibility and UX hardening.
 
 ## Verification
 
-TASK-013 verification is complete. All commands pass: `npm run verify` (typecheck, 274 tests, lint, format). Build succeeds: `npm run build`.
+TASK-014 verification is complete. All commands pass: `npm run verify` (typecheck, 274 tests, lint, format). `npm run benchmark` produces a results table (6 benchmark tests pass). Build succeeds: `npm run build`.
 
 ## Important Constraint
 
