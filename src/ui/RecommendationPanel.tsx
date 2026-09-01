@@ -54,8 +54,10 @@ export function RecommendationPanel({
 
   if (loading) {
     return (
-      <section className="recommendation-panel">
-        <div className="loading">Loading recommendation...</div>
+      <section className="recommendation-panel" aria-live="polite">
+        <div className="loading" role="status">
+          Loading recommendation...
+        </div>
       </section>
     );
   }
@@ -81,7 +83,11 @@ export function RecommendationPanel({
         data-testid="recommendation-panel"
       >
         <h2>Recommendation</h2>
-        <p className="no-recommendation">No eligible tasks to recommend.</p>
+        <div className="empty-state">
+          <p className="no-recommendation">
+            No eligible tasks to recommend right now.
+          </p>
+        </div>
         <WarningsPanel warnings={recommendation.warnings} />
       </section>
     );

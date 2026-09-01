@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import type { ProjectSummary } from "../application/repository.js";
 import type { Task } from "../domain/index.js";
 import type { DependencyGraph } from "../domain/index.js";
@@ -39,6 +39,17 @@ export function Dashboard({
   const [schedule, setSchedule] = useState<ScheduleResult | null>(null);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
+  const workspaceHeadingRef = useRef<HTMLHeadingElement | null>(null);
+
+  useEffect(() => {
+    if (selectedProjectId && !loading && !error) {
+      workspaceHeadingRef.current?.focus();
+    }
+  }, [selectedProjectId, loading, error]);
+
+  const handleSelectProject = useCallback((projectId: string) => {
+    setSelectedProjectId(projectId);
+  }, []);
 
   const loadProjects = useCallback(async () => {
     setLoading(true);
@@ -183,83 +194,112 @@ export function Dashboard({
 
   return (
     <div className="dashboard" data-testid="dashboard">
+      <a className="skip-link" href="#main-content">
+        Skip to main content
+      </a>
       <header className="dashboard-header">
         <h1>Trajectory</h1>
         <p className="dashboard-subtitle">Explainable project planning</p>
       </header>
 
-      <section data-testid="project-actions">
-        <ProjectSelector
-          projects={projects}
-          selectedProjectId={selectedProjectId}
-          onSelectProject={setSelectedProjectId}
-        />
-        <button
-          type="button"
-          onClick={() => setShowCreateForm(!showCreateForm)}
-          data-testid="toggle-create-form"
-        >
-          {showCreateForm ? "Cancel" : "New Project"}
-        </button>
-        <button
-          type="button"
-          onClick={handleSeedSample}
-          data-testid="seed-sample-button"
-        >
-          Load Sample Project
-        </button>
-      </section>
-
-      {showCreateForm && <ProjectForm onSubmit={handleCreateProject} />}
-
-      {loading && <div className="loading">Loading...</div>}
-      {error && (
-        <div className="error" role="alert">
-          {error}
-        </div>
-      )}
-
-      {selectedProjectId && !loading && !error && (
-        <section data-testid="project-workspace">
-          <RecommendationPanel
-            projectId={selectedProjectId}
-            recommendationService={recommendationService}
-            refreshToken={refreshKey}
+      <main id="main-content">
+        <section data-testid="project-actions" aria-label="Project actions">
+          <ProjectSelector
+            projects={projects}
+            selectedProjectId={selectedProjectId}
+            onSelectProject={handleSelectProject}
           />
-
-          <TaskForm
-            existingTaskIds={graphTasks.map((t) => t.id)}
-            onSubmit={handleAddTask}
-          />
-
-          <DependencyEditor
-            tasks={graphTasks}
-            onAddDependency={handleAddDependency}
-            onRemoveDependency={handleRemoveDependency}
-          />
-
-          {graph && schedule && (
-            <DependencyGraphVisualization
-              tasks={graphTasks}
-              graph={graph}
-              schedule={schedule}
-            />
-          )}
-
-          <ScenarioPanel
-            projectId={selectedProjectId}
-            scenarioService={scenarioService}
-            tasks={graphTasks}
-          />
-
-          <TaskList
-            projectId={selectedProjectId}
-            recommendationService={recommendationService}
-            refreshToken={refreshKey}
-            onUpdateTaskStatus={handleUpdateTaskStatus}
-          />
+          <button
+            type="button"
+            onClick={() => setShowCreateForm(!showCreateForm)}
+            data-testid="toggle-create-form"
+          >
+            {showCreateForm ? "Cancel" : "New Project"}
+          </button>
+          <button
+            type="button"
+            onClick={handleSeedSample}
+            data-testid="seed-sample-button"
+          >
+            Load Sample Project
+          </button>
         </section>
-      )}
+
+        {showCreateForm && <ProjectForm onSubmit={handleCreateProject} />}
+
+        {loading && (
+          <div className="loading" role="status" aria-live="polite">
+            Loading...
+          </div>
+        )}
+        {error && (
+          <div className="error" role="alert">
+            {error}
+          </div>
+        )}
+
+        {!loading && !error && projects.length === 0 && (
+          <div className="empty-state" data-testid="empty-state">
+            <h2>No projects yet</h2>
+            <p>
+              Create a new project or load the sample project to see an
+              explainable next-task recommendation.
+            </p>
+          </div>
+        )}
+
+        {selectedProjectId && !loading && !error && (
+          <section
+            data-testid="project-workspace"
+            aria-label="Project workspace"
+          >
+            <h2
+              ref={workspaceHeadingRef}
+              tabIndex={-1}
+              className="workspace-heading"
+            >
+              Project Workspace
+            </h2>
+            <RecommendationPanel
+              projectId={selectedProjectId}
+              recommendationService={recommendationService}
+              refreshToken={refreshKey}
+            />
+
+            <TaskForm
+              existingTaskIds={graphTasks.map((t) => t.id)}
+              onSubmit={handleAddTask}
+            />
+
+            <DependencyEditor
+              tasks={graphTasks}
+              onAddDependency={handleAddDependency}
+              onRemoveDependency={handleRemoveDependency}
+            />
+
+            {graph && schedule && (
+              <DependencyGraphVisualization
+                tasks={graphTasks}
+                graph={graph}
+                schedule={schedule}
+              />
+            )}
+
+            <ScenarioPanel
+              projectId={selectedProjectId}
+              scenarioService={scenarioService}
+              tasks={graphTasks}
+            />
+
+            <TaskList
+              projectId={selectedProjectId}
+              recommendationService={recommendationService}
+              refreshToken={refreshKey}
+              onUpdateTaskStatus={handleUpdateTaskStatus}
+            />
+          </section>
+        )}
+      </main>
     </div>
   );
 }

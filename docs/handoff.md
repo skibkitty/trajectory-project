@@ -6,13 +6,11 @@ Domain core complete (Phases 1–5 of the implementation plan: model, graph, sch
 
 ## Current Task
 
-TASK-014 — Benchmark algorithms (implemented on feat/014-benchmark-algorithms) — measures the key domain algorithms at 100, 1000, 5000, and 10,000 tasks via a deterministic dataset generator and a wall-clock best-of-N harness, run as a separate npm script. The PR (#16) review findings are being addressed on this same branch before merge.
+TASK-015 — Accessibility and UX hardening (implemented on feat/015-accessibility-ux) — makes the application polished and demonstrable with a consistent visual design, keyboard/ARIA accessibility, responsive behavior, styled loading/empty states, and focus management. Implemented and verified on this branch, pending PR review and merge.
 
 ## State
 
-TASK-014 adds `benchmark/datasets.ts` (seeded LCG task-DAG generator at 100/1000/5000/10000 tasks), `benchmark/benchmark.ts` (best-of-N wall-clock harness reporting mean + min ms per operation per dataset size), `benchmark/report.ts` (formats and writes the results table), and `benchmark/benchmark.test.ts` (dataset reproducibility, domain-result determinism, scenario input non-mutation, dependent-hub regression, and required-coverage checks that also emit the report). `npm run benchmark` runs `tsc --noEmit -p tsconfig.benchmark.json && vitest run --config vitest.benchmark.config.ts`; it is NOT part of `npm test`. Only the public domain API is exercised; the only new dev dependency is `@types/node` (type-only). ADR-011 documents the methodology. `npm run benchmark` prints the results table AND writes it to `benchmark/results.txt` (git-ignored). 279 correctness/component/integration tests pass plus 6 benchmark tests.
-
-PR #16 review findings remediated on this branch: benchmark report explicitly emitted (table printed + written to `benchmark/results.txt`); deactivated `idx !== i` guard in the dataset generator (determinism unchanged); dataset sizes extended to include 10,000 and iteration thresholds documented (2 for 10k); dependent/transitive-dependents benchmarks now target a dependent hub rather than a leaf ($pickDependentHub); task-list refreshes when project state changes (refreshToken from Dashboard); per-row task status `<select>` wired through `TaskService.updateTaskStatus`; `TaskForm.onSubmit` is awaitable and clears fields only after a successful save.
+TASK-015 adds a design system in `src/ui/styles.css` (CSS custom properties for a consistent palette/spacing/typography, reusable card surfaces, focus-visible rings, styled loading spinner and empty states, table styling, warning/error surfaces, and a responsive layout with media queries below 768px), imported via `main.tsx`. It adds a keyboard-visible skip link and a semantic `<main>` landmark (`#main-content`), labels the project-actions and project-workspace regions, marks the dependency graph SVG as `role=img` with a descriptive aria-label, exposes loading states as `role=status` + `aria-live=polite`, gives dependency remove buttons explicit accessible names, and moves focus to the workspace heading when a project is opened. `src/vite-env.d.ts` (referencing `vite/client`) makes the CSS side-effect import type-check. 6 accessibility tests added in `src/ui/accessibility.test.tsx`. All changes are confined to the UI layer; domain/application/infrastructure are untouched. 285 correctness/component/integration tests pass (279 prior + 6 new), and `npm run build` succeeds.
 
 ## Completed
 
@@ -86,6 +84,7 @@ PR #16 review findings remediated on this branch: benchmark report explicitly em
 - `npm run benchmark` prints the results table and writes it to `benchmark/results.txt` (git-ignored)
 - ADR-011 documenting benchmark methodology (deterministic datasets, best-of-N timing, determinism interpretation, report output, separation from correctness tests)
 - 6 benchmark tests (6/6 pass under `npm run benchmark`)
+- Accessibility and UX hardening (TASK-015): design system in `src/ui/styles.css` imported via `main.tsx` (CSS custom properties, card surfaces, focus-visible rings, styled loading/empty states, responsive layout below 768px); keyboard-visible skip link targeting a semantic `<main>` landmark; labeled project-actions and project-workspace regions; dependency-graph SVG marked `role=img` with aria-label; loading states as `role=status` + `aria-live=polite`; accessible names on dependency remove buttons; focus moved to the workspace heading when a project is opened; `src/vite-env.d.ts` referencing `vite/client`; 6 new accessibility tests in `src/ui/accessibility.test.tsx`
 
 ## Not Yet Started
 
@@ -103,11 +102,11 @@ These are intentionally provisional:
 
 ## Next Recommended Action
 
-Address the outstanding findings in the PR #16 review before merging TASK-014. Once the branch is merged to main, proceed to TASK-015 — Accessibility and UX hardening.
+Create a PR for feat/015-accessibility-ux (TASK-015), review, and merge to main. Once merged, proceed to TASK-016 — CI/CD.
 
 ## Verification
 
-TASK-014 verification is complete. All commands pass: `npm run verify` (typecheck, 279 tests, lint, format). `npm run benchmark` prints a results table and writes `benchmark/results.txt` (6 benchmark tests pass). Build succeeds: `npm run build`.
+TASK-015 verification is complete. All commands pass: `npm run verify` (typecheck, 285 tests, lint, format). Build succeeds: `npm run build`.
 
 ## Important Constraint
 

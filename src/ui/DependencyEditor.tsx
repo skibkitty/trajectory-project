@@ -104,6 +104,7 @@ export function DependencyEditor({
                 <button
                   type="button"
                   onClick={() => onRemoveDependency(task.id, depId)}
+                  aria-label={`Remove dependency: ${depId} is prerequisite for ${task.id}`}
                   data-testid={`remove-dependency-${task.id}-${depId}`}
                 >
                   Remove

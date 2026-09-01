@@ -52,7 +52,11 @@ export function TaskList({
   }, [loadGraph, refreshToken]);
 
   if (loading) {
-    return <div className="loading">Loading tasks...</div>;
+    return (
+      <div className="loading" role="status" aria-live="polite">
+        Loading tasks...
+      </div>
+    );
   }
 
   if (error) {
@@ -67,7 +71,10 @@ export function TaskList({
     return (
       <section className="task-list" data-testid="task-list">
         <h2>Project Tasks</h2>
-        <p>No tasks in this project.</p>
+        <div className="empty-state">
+          <p>No tasks in this project yet.</p>
+          <p>Use the Add Task form to create your first task.</p>
+        </div>
       </section>
     );
   }

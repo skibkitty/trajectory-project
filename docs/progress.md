@@ -341,3 +341,14 @@ Completed:
 - Verified: `npm run verify` passes (typecheck, 279 tests, lint, format); `npm run benchmark` passes (6 tests, table printed + written); `npm run build` succeeds
 
 
+## 2026-08-31 — Accessibility and UX hardening implemented (TASK-015)
+
+Completed:
+- Added a design system in `src/ui/styles.css` (imported via `main.tsx`): consistent spacing/typography/color palette via CSS custom properties, reusable card/panel surfaces, focus-visible rings, a styled loading spinner, styled empty states, tables with clear headings, warning/error surfaces, and a responsive layout (grid for scenario controls, auto-horizontal-scroll for tables, header/side adjustment) below 768px
+- Added a skip link (`Skip to main content`) visible only on keyboard focus that targets the `#main-content` landmark; the app now uses a semantic `<main>` landmark
+- ARIA improvements: project actions and project workspace wrapped in labeled `region`s; the SVG dependency graph marked `role=img` with a descriptive aria-label; loading states use `role=status` + `aria-live=polite`; dependency remove buttons carry explicit accessible names
+- Focus management: when a project is opened, focus moves to the workspace heading so keyboard/screen-reader users land on the newly rendered content
+- Added `src/vite-env.d.ts` referencing `vite/client` so the `styles.css` side-effect import type-checks
+- Added `src/ui/accessibility.test.tsx` with 6 tests covering the skip link, main landmark, labeled regions, styled empty state, live status region, SVG image semantics, and remove-button accessible names
+- All changes confined to the UI layer; domain/application/infrastructure untouched
+- Verified: `npm run verify` passes (typecheck, 285 tests, lint, format); `npm run build` succeeds

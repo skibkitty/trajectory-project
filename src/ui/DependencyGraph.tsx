@@ -35,16 +35,21 @@ export function DependencyGraphVisualization({
 
   if (tasks.length === 0) {
     return (
-      <div data-testid="dependency-graph-empty">
-        <p>No tasks to visualize.</p>
+      <div data-testid="dependency-graph-empty" className="empty-state">
+        <h3>Dependency Graph</h3>
+        <p>No tasks to visualize yet.</p>
       </div>
     );
   }
 
+  const title = `Dependency graph with ${tasks.length} tasks. `;
+
   return (
-    <div data-testid="dependency-graph">
+    <div data-testid="dependency-graph" className="dependency-graph">
       <h3>Dependency Graph</h3>
       <svg
+        role="img"
+        aria-label={title}
         width={layout.width}
         height={layout.height}
         viewBox={`0 0 ${layout.width} ${layout.height}`}
