@@ -282,13 +282,27 @@ Verification:
 
 ## TASK-013 — Add integration and E2E coverage
 
-Status: BACKLOG
+Status: IN_PROGRESS
 
 Goal:
 Protect the primary user workflow.
 
 Prerequisites:
 TASK-012
+
+Note:
+Scoped to integration coverage for this pass. Integration tests drive the application services against the real domain + infrastructure repository through the primary workflow. Browser-level E2E (Playwright) is deferred and may be introduced with CI/CD (TASK-016).
+
+Acceptance criteria:
+- integration tests exercise the primary user workflow (create/open project → create tasks → create dependencies → view recommendation → inspect explanation → run scenario → compare result)
+- integration tests cross layer boundaries (application services + domain + real local repository) rather than using stubbed repositories
+- baseline project state is verified unchanged after running a scenario
+- project summaries, cross-service state sharing, cycle rejection, and rich metadata persistence round-trips are covered
+- all verification commands pass
+
+Verification:
+- npm run verify passes (typecheck, tests, lint, format)
+- npm run build succeeds
 
 ## TASK-014 — Benchmark algorithms
 
