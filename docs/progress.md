@@ -403,3 +403,12 @@ Completed:
 - Verified locally: `npm run test:e2e` (2 specs pass), `npm run verify` (typecheck incl. e2e via its own script, 287 tests, lint, format), and `npm run build` all pass
 
 Next: TASK-017 -- Architecture case study and final documentation.
+
+## 2026-09-01 - TASK-016 PR #18 review remediation (on feat/016-ci-cd)
+
+Completed:
+- Benchmark artifact is now a hard CI contract: `if-no-files-found: error` on the `benchmark-results` upload, so `npm run benchmark` succeeding without producing the report fails the job instead of passing with a warning
+- Added a workflow-level `concurrency` group keyed by workflow + PR number/branch with `cancel-in-progress: true`, so superseded commits cancel in-flight runs instead of wasting CI capacity (four jobs + browser install each)
+- Documented the E2E browser matrix as intentionally Chromium-only for MVP in ADR-012 (rationale: bounded CI cost and browser-download size, smallest-justified-setup principle; WebKit/Firefox remain a documented follow-up pending evidence of a real cross-browser defect)
+- Kept the intentionally deterministic E2E assertions (task id b, value removed 5, sample recommendation t4, 8 edges, critical-path flags) - these re-validate the demo story and are documented as regression guards in ADR-012; focused scoring/sample-dataset behavior remains owned by the domain unit tests
+- Pending human action remains: configure main-branch protection/required status checks (or a ruleset) so verify/benchmark/e2e/build gate merges

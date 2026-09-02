@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [main]
 
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   verify:
     name: Verify (typecheck, tests, lint, format)
@@ -52,7 +56,7 @@ jobs:
         with:
           name: benchmark-results
           path: benchmark/results.txt
-          if-no-files-found: warn
+          if-no-files-found: error
 
   e2e:
     name: Playwright E2E
