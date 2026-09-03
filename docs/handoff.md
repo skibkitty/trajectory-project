@@ -2,15 +2,15 @@
 
 ## Phase
 
-Domain core complete (Phases 1–5 of the implementation plan: model, graph, scheduling, decision engine, scenario simulation). Persistence implemented. Application services implemented. UI foundation complete. CRUD UI and dependency visualization complete. Scenario comparison complete. Integration coverage complete. Algorithm benchmarks implemented. Accessibility and UX hardening complete. CI/CD and Playwright E2E coverage complete.
+All planned phases complete. Domain foundation, dependency graph, scheduling and critical path, decision engine, scenario simulation, persistence, application services, UI, integration coverage, algorithm benchmarks, accessibility/UX hardening, CI/CD with Playwright E2E, and architecture documentation are all implemented and passing.
 
 ## Current Task
 
-TASK-017 — Architecture case study and final documentation (BACKLOG) — document decisions, algorithms, testing, and measured performance for recruiter/interview use. All prerequisites (TASK-014, TASK-015, TASK-016) are now DONE.
+TASK-017 — Architecture case study and final documentation (DONE). All acceptance criteria satisfied: case study written, ADR-013 added for project naming/availability, resume story updated with actual measurements, architecture.md and README.md updated to reference the case study.
 
 ## State
 
-TASK-016 adds `.github/workflows/ci.yml` with four independent jobs: `verify` (typecheck, tests, lint, format via `npm run verify`), `benchmark` (runs `npm run benchmark` and uploads `benchmark/results.txt` as a `benchmark-results` artifact with `if-no-files-found: error`), `e2e` (installs Chromium via `npx playwright install --with-deps chromium`, runs `npm run test:e2e`, and uploads the Playwright HTML report on failure), and `build` (production `vite build`). All jobs run on `ubuntu-latest` with Node 24 and `npm ci` (npm cache enabled via `actions/setup-node`). Workflow triggers on push and pull_request to `main`, and a workflow-level `concurrency` group with `cancel-in-progress: true` ensures only the latest commit's run per PR proceeds. E2E coverage uses `playwright.config.ts` (single Chromium project — intentionally Chromium-only for MVP, self-managed dev server via `webServer`, CI-specific retries/serial workers), `tsconfig.e2e.json` (type-checks e2e specs before running), and two specs in `e2e/`: `primary-journey.spec.ts` (create project → add tasks → add dependencies → view recommendation → inspect factors → run delay scenario → compare → de-scope → verify baseline unchanged) and `sample-project.spec.ts` (sample project recommendation, factor breakdown, dependency graph with critical path). E2E specs are excluded from the Vitest suite by its `include` glob and run only via `npm run test:e2e`. No production code changes — CI/E2E are purely infrastructure/testing configuration. TASK-015 is merged to main (PR #17) and marked DONE; 287 correctness/component/integration tests and 2 E2E specs pass locally, `npm run build` succeeds, and `npm run benchmark` passes (6 tests) and writes `benchmark/results.txt`.
+TASK-017 adds `docs/case-study.md` — a comprehensive architecture case study covering the core problem, domain model, dependency graph, scheduling/CPM, decision engine, explainability, scenario simulation, architecture/layering, persistence, testing strategy, measured performance (with full benchmark table from `benchmark/results.txt`), CI/CD, design tradeoffs, and repository structure. ADR-013 resolves the project naming/availability decision: product name is Trajectory, repository is `skibkitty/trajectory-project` on GitHub, availability is source code on GitHub (no deployment target for MVP). PROJECT_PLAN.md §24 resume story updated with concrete claims based on actual benchmark results and test counts. README.md and docs/architecture.md updated to reference the case study. TASK-016 is merged to main (PR #18) and marked DONE; 287 correctness/component/integration tests and 2 E2E specs pass locally, `npm run build` succeeds, and `npm run benchmark` passes (6 tests).
 
 ## Completed
 
@@ -19,7 +19,7 @@ TASK-016 adds `.github/workflows/ci.yml` with four independent jobs: `verify` (t
 - opencode.json (default_agent: builder)
 - agent definitions (builder, tester, reviewer, orchestrator)
 - architecture document
-- decision record (ADR-001 through ADR-010)
+- decision record (ADR-001 through ADR-013)
 - task backlog
 - progress log
 - handoff document
@@ -87,28 +87,36 @@ TASK-016 adds `.github/workflows/ci.yml` with four independent jobs: `verify` (t
 - Accessibility and UX hardening (TASK-015): design system in `src/ui/styles.css` imported via `main.tsx` (CSS custom properties, card surfaces, focus-visible rings, styled loading/empty states, responsive layout below 768px); keyboard-visible skip link targeting a semantic `<main>` landmark; labeled project-actions and project-workspace regions; dependency-graph SVG marked `role=img` with aria-label; loading states as `role=status` + `aria-live=polite`; accessible names on dependency remove buttons; focus moved to the workspace heading when a project is opened (restricted to project-selection transitions); `src/vite-env.d.ts` referencing `vite/client`; 7 accessibility tests in `src/ui/accessibility.test.tsx`
 - PR #17 review remediation on feat/015: fixed invisible Trajectory heading and 1:1 table-header contrast in `styles.css` (light colors on the dark page background / light header background); fixed focus-steal regression in `Dashboard.tsx` (focus now only moves on an actual project-selection transition via `previousProjectIdRef`), with a regression test; fixed missing card surfaces after reviewer follow-up — `TaskForm`/`ProjectForm`/`DependencyEditor` now carry their surface `className` (`task-form`/`project-form`/`dependency-editor`) so the card background CSS actually matches, and the unused `.section-card` selector was removed; the `workspace-heading` ("Project Workspace") — also a direct child of the dark page background — is now styled `#f1f5f9`; the dependency-graph SVG is wrapped in a scrollable region (`.graph-scroll`, `overflow: auto`, `role=region`) so long graphs scroll inside the white card while the heading and legend stay fixed
 - Playwright E2E coverage (TASK-016): `@playwright/test` dev dependency, `playwright.config.ts` (single Chromium project, self-managed dev server, CI-specific retries/serial workers), `tsconfig.e2e.json`, and two specs under `e2e/` covering the primary user journey and the sample-project demo; `npm run test:e2e` type-checks the specs then runs Playwright; Playwright artifacts git-ignored; a fourth `e2e` CI job installs Chromium and uploads the report on failure; ADR-012 documents the CI/CD + E2E design
+- Architecture case study (TASK-017): `docs/case-study.md` covering core problem, domain model, dependency graph, scheduling/CPM, decision engine, explainability, scenario simulation, architecture/layering, persistence, testing strategy, measured performance (full benchmark table), CI/CD, design tradeoffs, and repository structure
+- ADR-013 resolving project naming and availability (product name: Trajectory, repository: `skibkitty/trajectory-project`, availability: source code on GitHub)
+- Resume story (PROJECT_PLAN §24) updated with concrete claims based on actual benchmark results and test counts
 
 ## Not Yet Started
 
 - Branch protection / required status checks on GitHub (human repository-settings action, not a repo-file change)
+- Phase 18 — Logging and observability (structured logging for domain, application, and infrastructure layers)
 
 ## Human Decisions Still Needed
 
 These are intentionally provisional:
 
-1. Final product name and availability.
-2. Exact decision-engine weights.
-3. Exact scheduling/calendar semantics.
-4. Final MVP scenario scope.
-5. Benchmark methodology.
+1. Exact decision-engine weights (currently all 1).
+2. Exact scheduling/calendar semantics (dates, deadlines, working days).
+3. Final MVP scenario scope (deadline-change scenario deferred until a date model exists).
+4. Whether to implement a weighted-random selection policy.
 
 ## Next Recommended Action
 
-Proceed to TASK-017 — Architecture case study and final documentation. Branch protection / required status checks on GitHub must be configured by a human (repository settings, not a repo-file change).
+TASK-017 is the final task in the current backlog. All planned implementation phases are complete. Possible next steps (not yet defined as tasks):
+- Phase 18 — Logging and observability (structured logging via injected interfaces)
+- Calendar-based scheduling (date model, deadline scenarios)
+- Weighted-random selection policy (requires `RandomSource` abstraction)
+- Deployment configuration (if a deployment target is chosen)
+- Branch protection / required status checks (human action)
 
 ## Verification
 
-TASK-016 verification is complete locally and in CI. Locally: `npm run verify` (typecheck, 287 tests, lint, format:check), `npm run build`, `npm run benchmark` (6 tests), and `npm run test:e2e` (2 Playwright specs) all pass. CI on PR #18 observed green: the `CI` workflow's `verify`, `benchmark`, `build`, and `e2e` jobs all pass; PR #18 merged to main on 2026-09-03. The remaining acceptance item — blocking merge on required status checks — needs the GitHub repository-setup branch-protection action by a human.
+TASK-017 verification is complete. Locally: `npm run verify` (typecheck, 287 tests, lint, format:check), `npm run build`, and `npm run benchmark` (6 tests) all pass. `npm run test:e2e` (2 Playwright specs) also passes with browsers installed. All documentation is accurate against the implemented codebase.
 
 ## Important Constraint
 

@@ -4,6 +4,8 @@
 
 Domain foundation complete: Project, Task, Goal entities and invariants; dependency graph with traversal, cycle detection, and deterministic topological ordering; scheduling and critical-path analysis; a deterministic decision engine with composable additive scoring, candidate eligibility, and structured factor breakdowns; recommendation explainability with machine-readable factor ids, assumptions, and warnings; and scenario simulation. Persistence (repository interface, versioned local implementation) is implemented, as are the application services (project/task/goal/dependency/recommendation/scenario), the React/Vite UI (recommendation dashboard, CRUD editor, dependency graph, scenario comparison), integration coverage, and algorithm benchmarks. This document records the intended architecture and is expected to evolve through documented decisions.
 
+For a detailed technical walkthrough, see [case-study.md](./case-study.md).
+
 ## Dependency Direction
 
 ```text

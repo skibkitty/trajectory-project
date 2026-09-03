@@ -423,3 +423,15 @@ Completed:
 - Documented the E2E browser matrix as intentionally Chromium-only for MVP in ADR-012 (rationale: bounded CI cost and browser-download size, smallest-justified-setup principle; WebKit/Firefox remain a documented follow-up pending evidence of a real cross-browser defect)
 - Kept the intentionally deterministic E2E assertions (task id b, value removed 5, sample recommendation t4, 8 edges, critical-path flags) - these re-validate the demo story and are documented as regression guards in ADR-012; focused scoring/sample-dataset behavior remains owned by the domain unit tests
 - Pending human action remains: configure main-branch protection/required status checks (or a ruleset) so verify/benchmark/e2e/build gate merges
+
+## 2026-09-03 — Architecture case study and final documentation (TASK-017)
+
+Completed:
+- Added `docs/case-study.md` — comprehensive architecture case study covering: core problem statement, domain model (Project/Task/Goal entities, task status model, dependency direction), dependency graph (construction, Kahn's topological ordering, cycle detection via self-reachability), scheduling and critical path (CPM forward/backward pass, slack, critical path), decision engine (eligibility, additive scoring model, six default factors, normalization, tie-breaking, composability, selection policy), recommendation explainability (factors, assumptions, warnings, nullable recommendation), scenario simulation (three scenario types, derivation over mutation, affected-downstream filtering, comparison output), architecture and layering (UI/Application/Domain/Infrastructure), persistence (repository abstraction, StorageProvider, versioned serialization), testing strategy (287 tests, 2 E2E specs, 6 benchmarks, integration tests crossing layer boundaries), measured performance (full benchmark table from `benchmark/results.txt` at 100–10,000 tasks), CI/CD (four-job workflow, Playwright E2E), design decisions and tradeoffs (deterministic over probabilistic, additive over multiplicative, domain independence, derivation over mutation, local-first persistence, no unnecessary dependencies), and repository structure
+- Added ADR-013 to `docs/decisions.md` resolving project naming and availability: product name is Trajectory, repository is `skibkitty/trajectory-project` on GitHub, availability is source code on GitHub (no deployment target for MVP); removed "final product name" from Pending Decisions
+- Updated PROJECT_PLAN.md §24 resume story with concrete claims based on actual benchmark results and test counts (287 tests, 2 E2E specs, graph construction ~11ms at 10k tasks, recommendation ~22ms)
+- Updated `docs/architecture.md` to reference the case study
+- Updated `README.md` repository guide to include the case study
+- Updated `docs/handoff.md` to reflect TASK-017 DONE and all phases complete
+- Updated `docs/tasks.md` to mark TASK-017 DONE
+- Verified: `npm run verify` (typecheck, 287 tests, lint, format:check), `npm run build`, all pass

@@ -374,7 +374,7 @@ Verification:
 
 ## TASK-017 — Architecture case study and final documentation
 
-Status: BACKLOG
+Status: DONE
 
 Goal:
 Document decisions, algorithms, testing, and measured performance for recruiter/interview use.
