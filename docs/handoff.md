@@ -105,6 +105,8 @@ These are intentionally provisional:
 3. Final MVP scenario scope (deadline-change scenario deferred until a date model exists).
 4. Whether to implement a weighted-random selection policy.
 
+Project naming and availability are resolved per ADR-013: product name Trajectory, repository `skibkitty/trajectory-project`, availability as source code on GitHub with no deployment target for MVP.
+
 ## Next Recommended Action
 
 TASK-017 is the final task in the current backlog. All planned implementation phases are complete. Possible next steps (not yet defined as tasks):

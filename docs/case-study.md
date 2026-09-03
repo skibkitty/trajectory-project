@@ -305,7 +305,9 @@ Two Playwright specs exercise real browser behavior against the real persistence
 
 ## 11. Measured Performance
 
-Benchmarks run against deterministic datasets (100, 1,000, 5,000, and 10,000 tasks) on the machine where `npm run benchmark` was last executed. All timings are wall-clock milliseconds; the methodology is best-of-N iterations using `process.hrtime.bigint()`. Timings are machine-dependent and presented as relative signals, not cross-machine claims.
+Benchmarks run against deterministic datasets (100, 1,000, 5,000, and 10,000 tasks) via `npm run benchmark`. All timings are wall-clock milliseconds; the methodology is best-of-N iterations using `process.hrtime.bigint()`. Iteration counts step down as dataset size rises (50 for ≤100 tasks, 20 for ≤1000, 5 for ≤5000, 2 for 10,000) to keep total wall-clock time tolerable. Both mean and minimum are recorded so stability is visible.
+
+**Machine context** (where `npm run benchmark` last produced `benchmark/results.txt`): the benchmark was run on a Windows 11 machine with Node.js 24 (node 24.19.0, npm 11.17.0). The exact CPU/OS combination is not captured by the harness; timings are intentionally treated as machine-dependent relative signals, not cross-machine claims. Reproduce locally for a current measurement on your own hardware.
 
 | Operation | 100 tasks (ms) | 1,000 tasks (ms) | 5,000 tasks (ms) | 10,000 tasks (ms) |
 |-----------|---------------|-------------------|-------------------|--------------------|
@@ -330,7 +332,7 @@ Benchmarks run against deterministic datasets (100, 1,000, 5,000, and 10,000 tas
 - **Topological order** and **critical-path analysis** scale with the graph's width and depth — these are O(V + E) per pass but the constant factor grows with the ready-queue re-sorting.
 - **Decision scoring** and **recommendation** scale nearly linearly with the number of eligible candidates.
 - **Scenario simulation** is the most expensive operation because it recomputes the full pipeline (graph → schedule → recommendation) for the projected state. At 10,000 tasks it takes ~1.6 seconds — acceptable for an interactive what-if tool, and a clear target for future optimization if needed.
-- All results are deterministic: identical inputs always produce identical outputs, verified by the benchmark test suite.
+- The benchmark datasets and all algorithm outputs are deterministic: a given seed always yields the identical task set, and identical inputs always produce identical topological orderings, schedules, scores, and recommendations — verified by the benchmark test suite. Wall-clock timings, by contrast, naturally vary between runs and are reported as machine-dependent measurements rather than exact figures.
 
 ---
 
@@ -379,12 +381,13 @@ The graph algorithms, scheduling, and scoring are all hand-rolled. No graph libr
 
 The following remain under human review and are not yet implemented:
 
-- Final product name and availability
 - Exact decision-engine weights (currently all 1)
 - Calendar-based scheduling (dates, deadlines, working days)
 - Deadline-change scenario type (deferred until a date model exists)
 - Weighted-random selection policy (requires explicit `RandomSource` abstraction for testability)
 - Cross-browser E2E (Chromium-only for MVP; WebKit/Firefox pending evidence of a real defect)
+
+Project naming and availability are resolved in [ADR-013](./decisions.md): the product is Trajectory, hosted as source on GitHub (`skibkitty/trajectory-project`), with no deployment target for MVP.
 
 ---
 
