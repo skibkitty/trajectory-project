@@ -329,7 +329,7 @@ Verification:
 
 ## TASK-015 — Accessibility and UX hardening
 
-Status: READY
+Status: DONE
 
 Goal:
 Make the application polished and demonstrable.
@@ -351,7 +351,7 @@ Verification:
 
 ## TASK-016 — CI/CD
 
-Status: BACKLOG
+Status: IN_PROGRESS
 
 Goal:
 Automate verification and deployment.

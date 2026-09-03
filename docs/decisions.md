@@ -269,3 +269,40 @@ TASK-014 requires measuring the key domain algorithms at meaningful graph sizes 
 - The seeded-dataset generator and harness already cover the 10,000-task size (PROJECT_PLAN §16) and can grow further without changing the methodology.
 - No performance claims are added to the resume story until measurements are actually produced and placed in context.
 
+## ADR-012 — CI/CD Workflow and Playwright E2E Coverage
+
+### Status
+Accepted
+
+### Context
+TASK-016 requires automated verification and eventual deployability. The local verification gate (`npm run verify`), benchmark harness (`npm run benchmark`), and production build (`npm run build`) must run on every push/PR to main so regressions are caught without relying on a developer's local machine. PROJECT_PLAN §15 also calls for E2E coverage of the primary user journey, deferred from TASK-013 to TASK-016. There was no existing CI configuration.
+
+### Decision
+
+- **Workflow**: `.github/workflows/ci.yml` defines three (`verify`, `benchmark`, `build`) plus a fourth `e2e` job, all on `ubuntu-latest` with Node 24 and `npm ci` (npm cache via `actions/setup-node`), triggered on push and pull_request to main. Any failed job fails the workflow.
+  - `verify` runs the full local gate: typecheck, unit/component/integration tests, lint, and format check.
+  - `benchmark` runs the benchmark suite and uploads `benchmark/results.txt` as a `benchmark-results` artifact with `if-no-files-found: error`, so a missing report fails the job — the artifact contract is testable rather than silently warnable.
+  - `build` runs the production Vite build.
+  - `e2e` installs Chromium (`npx playwright install --with-deps chromium`), runs `npm run test:e2e`, and uploads the Playwright HTML report as a `playwright-report` artifact only on failure (`retention-days: 14`).
+- **Concurrency**: a workflow-level `concurrency` group keyed by workflow + PR number/branch with `cancel-in-progress: true` ensures only the latest commit's CI run proceeds per PR, cancelling in-flight runs for superseded commits instead of wasting capacity on parallel redundant jobs.
+- **Playwright configuration**: `playwright.config.ts` uses a single Chromium project, `fullyParallel` locally, a self-managed dev server via `webServer` (`npm run dev`, `reuseExistingServer: !CI`), and CI-specific settings (`forbidOnly`, `retries: 2`, `workers: 1`, HTML reporter). Serial workers in CI reduce cross-test interference at the cost of wall-clock time.
+- **Browser matrix**: E2E is intentionally Chromium-only for MVP. A single supported browser keeps CI cost and browser-download size bounded and matches the plan's "smallest justified setup" principle; no cross-browser support is claimed. Expanding the matrix to WebKit/Firefox is a documented follow-up only if evidence of a real cross-browser defect justifies the added CI time.
+- **E2E scope**: two specs under `e2e/` exercising real browser behavior against the real persistence/app layer stack (localStorage-backed):
+  - `primary-journey.spec.ts` — the PROJECT_PLAN §15 journey: create project → add tasks → add dependencies → view recommendation → inspect factor explanation → run a delay scenario → compare baseline vs. projected → de-scope a task → confirm the recommendation changes and value removed is reported → verify the baseline project is unchanged.
+  - `sample-project.spec.ts` — seeds the sample project and asserts the deterministic recommendation, factor breakdown, rendered dependency graph with critical-path marking, and legend.
+- **Separation from correctness tests**: E2E specs live in `e2e/` (outside `src/`), excluded from Vitest by its `include` pattern, and run only via `npm run test:e2e`. `tsconfig.e2e.json` type-checks the specs; `npm run test:e2e` runs `tsc` on it first so type errors fail locally and in CI. Playwright artifacts (`test-results/`, `playwright-report/`, `blob-report/`, `playwright/.cache/`) are git-ignored.
+- **Branch protection**: blocking merge on the required status checks must be configured in the GitHub repository settings by a human; the workflow itself cannot enforce it.
+
+### Alternatives considered
+- Running E2E as part of `npm run verify`: rejected — it would couple the fast feedback loop to browser downloads and a dev-server run.
+- Adding Playwright browsers via `postinstall`: rejected — forces ~100+ MB downloads on every contributor install, including the benchmark/CI paths that never run E2E.
+- Deferring E2E entirely: rejected — TASK-013 explicitly scheduled it with TASK-016, and the primary journey is the product's central demonstration.
+
+### Consequences
+- Every push/PR to main now gates on typecheck, tests, lint, format, benchmark, build, and browser E2E.
+- E2E catches integration bugs that fake-DOM component tests cannot (real routing, real localStorage persistence, real browser layout/interaction).
+- The benchmark report and Playwright HTML report are inspectable as CI artifacts.
+- A deliberate breaking change will fail its corresponding job, satisfying TASK-016's verification requirement.
+- `npm run test:e2e` requires Playwright browsers installed (`npx playwright install chromium`), which is documented in the verification path and handled in CI.
+- E2E assertions on the deterministic recommendation (e.g. sample project recommends `t4`) will need updating if the scoring model changes, by design — they re-validate the demo story.
+

@@ -371,3 +371,44 @@ Completed:
 - Also fixed the same bug for the `workspace-heading`: `Dashboard.tsx` renders an `h2.workspace-heading` directly on the dark page background, inheriting dark `#1e293b` text — added a `.workspace-heading { color: #f1f5f9 }` rule so "Project Workspace" is visible.
 - Wrapped the dependency-graph SVG in a scrollable region (`.graph-scroll`, `overflow: auto` + `role="region"`) so long graphs scroll inside the white card instead of overflowing past its edge; heading and legend stay fixed. New regression test (287 total passing).
 - Verified: `npm run verify` passes (typecheck, 287 tests, lint, format); `npm run build` succeeds.
+
+## 2026-09-01 -- CI/CD implemented (TASK-016)
+
+Completed:
+- Added `.github/workflows/ci.yml` with three independent GitHub Actions jobs running on every push/PR to main
+- `verify` job: runs the full local verification gate (typecheck, tests, lint, format) via `npm run verify`
+- `benchmark` job: runs `npm run benchmark` and uploads `benchmark/results.txt` as a `benchmark-results` artifact (`if-no-files-found: warn`)
+- `build` job: runs the production build (`npm run build`)
+- All jobs use `ubuntu-latest`, Node 24, and `npm ci` with npm cache enabled via `actions/setup-node`
+- No production code changes; this is purely infrastructure configuration
+- TASK-015 marked DONE (merged to main via PR #17)
+- Verified locally: `npm run verify` (typecheck, 287 tests, lint, format), `npm run build`, and `npm run benchmark` (6 tests) all pass
+- CI itself must be verified by pushing the branch and observing the workflow run on the PR; required status checks must be configured in GitHub branch protection by a human
+
+Next: TASK-017 -- Architecture case study and final documentation.
+
+## 2026-09-01 -- Playwright E2E coverage added (TASK-016, part 2)
+
+Completed:
+- Added `@playwright/test` as a dev dependency (1.62.1)
+- Added `playwright.config.ts`: single Chromium project, `fullyParallel` locally, self-managed dev server via `webServer` (`npm run dev`, `reuseExistingServer: !CI`), CI-specific settings (`forbidOnly`, `retries: 2`, `workers: 1`, HTML reporter), baseURL on port 5173
+- Added `tsconfig.e2e.json` so E2E specs and the Playwright config are type-checked; `npm run test:e2e` runs `tsc` first, then `playwright test`
+- Added two specs under `e2e/` (excluded from the Vitest suite by its `include` glob):
+- `primary-journey.spec.ts` - the PROJECT_PLAN §15 journey: create project -> add tasks -> add dependency -> view recommendation -> inspect factor breakdown -> run a delay scenario (asserts `+1` duration delta and affected downstream) -> de-scope a task (asserts value removed `5` and the projected recommendation changing) -> verify the baseline project is unchanged
+  - `sample-project.spec.ts` - seeds the sample project; asserts the deterministic `t4` recommendation, all six factor rows, the SVG dependency graph (`role=img`, 8 edges), critical-path marking (t8 critical, t6 not), and the legend
+- Playwright artifacts (`test-results/`, `playwright-report/`, `blob-report/`, `playwright/.cache/`) added to `.gitignore`
+- Added a fourth `e2e` job to `.github/workflows/ci.yml`: installs Chromium via `npx playwright install --with-deps chromium`, runs `npm run test:e2e`, and uploads `playwright-report` as an artifact on failure (`retention-days: 14`)
+- Added ADR-012 documenting the CI/CD workflow and Playwright E2E design (job split, Playwright config, E2E/unit-test separation, report artifacts, branch protection as a human action)
+- E2E learning: `<option>` elements are not "visible" to Playwright (wait with `state: "attached"`), and SVG `<line>` edges count as hidden (assert edge count instead); the sample project's critical path is t1/t2/t4/t5/t8, so t6 (slack 2) is the non-critical node to assert
+- Verified locally: `npm run test:e2e` (2 specs pass), `npm run verify` (typecheck incl. e2e via its own script, 287 tests, lint, format), and `npm run build` all pass
+
+Next: TASK-017 -- Architecture case study and final documentation.
+
+## 2026-09-01 - TASK-016 PR #18 review remediation (on feat/016-ci-cd)
+
+Completed:
+- Benchmark artifact is now a hard CI contract: `if-no-files-found: error` on the `benchmark-results` upload, so `npm run benchmark` succeeding without producing the report fails the job instead of passing with a warning
+- Added a workflow-level `concurrency` group keyed by workflow + PR number/branch with `cancel-in-progress: true`, so superseded commits cancel in-flight runs instead of wasting CI capacity (four jobs + browser install each)
+- Documented the E2E browser matrix as intentionally Chromium-only for MVP in ADR-012 (rationale: bounded CI cost and browser-download size, smallest-justified-setup principle; WebKit/Firefox remain a documented follow-up pending evidence of a real cross-browser defect)
+- Kept the intentionally deterministic E2E assertions (task id b, value removed 5, sample recommendation t4, 8 edges, critical-path flags) - these re-validate the demo story and are documented as regression guards in ADR-012; focused scoring/sample-dataset behavior remains owned by the domain unit tests
+- Pending human action remains: configure main-branch protection/required status checks (or a ruleset) so verify/benchmark/e2e/build gate merges

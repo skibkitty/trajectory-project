@@ -2,15 +2,15 @@
 
 ## Phase
 
-Domain core complete (Phases 1–5 of the implementation plan: model, graph, scheduling, decision engine, scenario simulation). Persistence implemented. Application services implemented. UI foundation complete. CRUD UI and dependency visualization complete. Scenario comparison complete. Integration coverage complete. Algorithm benchmarks implemented.
+Domain core complete (Phases 1–5 of the implementation plan: model, graph, scheduling, decision engine, scenario simulation). Persistence implemented. Application services implemented. UI foundation complete. CRUD UI and dependency visualization complete. Scenario comparison complete. Integration coverage complete. Algorithm benchmarks implemented. Accessibility and UX hardening complete.
 
 ## Current Task
 
-TASK-015 — Accessibility and UX hardening (implemented on feat/015-accessibility-ux) — makes the application polished and demonstrable with a consistent visual design, keyboard/ARIA accessibility, responsive behavior, styled loading/empty states, and focus management. Implemented and verified on this branch, pending PR review and merge.
+TASK-016 — CI/CD (implemented on feat/016-ci-cd) — automate verification and deployment via GitHub Actions. Adds a CI workflow that runs the full local verification gate (`npm run verify`), the benchmark suite (`npm run benchmark`), and the production build (`npm run build`) on every push/PR to main, uploads the benchmark report as an artifact, and adds Playwright E2E coverage of the primary user journey with its own CI job. Pending PR review and merge; branch protection for required status checks must be configured in the GitHub repository settings by a human.
 
 ## State
 
-TASK-015 adds a design system in `src/ui/styles.css` (CSS custom properties for a consistent palette/spacing/typography, reusable card surfaces, focus-visible rings, styled loading spinner and empty states, table styling, warning/error surfaces, and a responsive layout with media queries below 768px), imported via `main.tsx`. It adds a keyboard-visible skip link and a semantic `<main>` landmark (`#main-content`), labels the project-actions and project-workspace regions, marks the dependency graph SVG as `role=img` with a descriptive aria-label, exposes loading states as `role=status` + `aria-live=polite`, gives dependency remove buttons explicit accessible names, and moves focus to the workspace heading when a project is opened. `src/vite-env.d.ts` (referencing `vite/client`) makes the CSS side-effect import type-check. 7 accessibility tests added in `src/ui/accessibility.test.tsx` (6 initial + 1 focus-regression test added during PR #17 review remediation). All changes are confined to the UI layer; domain/application/infrastructure are untouched. 286 correctness/component/integration tests pass (279 prior + 7 new), and `npm run build` succeeds.
+TASK-016 adds `.github/workflows/ci.yml` with four independent jobs: `verify` (typecheck, tests, lint, format via `npm run verify`), `benchmark` (runs `npm run benchmark` and uploads `benchmark/results.txt` as a `benchmark-results` artifact with `if-no-files-found: error`), `e2e` (installs Chromium via `npx playwright install --with-deps chromium`, runs `npm run test:e2e`, and uploads the Playwright HTML report on failure), and `build` (production `vite build`). All jobs run on `ubuntu-latest` with Node 24 and `npm ci` (npm cache enabled via `actions/setup-node`). Workflow triggers on push and pull_request to `main`, and a workflow-level `concurrency` group with `cancel-in-progress: true` ensures only the latest commit's run per PR proceeds. E2E coverage uses `playwright.config.ts` (single Chromium project — intentionally Chromium-only for MVP, self-managed dev server via `webServer`, CI-specific retries/serial workers), `tsconfig.e2e.json` (type-checks e2e specs before running), and two specs in `e2e/`: `primary-journey.spec.ts` (create project → add tasks → add dependencies → view recommendation → inspect factors → run delay scenario → compare → de-scope → verify baseline unchanged) and `sample-project.spec.ts` (sample project recommendation, factor breakdown, dependency graph with critical path). E2E specs are excluded from the Vitest suite by its `include` glob and run only via `npm run test:e2e`. No production code changes — CI/E2E are purely infrastructure/testing configuration. TASK-015 is merged to main (PR #17) and marked DONE; 287 correctness/component/integration tests and 2 E2E specs pass locally, `npm run build` succeeds, and `npm run benchmark` passes (6 tests) and writes `benchmark/results.txt`.
 
 ## Completed
 
@@ -86,10 +86,11 @@ TASK-015 adds a design system in `src/ui/styles.css` (CSS custom properties for 
 - 6 benchmark tests (6/6 pass under `npm run benchmark`)
 - Accessibility and UX hardening (TASK-015): design system in `src/ui/styles.css` imported via `main.tsx` (CSS custom properties, card surfaces, focus-visible rings, styled loading/empty states, responsive layout below 768px); keyboard-visible skip link targeting a semantic `<main>` landmark; labeled project-actions and project-workspace regions; dependency-graph SVG marked `role=img` with aria-label; loading states as `role=status` + `aria-live=polite`; accessible names on dependency remove buttons; focus moved to the workspace heading when a project is opened (restricted to project-selection transitions); `src/vite-env.d.ts` referencing `vite/client`; 7 accessibility tests in `src/ui/accessibility.test.tsx`
 - PR #17 review remediation on feat/015: fixed invisible Trajectory heading and 1:1 table-header contrast in `styles.css` (light colors on the dark page background / light header background); fixed focus-steal regression in `Dashboard.tsx` (focus now only moves on an actual project-selection transition via `previousProjectIdRef`), with a regression test; fixed missing card surfaces after reviewer follow-up — `TaskForm`/`ProjectForm`/`DependencyEditor` now carry their surface `className` (`task-form`/`project-form`/`dependency-editor`) so the card background CSS actually matches, and the unused `.section-card` selector was removed; the `workspace-heading` ("Project Workspace") — also a direct child of the dark page background — is now styled `#f1f5f9`; the dependency-graph SVG is wrapped in a scrollable region (`.graph-scroll`, `overflow: auto`, `role=region`) so long graphs scroll inside the white card while the heading and legend stay fixed
+- Playwright E2E coverage (TASK-016): `@playwright/test` dev dependency, `playwright.config.ts` (single Chromium project, self-managed dev server, CI-specific retries/serial workers), `tsconfig.e2e.json`, and two specs under `e2e/` covering the primary user journey and the sample-project demo; `npm run test:e2e` type-checks the specs then runs Playwright; Playwright artifacts git-ignored; a fourth `e2e` CI job installs Chromium and uploads the report on failure; ADR-012 documents the CI/CD + E2E design
 
 ## Not Yet Started
 
-- Browser-level E2E coverage (deferred to TASK-016 CI/CD)
+- Branch protection / required status checks on GitHub (human repository-settings action, not a repo-file change)
 
 ## Human Decisions Still Needed
 
@@ -103,11 +104,11 @@ These are intentionally provisional:
 
 ## Next Recommended Action
 
-Create a PR for feat/015-accessibility-ux (TASK-015), review, and merge to main. Once merged, proceed to TASK-016 — CI/CD.
+Create a PR for feat/016-ci-cd (TASK-016), review, and merge to main. Once merged, proceed to TASK-017 — Architecture case study and final documentation.
 
 ## Verification
 
-TASK-015 verification is complete. All commands pass: `npm run verify` (typecheck, 286 tests, lint, format). Build succeeds: `npm run build`.
+TASK-016 verification is complete locally and in CI. Locally: `npm run verify` (typecheck, 287 tests, lint, format), `npm run build`, `npm run benchmark` (6 tests), and `npm run test:e2e` (2 Playwright specs, requires Chromium installed via `npx playwright install chromium`) all pass. CI on PR #18 observed green: the `CI` workflow's `verify`, `benchmark`, `build`, and `e2e` jobs all pass. The remaining acceptance item — blocking merge on required status checks — needs the GitHub repository-setup branch-protection action by a human.
 
 ## Important Constraint
 
