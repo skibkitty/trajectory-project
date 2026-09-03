@@ -331,7 +331,7 @@ Benchmarks run against deterministic datasets (100, 1,000, 5,000, and 10,000 tas
 - **Graph construction** and **lookup operations** are sub-millisecond for practical project sizes (<1,000 tasks).
 - **Topological ordering** and **critical-path analysis** are the heaviest graph operations in practice. The CPM passes themselves are linear, but Kahn's algorithm's ready queue is implemented as an array that is re-sorted as nodes are added, so total ordering cost grows superlinearly — which the benchmark data reflects (7.26 ms at 1,000 tasks → 799.31 ms at 10,000 tasks). The benchmark table shows the same pattern for critical-path analysis because `calculateSchedule` invokes the topological order internally.
 - **Decision scoring** and **recommendation** scale nearly linearly with the number of eligible candidates.
-- **Scenario simulation** is the most expensive operation because it recomputes the full pipeline (graph → schedule → recommendation) for the projected state. At 10,000 tasks it takes ~1.6 seconds — acceptable for an interactive what-if tool, and a clear target for future optimization if needed.
+- **Scenario simulation** is the most expensive operation because it recomputes the full pipeline (graph → schedule → recommendation) for the projected state. At 10,000 tasks it takes ~1.6 seconds in the benchmark environment — likely acceptable for occasional interactive what-if operations, but it is a candidate for future optimization.
 - The benchmark datasets and all algorithm outputs are deterministic: a given seed always yields the identical task set, and identical inputs always produce identical topological orderings, schedules, scores, and recommendations — verified by the benchmark test suite. Wall-clock timings, by contrast, naturally vary between runs and are reported as machine-dependent measurements rather than exact figures.
 
 ---
@@ -346,6 +346,8 @@ Every push/PR to main triggers a GitHub Actions workflow with four independent j
 4. **e2e**: installs Chromium, runs Playwright specs, uploads HTML report on failure
 
 A workflow-level concurrency group with `cancel-in-progress: true` ensures only the latest commit's run proceeds per PR. The four CI jobs run on every push/PR and their results are visible as status checks. Enforcing those checks as required before merge (via GitHub branch-protection rules on main) is a repository-settings action that remains to be configured by the repository owner; the workflow itself defines and runs the checks but cannot require them.
+
+Because several documents independently describe project state, the repository treats documentation consistency as a review concern: every "implemented" claim maps to code or configuration, every "accepted" decision is removed from the pending-decisions list, every "future" or "human action" item remains explicitly marked as such, and benchmark figures trace to the `npm run benchmark` output. The current handoff and decision records are the authoritative statement of that state.
 
 ---
 
