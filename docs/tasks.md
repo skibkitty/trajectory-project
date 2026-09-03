@@ -351,7 +351,7 @@ Verification:
 
 ## TASK-016 — CI/CD
 
-Status: IN_PROGRESS
+Status: DONE
 
 Goal:
 Automate verification and deployment.
