@@ -404,6 +404,17 @@ Completed:
 
 Next: TASK-017 -- Architecture case study and final documentation.
 
+## 2026-09-03 -- TASK-016 merged to main (PR #18)
+
+Completed:
+- PR #18 (feat/016-ci-cd) merged to main. The CI workflow, Playwright E2E coverage, and all CI/CD configuration are now on main.
+- Reviewer feedback addressed: added `permissions: contents: read` to `.github/workflows/ci.yml` for explicit least-privilege token handling (security hardening, since the workflow executes PR code via npm ci); updated the PR description to correctly describe the four CI jobs (verify, benchmark, e2e, build) with `if-no-files-found: error`.
+- Two GitHub Actions runs were stuck in queue for ~51 minutes; re-triggering via a new commit (all four jobs then completed green in ~1 minute).
+- Branch protection ruleset on main configured by human in GitHub settings (require pull request + require the four status checks).
+- TASK-016 marked DONE; handoff moved to TASK-017.
+
+Next: TASK-017 -- Architecture case study and final documentation.
+
 ## 2026-09-01 - TASK-016 PR #18 review remediation (on feat/016-ci-cd)
 
 Completed:

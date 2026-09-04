@@ -2,11 +2,11 @@
 
 ## Phase
 
-Domain core complete (Phases 1–5 of the implementation plan: model, graph, scheduling, decision engine, scenario simulation). Persistence implemented. Application services implemented. UI foundation complete. CRUD UI and dependency visualization complete. Scenario comparison complete. Integration coverage complete. Algorithm benchmarks implemented. Accessibility and UX hardening complete.
+Domain core complete (Phases 1–5 of the implementation plan: model, graph, scheduling, decision engine, scenario simulation). Persistence implemented. Application services implemented. UI foundation complete. CRUD UI and dependency visualization complete. Scenario comparison complete. Integration coverage complete. Algorithm benchmarks implemented. Accessibility and UX hardening complete. CI/CD and Playwright E2E coverage complete.
 
 ## Current Task
 
-TASK-016 — CI/CD (implemented on feat/016-ci-cd) — automate verification and deployment via GitHub Actions. Adds a CI workflow that runs the full local verification gate (`npm run verify`), the benchmark suite (`npm run benchmark`), and the production build (`npm run build`) on every push/PR to main, uploads the benchmark report as an artifact, and adds Playwright E2E coverage of the primary user journey with its own CI job. Pending PR review and merge; branch protection for required status checks must be configured in the GitHub repository settings by a human.
+TASK-017 — Architecture case study and final documentation (BACKLOG) — document decisions, algorithms, testing, and measured performance for recruiter/interview use. All prerequisites (TASK-014, TASK-015, TASK-016) are now DONE.
 
 ## State
 
@@ -104,11 +104,11 @@ These are intentionally provisional:
 
 ## Next Recommended Action
 
-Create a PR for feat/016-ci-cd (TASK-016), review, and merge to main. Once merged, proceed to TASK-017 — Architecture case study and final documentation.
+Proceed to TASK-017 — Architecture case study and final documentation. Branch protection / required status checks on GitHub must be configured by a human (repository settings, not a repo-file change).
 
 ## Verification
 
-TASK-016 verification is complete locally and in CI. Locally: `npm run verify` (typecheck, 287 tests, lint, format), `npm run build`, `npm run benchmark` (6 tests), and `npm run test:e2e` (2 Playwright specs, requires Chromium installed via `npx playwright install chromium`) all pass. CI on PR #18 observed green: the `CI` workflow's `verify`, `benchmark`, `build`, and `e2e` jobs all pass. The remaining acceptance item — blocking merge on required status checks — needs the GitHub repository-setup branch-protection action by a human.
+TASK-016 verification is complete locally and in CI. Locally: `npm run verify` (typecheck, 287 tests, lint, format:check), `npm run build`, `npm run benchmark` (6 tests), and `npm run test:e2e` (2 Playwright specs) all pass. CI on PR #18 observed green: the `CI` workflow's `verify`, `benchmark`, `build`, and `e2e` jobs all pass; PR #18 merged to main on 2026-09-03. The remaining acceptance item — blocking merge on required status checks — needs the GitHub repository-setup branch-protection action by a human.
 
 ## Important Constraint
 
