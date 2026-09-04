@@ -552,13 +552,13 @@ If not, challenge the feature.
 
 ## 24. Resume Story
 
-Potential resume framing after implementation:
+> Built an explainable project-planning engine (Trajectory) that models task dependencies, scheduling constraints, effort, value, and urgency to recommend the best next action and simulate project changes. Implemented a deterministic decision engine with composable additive scoring, critical-path analysis via the Critical Path Method, structured explainability (machine-readable factor breakdowns, assumptions, and warnings), and immutable scenario simulation — all in a framework-independent domain layer with zero runtime dependencies.
 
-> Built an explainable project-planning engine that models task dependencies, scheduling constraints, effort, value, and deadlines to recommend the best next action and simulate project changes.
+A second bullet:
 
-A second bullet can discuss deterministic graph analysis, scenario simulation, structured explainability, testing, and measured performance.
+> Designed a dependency-graph layer with cycle detection, deterministic topological ordering (Kahn's algorithm), and transitive traversal; measured algorithm performance across 100–10,000 task datasets (e.g., graph construction completes in ~11ms at 10,000 tasks, recommendation scoring in ~22ms). Enforced domain independence (no React/browser/persistence imports), versioned local persistence behind a repository abstraction, 287 unit/component/integration tests plus 2 Playwright E2E specs, and a four-job CI pipeline (typecheck, tests, benchmarks, build, browser E2E).
 
-No metric should be added until actually measured.
+These claims are based on actual benchmark results in `benchmark/results.txt` and the test suite as of TASK-017.
 
 ## 25. Current Human Review Items
 

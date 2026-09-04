@@ -21,6 +21,7 @@ The project is designed to demonstrate:
 
 - `PROJECT_PLAN.md` — product and engineering specification
 - `AGENTS.md` — repository-wide OpenCode instructions
+- `docs/case-study.md` — architecture case study (algorithms, design, performance, testing)
 - `docs/tasks.md` — implementation backlog
 - `docs/handoff.md` — current continuation state
 - `docs/progress.md` — append-only history

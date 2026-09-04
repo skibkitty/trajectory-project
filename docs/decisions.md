@@ -79,15 +79,33 @@ TASK-003 requires representing task dependencies as a directed graph with prereq
 - Cycles are representable in the graph so they can be analyzed and reported; the application layer decides whether to reject them.
 - Repeated single-node BFS/DFS is sufficient for MVP; performance benchmarking is deferred to TASK-014.
 
+## ADR-013 — Project Naming and Availability
+
+### Status
+Accepted
+
+### Context
+TASK-017 requires resolving the final product name and availability decision (PROJECT_PLAN §25). The project has been referred to as "Trajectory" throughout development. The GitHub repository is `skibkitty/trajectory-project`. The npm package name in `package.json` is `trajectory-project`.
+
+### Decision
+
+- **Product name**: Trajectory. The name reflects the project's focus on trajectory analysis — understanding where a project is headed and what the best next move is.
+- **Repository**: `skibkitty/trajectory-project` on GitHub. The repository is public and serves as the portfolio demonstration.
+- **Availability**: the project is a portfolio piece, not a published npm package or SaaS product. It is available as source code on GitHub for inspection and demonstration. No deployment target is defined for MVP; the application runs locally via `npm run dev`.
+- **Branding**: the UI uses "Trajectory" as the application name. The `package.json` description reads: "Trajectory is an explainable project-planning and decision-support engine that recommends the best next task from a project's current state."
+
+### Consequences
+- The product name is stable and used consistently across documentation, UI, and repository metadata.
+- No deployment or distribution infrastructure is required for MVP.
+- The name can be changed later if needed, but all ADRs, documentation, and code references use "Trajectory."
+
 ## Pending Decisions
 
-- final product name
 - exact score weights
 - exact scheduling/calendar semantics
 - date/time representation
 - whether all proposed scenario types belong in MVP
 - final UI stack
-- benchmark methodology
 
 ## ADR-006 — Scheduling and Critical Path Semantics
 
