@@ -1,21 +1,7 @@
-import type { Goal, Task, CreateGoalInput } from "../domain/index.js";
+import type { Goal, CreateGoalInput } from "../domain/index.js";
 import { createGoal, createTask, createProject } from "../domain/index.js";
 import type { ProjectRepository } from "./repository.js";
-
-function toCreateTaskInput(task: Task) {
-  return {
-    id: task.id,
-    title: task.title,
-    description: task.description,
-    status: task.status,
-    value: task.value,
-    urgency: task.urgency,
-    estimatedEffort: task.estimatedEffort,
-    confidence: task.confidence,
-    goalId: task.goalId ?? undefined,
-    dependencies: task.dependencies,
-  };
-}
+import { toCreateTaskInput } from "./task-input.js";
 
 export class GoalService {
   private readonly repository: ProjectRepository;
