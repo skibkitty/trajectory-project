@@ -58,7 +58,9 @@ function serializeTask(task: Task): TaskData {
     estimatedEffort: task.estimatedEffort,
     confidence: task.confidence,
     goalId: task.goalId,
-    dependencies: task.dependencies,
+    // Copy so later mutation of the caller's array cannot alias into the
+    // serialized output, then freeze to match the deep-freeze contract.
+    dependencies: Object.freeze([...task.dependencies]),
   });
 }
 
@@ -172,9 +174,23 @@ function deserializeTask(data: unknown): Task {
     confidence: typeof obj.confidence === "number" ? obj.confidence : undefined,
     goalId: typeof obj.goalId === "string" ? obj.goalId : undefined,
     dependencies: Array.isArray(obj.dependencies)
-      ? obj.dependencies.filter((d): d is string => typeof d === "string")
+      ? deserializeDependencies(obj.dependencies)
       : undefined,
   });
+}
+
+function deserializeDependencies(value: unknown[]): readonly string[] {
+  const dependencies: string[] = [];
+  for (const entry of value) {
+    if (typeof entry !== "string") {
+      throw new Error(
+        "Invalid task data: dependency entries must be strings, got " +
+          `${entry === null ? "null" : typeof entry}`,
+      );
+    }
+    dependencies.push(entry);
+  }
+  return Object.freeze(dependencies);
 }
 
 const VALID_STATUSES = new Set<string>(ALL_TASK_STATUSES);

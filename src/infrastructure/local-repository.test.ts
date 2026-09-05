@@ -188,6 +188,43 @@ describe("Serialization", () => {
     expect(task!.dependencies).toEqual([]);
   });
 
+  it("copies and freezes dependencies into serialized output", () => {
+    const dependencies = ["task-1"];
+    const project = createProject({
+      id: "proj-1",
+      name: "Test",
+      tasks: [createTask({ id: "t1", title: "T1", dependencies })],
+    });
+    const data = serialize(project);
+    expect(Object.isFrozen(data.tasks[0].dependencies)).toBe(true);
+    // Mutating the caller's array must not affect earlier serialized output.
+    dependencies.push("task-2");
+    expect(data.tasks[0].dependencies).toEqual(["task-1"]);
+  });
+
+  it("rejects tasks with non-string dependency entries", () => {
+    const project = sampleProject();
+    const data = {
+      ...serialize(project),
+      tasks: [{ id: "t1", title: "T1", dependencies: ["a", 42, "b"] }],
+    };
+    expect(() => deserialize(data)).toThrow(
+      "Invalid task data: dependency entries must be strings",
+    );
+  });
+
+  it("accepts tasks with valid string dependency entries", () => {
+    const project = sampleProject();
+    const data = {
+      ...serialize(project),
+      tasks: [{ id: "t1", title: "T1", dependencies: ["a", "b"] }],
+    };
+    const restored = deserialize(data);
+    const task = restored.tasks.find((t) => t.id === "t1");
+    expect(task).toBeDefined();
+    expect(task!.dependencies).toEqual(["a", "b"]);
+  });
+
   it("defaults missing goal description to empty string", () => {
     const project = sampleProject();
     const data = {
