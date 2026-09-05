@@ -114,6 +114,24 @@ describe("sample project through the real stack (integration)", () => {
     expect(second.taskId).not.toBeNull();
     expect(second.taskId).not.toBe(first.taskId);
   });
+
+  it("locks the demo-story outcome to the seeded sample project", async () => {
+    const services = createServices();
+    const input = createSampleProject();
+    await services.projectService.createProject(input);
+
+    // The demo story (recommendation, graph shape, critical path) must be
+    // derived from the single seeded sample, not duplicated test fixtures.
+    const rec = await services.recommendationService.getRecommendation(
+      input.id,
+    );
+    expect(rec.taskId).toBe("t4");
+    expect(rec.factors).toHaveLength(6);
+
+    const graph = await services.recommendationService.getGraph(input.id);
+    expect(graph.tasks).toHaveLength(8);
+    expect(graph.schedule.criticalPath).toEqual(["t1", "t2", "t4", "t5", "t8"]);
+  });
 });
 
 describe("cross-service state sharing through one repository (integration)", () => {
