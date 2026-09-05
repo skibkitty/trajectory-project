@@ -319,4 +319,31 @@ describe("Dashboard", () => {
     });
     expect(screen.getByTestId("recommendation-card")).toHaveTextContent("t2");
   });
+
+  it("surfaces an error when re-seeding the sample project instead of overwriting", async () => {
+    render(
+      <Dashboard
+        projectService={projectService}
+        recommendationService={recommendationService}
+        taskService={taskService}
+        dependencyService={dependencyService}
+        scenarioService={scenarioService}
+      />,
+    );
+
+    const seedButton = screen.getByTestId("seed-sample-button");
+    fireEvent.click(seedButton);
+
+    await waitFor(() => {
+      expect(screen.getByText(/Trajectory Demo/)).toBeInTheDocument();
+    });
+
+    fireEvent.click(seedButton);
+
+    await waitFor(() => {
+      expect(screen.getByRole("alert")).toHaveTextContent(
+        /Project already exists: sample-project/,
+      );
+    });
+  });
 });

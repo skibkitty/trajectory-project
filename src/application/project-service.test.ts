@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { ProjectService } from "./project-service.js";
+import { createSampleProject } from "../ui/sample-data.js";
 import { createStubRepository } from "../test-support/index.js";
 
 describe("ProjectService", () => {
@@ -18,14 +19,45 @@ describe("ProjectService", () => {
       expect(project.goals).toEqual([]);
     });
 
-    it("overwrites existing project with same id", async () => {
+    it("rejects a duplicate project id with a descriptive error", async () => {
       const repo = createStubRepository();
       const service = new ProjectService(repo);
       await service.createProject({ id: "p1", name: "First" });
-      await service.createProject({ id: "p1", name: "Second" });
+
+      await expect(
+        service.createProject({ id: "p1", name: "Second" }),
+      ).rejects.toThrow("Project already exists: p1");
+    });
+
+    it("keeps the original project when a duplicate id is rejected", async () => {
+      const repo = createStubRepository();
+      const service = new ProjectService(repo);
+      await service.createProject({
+        id: "p1",
+        name: "First",
+        description: "original",
+      });
+
+      await expect(
+        service.createProject({ id: "p1", name: "Second" }),
+      ).rejects.toThrow("Project already exists: p1");
 
       const loaded = await service.getProject("p1");
-      expect(loaded!.name).toBe("Second");
+      expect(loaded!.name).toBe("First");
+      expect(loaded!.description).toBe("original");
+    });
+
+    it("rejects re-seeding the sample project", async () => {
+      const repo = createStubRepository();
+      const service = new ProjectService(repo);
+      await service.createProject(createSampleProject());
+
+      await expect(
+        service.createProject(createSampleProject()),
+      ).rejects.toThrow("Project already exists: sample-project");
+
+      const loaded = await service.getProject("sample-project");
+      expect(loaded!.name).toBe("Trajectory Demo");
     });
   });
 
