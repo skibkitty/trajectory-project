@@ -447,3 +447,19 @@ Completed:
 - Net diff: −275 lines of duplicated test helper code; no production code touched
 - Test count verified unchanged at HEAD and after the change: 290 `it`/`test` blocks (older progress entries citing 287 were already stale relative to HEAD)
 - Verified: `npm run verify` (typecheck, 290 tests, lint, format:check) and `npm run build` both pass
+
+## 2026-09-05 — Review remediation backlog completed (TASK-018 through TASK-026, on fix/review-remediation-018-026)
+
+Completed:
+- TASK-018 — deep-frozen the `affectedTaskIds` arrays on the `tie-break-applied` and `blocked-status-eligible` warnings (fresh frozen copies per warning), with a regression test asserting `Object.isFrozen` on the nested arrays and elements
+- TASK-019 — extracted the copy-pasted `Task → CreateTaskInput` mapper (`goalId: null → undefined` bridge included) into `src/application/task-input.ts`; task/goal/dependency services now import it instead of redefining it
+- TASK-020 — consolidated the ten duplicated `createStubRepository` helpers (plus `createInMemoryStorage`) into `src/test-support/index.ts`; all call sites migrated (see the earlier entry)
+- TASK-021 — `TaskForm` and `TaskList` dropdowns now render from the domain `ALL_TASK_STATUSES`; `STATUS_COLORS` in `DependencyGraph` is keyed by `TaskStatus`; `as TaskStatus` casts replaced with a typed `find()`; dropdown coverage tests added
+- TASK-022 — `serializeTask` copies and freezes `dependencies` (no caller aliasing); `deserializeTask` rejects non-string dependency entries with a descriptive error instead of silently filtering; ADR-010 documents the chosen semantics; alias-freedom and rejection tests added
+- TASK-023 — `ProjectService.createProject` rejects an existing id (`Project already exists: {id}`) including the `sample-project` seed; Dashboard test asserts the error surfaces instead of overwriting
+- TASK-024 — the benchmark report write is now a hard contract: `writeReport` propagates write failures (no warn-and-pass), and a new test simulates an unwritable location and asserts failure
+- TASK-025 — `SimulationSide` now exposes `blockedTaskCount` and `SimulationResult` adds `blockedTaskDelta` plus `newlyCriticalTaskIds` as the deterministic risk indicator (slack exhausted = becomes critical); definitions recorded in ADR-009; the scenario comparison panel displays both; backward-compatible (new fields only)
+- TASK-026 — archived `docs/task-006-review.md` (superseded banner, no live references), corrected stale counts in `docs/tasks.md` (TASK-015: 286→287) and `docs/handoff.md` (engine tests 31→34, ADR total now 13), added the `isReachable(t, t)` self-reachability note to the case study, narrowed ADR-006's per-pass complexity claim (dominated by the topological sort), pointed TASK-014's determinism criterion at ADR-011, and removed the unused `.next/` entry from `.gitignore`
+- Also: the demo-story outcome is locked by an integration test (`a9b4ab8`) asserting the sample project's deterministic recommendation, factor breakdown, task count, and critical path
+- Verified: `npm run verify` (typecheck, 304 tests, lint, format:check), `npm run build`, and `npm run benchmark` (7 tests, with `benchmark/results.txt` written) all pass
+- Branch pushed as `fix/review-remediation-018-026`; pending human review and merge (no PR created from automation)

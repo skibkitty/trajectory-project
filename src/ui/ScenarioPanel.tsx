@@ -212,9 +212,7 @@ function ScenarioComparison({
                 ? result.newlyCriticalTaskIds.join(", ")
                 : "none"}
             </td>
-            <td>
-              {result.newlyCriticalTaskIds.length > 0 ? "at risk" : "—"}
-            </td>
+            <td>{result.newlyCriticalTaskIds.length > 0 ? "at risk" : "—"}</td>
           </tr>
           <tr>
             <td>Critical path</td>

@@ -6,11 +6,11 @@ All planned phases complete. Domain foundation, dependency graph, scheduling and
 
 ## Current Task
 
-TASK-017 — Architecture case study and final documentation (DONE). All acceptance criteria satisfied: case study written, ADR-013 added for project naming/availability, resume story updated with actual measurements, architecture.md and README.md updated to reference the case study.
+TASK-018 through TASK-026 (the full-branch code-review remediation backlog) are implemented, verified, marked DONE, and pushed on `fix/review-remediation-018-026`. The branch is pending human review and merge. See "Next Recommended Action".
 
 ## State
 
-TASK-017 adds `docs/case-study.md` — a comprehensive architecture case study covering the core problem, domain model, dependency graph, scheduling/CPM, decision engine, explainability, scenario simulation, architecture/layering, persistence, testing strategy, measured performance (with full benchmark table from `benchmark/results.txt`), CI/CD, design tradeoffs, and repository structure. ADR-013 resolves the project naming/availability decision: product name is Trajectory, repository is `skibkitty/trajectory-project` on GitHub, availability is source code on GitHub (no deployment target for MVP). PROJECT_PLAN.md §24 resume story updated with concrete claims based on actual benchmark results and test counts. README.md and docs/architecture.md updated to reference the case study. TASK-016 is merged to main (PR #18) and marked DONE; 287 correctness/component/integration tests and 2 E2E specs pass locally, `npm run build` succeeds, and `npm run benchmark` passes (6 tests).
+The review-remediation branch `fix/review-remediation-018-026` contains all nine remediation tasks: deep-frozen warning `affectedTaskIds` arrays (TASK-018), a shared `toCreateTaskInput` mapper (TASK-019), shared `createStubRepository`/`createInMemoryStorage` test helpers (TASK-020), UI status options driven from `ALL_TASK_STATUSES` with a typed `STATUS_COLORS` and no `as TaskStatus` casts (TASK-021), serialization that copies+freezes `dependencies` and rejects non-string dependency entries (TASK-022), a duplicate-project-id guard in `createProject` including the sample seed and dashboard error surfacing (TASK-023), a hard benchmark-report emission contract (TASK-024), simulator blocked-task and newly-critical risk deltas documented in ADR-009 and surfaced in the scenario panel (TASK-025), and documentation cleanup (archived `task-006-review.md`, corrected stale counts, `isReachable`/complexity/determinism notes, `.next/` removed from `.gitignore`). Earlier state: TASK-017 DONE, TASK-016 merged to main (PR #18).
 
 ## Completed
 
@@ -37,7 +37,7 @@ TASK-017 adds `docs/case-study.md` — a comprehensive architecture case study c
 - Scheduling: forward/backward pass CPM, critical path identification, slack calculation
 - Scheduling tests (13 tests = 71 total passing)
 - Decision engine: eligibility rules, composable additive scoring (six default factors), deterministic lexicographic tie-breaking, structured factor breakdowns, frozen results
-- Decision engine tests (31 tests = 102 total passing across 8 files)
+- Decision engine tests (34 tests = 105 total passing across 8 files)
 - ADR-007 documenting eligibility, scoring model, normalization, tie-breaking, and selection policy; ADR-004 marked Accepted
 - Recommendation explainability: `recommendNextTask` with machine-readable factor ids, fixed-order assumptions, ordered conditional warnings, explainable empty state, frozen deterministic output
 - Engine additions: stable factor ids on `EvaluationFactor`, normalization `maxValues` exposed on `EvaluationResult`
@@ -90,9 +90,11 @@ TASK-017 adds `docs/case-study.md` — a comprehensive architecture case study c
 - Architecture case study (TASK-017): `docs/case-study.md` covering core problem, domain model, dependency graph, scheduling/CPM, decision engine, explainability, scenario simulation, architecture/layering, persistence, testing strategy, measured performance (full benchmark table), CI/CD, design tradeoffs, and repository structure
 - ADR-013 resolving project naming and availability (product name: Trajectory, repository: `skibkitty/trajectory-project`, availability: source code on GitHub)
 - Resume story (PROJECT_PLAN §24) updated with concrete claims based on actual benchmark results and test counts
+- Review remediation (TASK-018–TASK-026) on `fix/review-remediation-018-026`: deep-freeze warning `affectedTaskIds`, shared `toCreateTaskInput` mapper, shared `createStubRepository`/`createInMemoryStorage` test helpers, `ALL_TASK_STATUSES`-driven UI dropdowns, versioned-serialization dependency freeze/rejection, `createProject` duplicate-id guard, hard benchmark-report emission contract, simulator blocked-task/newly-critical deltas (ADR-009 + scenario panel), and documentation cleanup
 
 ## Not Yet Started
 
+- TASK-018 through TASK-026 (the full-branch review remediation backlog) are implemented, verified, and marked DONE on the `fix/review-remediation-018-026` branch, which is pending human review and merge. See "Next Recommended Action".
 - Branch protection / required status checks on GitHub (human repository-settings action, not a repo-file change)
 - Phase 18 — Logging and observability (structured logging for domain, application, and infrastructure layers)
 
@@ -109,7 +111,10 @@ Project naming and availability are resolved per ADR-013: product name Trajector
 
 ## Next Recommended Action
 
-TASK-017 is the final task in the current backlog. All planned implementation phases are complete. Possible next steps (not yet defined as tasks):
+The full-branch review remediation backlog (TASK-018 through TASK-026) is implemented, verified, and marked DONE on the pushed branch `fix/review-remediation-018-026`. That branch should be reviewed and merged to `main` via pull request (per the standard workflow — wait for human review before merging). It cannot be stacked on any other pending branch; it is independent from main.
+
+Beyond the remediation backlog, possible future tracks (not yet defined as tasks):
+- Property-based testing (PROJECT_PLAN §15; requires a new dev dependency, human approval)
 - Phase 18 — Logging and observability (structured logging via injected interfaces)
 - Calendar-based scheduling (date model, deadline scenarios)
 - Weighted-random selection policy (requires `RandomSource` abstraction)
@@ -118,7 +123,7 @@ TASK-017 is the final task in the current backlog. All planned implementation ph
 
 ## Verification
 
-TASK-017 verification is complete. Locally: `npm run verify` (typecheck, 287 tests, lint, format:check), `npm run build`, and `npm run benchmark` (6 tests) all pass. `npm run test:e2e` (2 Playwright specs) also passes with browsers installed. All documentation is accurate against the implemented codebase.
+The review remediation is verified complete. Locally on `fix/review-remediation-018-026`: `npm run verify` (typecheck, 304 tests, lint, format:check), `npm run build`, and `npm run benchmark` (7 tests) all pass. `npm run test:e2e` (2 Playwright specs) passes with browsers installed.
 
 ## Important Constraint
 
