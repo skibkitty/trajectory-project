@@ -332,6 +332,29 @@ describe("recommendNextTask — determinism and immutability", () => {
     }
     for (const warning of recommendation.warnings) {
       expect(Object.isFrozen(warning)).toBe(true);
+      if (warning.affectedTaskIds) {
+        // The affectedTaskIds array itself is deep-frozen and owned by the
+        // warning, so it can never be mutated by a caller.
+        expect(Object.isFrozen(warning.affectedTaskIds)).toBe(true);
+      }
     }
+  });
+
+  it("does not share affectedTaskIds arrays across warnings", () => {
+    // Two BLOCKED candidates in separate subgraphs produce a tie-break
+    // warning AND a blocked-status warning, each carrying affectedTaskIds.
+    const recommendation = recommend([
+      task("a", { status: "BLOCKED", value: 5 }),
+      task("b", { status: "BLOCKED", value: 5 }),
+    ]);
+    const warned = recommendation.warnings.filter(
+      (w) => w.affectedTaskIds !== undefined,
+    );
+    expect(warned.length).toBeGreaterThanOrEqual(2);
+    const first = warned[0].affectedTaskIds!;
+    const second = warned[1].affectedTaskIds!;
+    expect(first).not.toBe(second);
+    expect(Object.isFrozen(first)).toBe(true);
+    expect(Object.isFrozen(second)).toBe(true);
   });
 });
