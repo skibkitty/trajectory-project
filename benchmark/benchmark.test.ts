@@ -122,27 +122,42 @@ describe("benchmark harness output", () => {
 
     // Emit the promised report as an explicit artifact so `npm run benchmark`
     // always produces a results table even when console output is captured.
+    // A failure to emit the report must FAIL the suite: CI treats the artifact
+    // as mandatory (`if-no-files-found: error`), so a local pass that silently
+    // skipped the write would only surface late and confusingly in the upload.
     expect(results.length).toBeGreaterThan(0);
     writeReport(results);
   }, 180_000);
+
+  it("fails, rather than passing silently, when the report cannot be written", () => {
+    const sample: OperationResult = {
+      operation: "graph-construction",
+      taskCount: 100,
+      meanMs: 1,
+      minMs: 1,
+      iterations: 1,
+    };
+
+    // A path whose parent is an existing file makes mkdirSync throw, simulating
+    // an unwritable report location. This must surface as a failure.
+    const badPath = fileURLToPath(
+      new URL("./results.txt/unwritable.txt", import.meta.url),
+    );
+    expect(() => writeResultsFile([sample], badPath)).toThrow();
+
+    // The same result writes cleanly to the canonical report location.
+    expect(() => writeResultsFile([sample], RESULTS_FILE)).not.toThrow();
+    expect(readFileSync(RESULTS_FILE, "utf8")).toContain("Total measurements");
+  });
 });
 
 function writeReport(results: readonly OperationResult[]): void {
-  try {
-    if (existsSync(RESULTS_FILE)) unlinkSync(RESULTS_FILE);
-    writeResultsFile(results, RESULTS_FILE);
-    const written = readFileSync(RESULTS_FILE, "utf8");
-    expect(written).toContain("Total measurements");
-    expect(written).toContain("mean (ms)");
-    console.log("\n" + written);
-  } catch (err) {
-    // Writing the report is a best-effort artifact; a failure to persist should
-    // not hide correctness failures in the benchmark itself.
-    console.warn(
-      "Benchmark report could not be written to disk:",
-      err instanceof Error ? err.message : err,
-    );
-  }
+  if (existsSync(RESULTS_FILE)) unlinkSync(RESULTS_FILE);
+  writeResultsFile(results, RESULTS_FILE);
+  const written = readFileSync(RESULTS_FILE, "utf8");
+  expect(written).toContain("Total measurements");
+  expect(written).toContain("mean (ms)");
+  console.log("\n" + written);
 }
 
 describe("benchmark dependent operations", () => {
