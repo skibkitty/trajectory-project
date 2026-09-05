@@ -1,37 +1,8 @@
 import { describe, it, expect } from "vitest";
 import { GoalService } from "./goal-service.js";
-import type { ProjectRepository, ProjectSummary } from "./repository.js";
 import type { Project, Goal } from "../domain/index.js";
 import { createGoal } from "../domain/index.js";
-
-function createStubRepository(initialProject?: Project): ProjectRepository {
-  const store = new Map<string, Project>();
-  if (initialProject) {
-    store.set(initialProject.id, initialProject);
-  }
-  return {
-    save: async (project: Project) => {
-      store.set(project.id, project);
-    },
-    load: async (id: string) => store.get(id) ?? null,
-    list: async () => {
-      const summaries: ProjectSummary[] = [];
-      for (const [id, project] of store) {
-        summaries.push({
-          id,
-          name: project.name,
-          description: project.description,
-          taskCount: project.tasks.length,
-          goalCount: project.goals.length,
-        });
-      }
-      return Object.freeze(summaries.sort((a, b) => a.id.localeCompare(b.id)));
-    },
-    delete: async (id: string) => {
-      return store.delete(id);
-    },
-  };
-}
+import { createStubRepository } from "../test-support/index.js";
 
 function makeProject(goals: Goal[] = []): Project {
   return {
@@ -46,7 +17,7 @@ function makeProject(goals: Goal[] = []): Project {
 describe("GoalService", () => {
   describe("addGoal", () => {
     it("adds a goal to the project", async () => {
-      const repo = createStubRepository(makeProject());
+      const repo = createStubRepository({ initialProject: makeProject() });
       const service = new GoalService(repo);
 
       const goal = await service.addGoal("p1", {
@@ -62,9 +33,11 @@ describe("GoalService", () => {
     });
 
     it("rejects duplicate goal ids", async () => {
-      const repo = createStubRepository(
-        makeProject([createGoal({ id: "g1", name: "Existing" })]),
-      );
+      const repo = createStubRepository({
+        initialProject: makeProject([
+          createGoal({ id: "g1", name: "Existing" }),
+        ]),
+      });
       const service = new GoalService(repo);
 
       await expect(
@@ -88,7 +61,7 @@ describe("GoalService", () => {
         createGoal({ id: "g1", name: "Launch" }),
         createGoal({ id: "g2", name: "Ship" }),
       ]);
-      const repo = createStubRepository(project);
+      const repo = createStubRepository({ initialProject: project });
       const service = new GoalService(repo);
 
       await service.removeGoal("p1", "g1");
@@ -99,7 +72,7 @@ describe("GoalService", () => {
     });
 
     it("throws for non-existent goal", async () => {
-      const repo = createStubRepository(makeProject());
+      const repo = createStubRepository({ initialProject: makeProject() });
       const service = new GoalService(repo);
 
       await expect(service.removeGoal("p1", "missing")).rejects.toThrow(

@@ -9,18 +9,7 @@ import {
   createDependencyGraph,
   calculateSchedule,
 } from "../domain/index.js";
-
-function createStubRepository(
-  overrides: Partial<ProjectRepository> = {},
-): ProjectRepository {
-  return {
-    save: vi.fn().mockResolvedValue(undefined),
-    load: vi.fn().mockResolvedValue(null),
-    list: vi.fn().mockResolvedValue([]),
-    delete: vi.fn().mockResolvedValue(false),
-    ...overrides,
-  };
-}
+import { createStubRepository } from "../test-support/index.js";
 
 describe("TaskList", () => {
   let repository: ProjectRepository;

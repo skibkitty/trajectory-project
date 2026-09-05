@@ -1,36 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { ProjectService } from "./project-service.js";
-import type { ProjectRepository, ProjectSummary } from "./repository.js";
-import type { Project } from "../domain/index.js";
-
-function createStubRepository(
-  overrides: Partial<ProjectRepository> = {},
-): ProjectRepository {
-  const store = new Map<string, Project>();
-  return {
-    save: async (project: Project) => {
-      store.set(project.id, project);
-    },
-    load: async (id: string) => store.get(id) ?? null,
-    list: async () => {
-      const summaries: ProjectSummary[] = [];
-      for (const [id, project] of store) {
-        summaries.push({
-          id,
-          name: project.name,
-          description: project.description,
-          taskCount: project.tasks.length,
-          goalCount: project.goals.length,
-        });
-      }
-      return Object.freeze(summaries.sort((a, b) => a.id.localeCompare(b.id)));
-    },
-    delete: async (id: string) => {
-      return store.delete(id);
-    },
-    ...overrides,
-  };
-}
+import { createStubRepository } from "../test-support/index.js";
 
 describe("ProjectService", () => {
   describe("createProject", () => {

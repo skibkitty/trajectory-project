@@ -5,18 +5,7 @@ import { ScenarioService } from "../application/scenario-service.js";
 import type { ProjectRepository } from "../application/repository.js";
 import type { Project } from "../domain/index.js";
 import { createProject, createTask } from "../domain/index.js";
-
-function createStubRepository(
-  overrides: Partial<ProjectRepository> = {},
-): ProjectRepository {
-  return {
-    save: vi.fn().mockResolvedValue(undefined),
-    load: vi.fn().mockResolvedValue(null),
-    list: vi.fn().mockResolvedValue([]),
-    delete: vi.fn().mockResolvedValue(false),
-    ...overrides,
-  };
-}
+import { createStubRepository } from "../test-support/index.js";
 
 function makeTestProject(): Project {
   const task1 = createTask({

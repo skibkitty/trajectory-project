@@ -435,3 +435,15 @@ Completed:
 - Updated `docs/handoff.md` to reflect TASK-017 DONE and all phases complete
 - Updated `docs/tasks.md` to mark TASK-017 DONE
 - Verified: `npm run verify` (typecheck, 287 tests, lint, format:check), `npm run build`, all pass
+
+## 2026-09-05 — Consolidated test repository stubs (review remediation, on fix/review-remediation-018-026)
+
+Completed:
+- Extracted the duplicated `createStubRepository` helper into a single shared module `src/test-support/index.ts` (with the existing `createInMemoryStorage`)
+- The shared stub seeds an in-memory Map via the `initialProject` option and accepts per-method `overrides`; each base method is a `vi.fn()` around its behavioral implementation, so tests can both rely on real save/load/list/delete behavior and reconfigure methods in place via `vi.mocked(repository.x).mockResolvedValue(...)` — no behavioral difference from the old per-file stubs
+- Migrated all ten test files that previously defined their own stub to import the shared one:
+  - Application service tests (`project`, `task`, `goal`, `dependency`, `recommendation`, `scenario`): positional `createStubRepository(project)` calls rewritten to the `{ initialProject }` options bag
+  - UI tests (`Dashboard`, `ScenarioPanel`, `TaskList`, `accessibility`): local vi.fn stubs replaced with the shared stub; `accessibility.test.tsx` passes its vi.fn list/load spies through `overrides`, and the focus-management test now relies on the stub's real save/load store instead of hand-rolled `currentProject` mutation
+- Net diff: −275 lines of duplicated test helper code; no production code touched
+- Test count verified unchanged at HEAD and after the change: 290 `it`/`test` blocks (older progress entries citing 287 were already stale relative to HEAD)
+- Verified: `npm run verify` (typecheck, 290 tests, lint, format:check) and `npm run build` both pass
