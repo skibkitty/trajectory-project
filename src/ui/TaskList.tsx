@@ -1,14 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import type { RecommendationService } from "../application/recommendation-service.js";
+import { ALL_TASK_STATUSES } from "../domain/index.js";
 import type { Task, ScheduleResult, TaskStatus } from "../domain/index.js";
-
-const STATUS_OPTIONS: readonly TaskStatus[] = [
-  "BACKLOG",
-  "TODO",
-  "IN_PROGRESS",
-  "BLOCKED",
-  "DONE",
-];
 
 export interface TaskListProps {
   projectId: string;
@@ -116,13 +109,16 @@ export function TaskList({
                 <td>
                   <select
                     value={task.status}
-                    onChange={(e) =>
-                      onUpdateTaskStatus(task.id, e.target.value as TaskStatus)
-                    }
+                    onChange={(e) => {
+                      const next = ALL_TASK_STATUSES.find(
+                        (s) => s === e.target.value,
+                      );
+                      if (next !== undefined) onUpdateTaskStatus(task.id, next);
+                    }}
                     aria-label={`Status for ${task.id}`}
                     data-testid={`task-status-${task.id}`}
                   >
-                    {STATUS_OPTIONS.map((s) => (
+                    {ALL_TASK_STATUSES.map((s) => (
                       <option key={s} value={s}>
                         {s}
                       </option>

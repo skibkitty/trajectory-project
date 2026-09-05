@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { TaskForm } from "./TaskForm.js";
+import { ALL_TASK_STATUSES } from "../domain/index.js";
 
 describe("TaskForm", () => {
   it("renders the form fields", () => {
@@ -13,6 +14,13 @@ describe("TaskForm", () => {
     expect(screen.getByTestId("task-confidence-input")).toBeInTheDocument();
     expect(screen.getByTestId("task-status-input")).toBeInTheDocument();
     expect(screen.getByTestId("add-task-button")).toBeInTheDocument();
+  });
+
+  it("offers every domain task status in the status dropdown", () => {
+    render(<TaskForm existingTaskIds={[]} onSubmit={vi.fn()} />);
+    const select = screen.getByTestId("task-status-input") as HTMLSelectElement;
+    const optionValues = [...select.options].map((option) => option.value);
+    expect(optionValues).toEqual(ALL_TASK_STATUSES);
   });
 
   it("calls onSubmit with form data", () => {

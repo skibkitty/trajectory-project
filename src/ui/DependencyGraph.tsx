@@ -1,10 +1,11 @@
 import { useMemo } from "react";
+import { TaskStatus } from "../domain/index.js";
 import type { Task } from "../domain/index.js";
 import type { DependencyGraph } from "../domain/index.js";
 import type { ScheduleResult } from "../domain/index.js";
 import { computeLayout, NODE_WIDTH, NODE_HEIGHT } from "./graph-layout.js";
 
-const STATUS_COLORS: Record<string, string> = {
+const STATUS_COLORS: Record<TaskStatus, string> = {
   DONE: "#22c55e",
   IN_PROGRESS: "#3b82f6",
   TODO: "#f59e0b",
@@ -91,8 +92,8 @@ export function DependencyGraphVisualization({
           {layout.nodes.map((node) => {
             const isCritical = criticalPathSet.has(node.taskId);
             const task = tasks.find((t) => t.id === node.taskId);
-            const status = task?.status ?? "BACKLOG";
-            const fillColor = STATUS_COLORS[status] ?? "#94a3b8";
+            const status = task?.status ?? TaskStatus.BACKLOG;
+            const fillColor = STATUS_COLORS[status];
 
             return (
               <g

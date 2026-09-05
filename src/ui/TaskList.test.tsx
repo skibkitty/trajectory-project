@@ -1,5 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, waitFor, fireEvent } from "@testing-library/react";
+import {
+  render,
+  screen,
+  waitFor,
+  fireEvent,
+  within,
+} from "@testing-library/react";
 import { TaskList } from "./TaskList.js";
 import { RecommendationService } from "../application/recommendation-service.js";
 import type { ProjectRepository } from "../application/repository.js";
@@ -8,6 +14,7 @@ import {
   createTask,
   createDependencyGraph,
   calculateSchedule,
+  ALL_TASK_STATUSES,
 } from "../domain/index.js";
 import { createStubRepository } from "../test-support/index.js";
 
@@ -18,6 +25,32 @@ describe("TaskList", () => {
   beforeEach(() => {
     repository = createStubRepository();
     recommendationService = new RecommendationService(repository);
+  });
+
+  it("offers every domain task status in a row's status dropdown", async () => {
+    const project = createProject({
+      id: "proj-1",
+      name: "Test",
+      tasks: [createTask({ id: "t1", title: "A", status: "TODO" })],
+    });
+    vi.mocked(repository.load).mockResolvedValue(project);
+
+    render(
+      <TaskList
+        projectId="proj-1"
+        recommendationService={recommendationService}
+        onUpdateTaskStatus={vi.fn()}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("task-status-t1")).toBeInTheDocument();
+    });
+    const select = screen.getByTestId("task-status-t1");
+    const optionValues = within(select)
+      .getAllByRole("option")
+      .map((option) => (option as HTMLOptionElement).value);
+    expect(optionValues).toEqual(ALL_TASK_STATUSES);
   });
 
   it("renders task table with tasks from the project", async () => {
