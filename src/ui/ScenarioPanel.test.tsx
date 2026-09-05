@@ -173,6 +173,35 @@ describe("ScenarioPanel", () => {
     expect(screen.getByTestId("value-removed")).toHaveTextContent("8");
   });
 
+  it("reports blocked-task and newly-critical deltas in the comparison", async () => {
+    const project = makeTestProject();
+    vi.mocked(repository.load).mockResolvedValue(project);
+
+    render(
+      <ScenarioPanel
+        projectId="proj-1"
+        scenarioService={scenarioService}
+        tasks={project.tasks}
+      />,
+    );
+
+    // Delaying nothing on the critical path keeps blocking unchanged.
+    fireEvent.change(screen.getByTestId("scenario-task-select"), {
+      target: { value: "t2" },
+    });
+    fireEvent.change(screen.getByTestId("scenario-amount-input"), {
+      target: { value: "10" },
+    });
+    fireEvent.click(screen.getByTestId("run-scenario-button"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("scenario-comparison")).toBeInTheDocument();
+    });
+
+    expect(screen.getByTestId("blocked-task-delta")).toHaveTextContent("0");
+    expect(screen.getByTestId("newly-critical")).toHaveTextContent("none");
+  });
+
   it("rejects a non-positive delay amount", async () => {
     const project = makeTestProject();
     vi.mocked(repository.load).mockResolvedValue(project);

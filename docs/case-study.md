@@ -61,7 +61,7 @@ The dependency graph (`src/domain/graph/dependency-graph.ts`) is constructed fro
 
 - **Direct lookup**: `getPrerequisites(id)` and `getDependents(id)` — O(1) via pre-built adjacency maps
 - **Transitive traversal**: `getAllPrerequisites(id)` and `getAllDependents(id)` — BFS, returning sorted results
-- **Reachability**: `isReachable(from, to)` — BFS with short-circuit
+- **Reachability**: `isReachable(from, to)` — BFS with short-circuit. `isReachable(t, t)` follows the self-reachability convention: it is `false` for acyclic graphs (no task reaches itself through an edge) and `true` only for tasks that are part of a cycle.
 - **Cycle detection**: `hasCycle()` and `getCyclicTaskIds()` — checks self-reachability for each node (BFS from a node back to itself), which yields precisely the tasks on cycles, excluding tasks merely downstream
 - **Topological ordering**: Kahn's algorithm with a lexicographically sorted ready queue — deterministic, independent of input ordering
 
@@ -213,7 +213,7 @@ A fourth type (deadline change) is deferred until a date model exists.
 
 ### 7.4 Comparison Output
 
-Each side (baseline, projected) exposes: `projectDuration`, `criticalPath`, `recommendedTaskId`, `recommendedScore`. Deltas: `durationDelta`, `criticalPathChanged`, `recommendationChanged`, and `valueRemoved` (for de-scope only).
+Each side (baseline, projected) exposes: `projectDuration`, `criticalPath`, `recommendedTaskId`, `recommendedScore`, `blockedTaskCount`. Deltas: `durationDelta`, `blockedTaskDelta`, `newlyCriticalTaskIds` (the project's risk indicator — tasks whose slack fell to zero), `criticalPathChanged`, `recommendationChanged`, and `valueRemoved` (for de-scope only).
 
 **Affected downstream**: the target plus its transitive dependents, filtered to tasks whose `[earliestStart, earliestFinish]` window actually changed. Merely being downstream of the change is not enough — slack absorbs some changes.
 

@@ -249,6 +249,67 @@ describe("simulateScenario — recommendation comparison", () => {
   });
 });
 
+describe("simulateScenario — blocked-task delta", () => {
+  function blockedBaseline(): Task[] {
+    return [
+      task("root", { status: "DONE" }),
+      task("mid", { status: "TODO", dependencies: ["root"] }),
+      task("leaf", { status: "TODO", dependencies: ["mid"] }),
+      task("solo", { status: "BACKLOG" }),
+    ];
+  }
+
+  it("counts blocked tasks per side (non-DONE with a non-DONE prerequisite)", () => {
+    const result = simulateScenario(blockedBaseline(), {
+      kind: "delay-task",
+      taskId: "root",
+      additionalEffort: 1,
+    });
+    expect(result.baseline.blockedTaskCount).toBe(1);
+    expect(result.projected.blockedTaskCount).toBe(1);
+    expect(result.blockedTaskDelta).toBe(0);
+  });
+
+  it("reports a lower blocked count when de-scoping removes a blocking prerequisite", () => {
+    const result = simulateScenario(blockedBaseline(), {
+      kind: "remove-task",
+      taskId: "mid",
+    });
+    expect(result.baseline.blockedTaskCount).toBe(1);
+    expect(result.projected.blockedTaskCount).toBe(0);
+    expect(result.blockedTaskDelta).toBe(-1);
+  });
+});
+
+describe("simulateScenario — risk indicators", () => {
+  const schedule = (): Task[] => [
+    task("critical", { estimatedEffort: 5 }),
+    task("side", { estimatedEffort: 1 }),
+    task("join", { estimatedEffort: 1, dependencies: ["critical", "side"] }),
+  ];
+
+  it("reports tasks that became newly critical when slack is exhausted", () => {
+    const result = simulateScenario(schedule(), {
+      kind: "delay-task",
+      taskId: "side",
+      additionalEffort: 5,
+    });
+    expect(result.baseline.criticalPath).toEqual(["critical", "join"]);
+    expect(result.projected.criticalPath).toEqual(["side", "join"]);
+    expect(result.newlyCriticalTaskIds).toEqual(["side"]);
+  });
+
+  it("reports no newly critical tasks when a delay is absorbed by slack", () => {
+    const result = simulateScenario(schedule(), {
+      kind: "delay-task",
+      taskId: "side",
+      additionalEffort: 2,
+    });
+    expect(result.durationDelta).toBe(0);
+    expect(result.newlyCriticalTaskIds).toEqual([]);
+  });
+});
+
 describe("simulateScenario — determinism and immutability", () => {
   it("produces identical results across repeated runs and input order", () => {
     const build = (): Task[] => [
@@ -290,6 +351,7 @@ describe("simulateScenario — determinism and immutability", () => {
     expect(Object.isFrozen(result.projected)).toBe(true);
     expect(Object.isFrozen(result.affectedDownstreamTaskIds)).toBe(true);
     expect(Object.isFrozen(result.scenarioTasks)).toBe(true);
+    expect(Object.isFrozen(result.newlyCriticalTaskIds)).toBe(true);
     expect(Object.isFrozen(result.baseline.criticalPath)).toBe(true);
   });
 });

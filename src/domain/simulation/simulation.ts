@@ -33,6 +33,7 @@ export interface SimulationSide {
   readonly criticalPath: readonly string[];
   readonly recommendedTaskId: string | null;
   readonly recommendedScore: number | null;
+  readonly blockedTaskCount: number;
 }
 
 export interface SimulationResult {
@@ -41,6 +42,8 @@ export interface SimulationResult {
   readonly baseline: SimulationSide;
   readonly projected: SimulationSide;
   readonly durationDelta: number;
+  readonly blockedTaskDelta: number;
+  readonly newlyCriticalTaskIds: readonly string[];
   readonly criticalPathChanged: boolean;
   readonly recommendationChanged: boolean;
   readonly affectedDownstreamTaskIds: readonly string[];
@@ -129,7 +132,25 @@ function buildSide(
     criticalPath: Object.freeze([...schedule.criticalPath]),
     recommendedTaskId: recommendation.taskId,
     recommendedScore: recommendation.score,
+    blockedTaskCount: countBlockedTasks(tasks, graph),
   });
+}
+
+function countBlockedTasks(
+  tasks: readonly Task[],
+  graph: DependencyGraph,
+): number {
+  // A task is blocked when it is not DONE and at least one prerequisite is not
+  // DONE. Blocking is derived from the graph (as in eligibility), never from
+  // the informational BLOCKED status flag.
+  const statusByTaskId = new Map(tasks.map((t) => [t.id, t.status]));
+  return tasks.filter(
+    (task) =>
+      task.status !== "DONE" &&
+      graph
+        .getPrerequisites(task.id)
+        .some((prereq) => statusByTaskId.get(prereq) !== "DONE"),
+  ).length;
 }
 
 type ScheduleWindow = Pick<
@@ -206,12 +227,19 @@ export function simulateScenario(
     a.id.localeCompare(b.id),
   );
 
+  const baselineCritical = new Set(baselineSchedule.criticalPath);
+  const newlyCriticalTaskIds = scenarioSchedule.criticalPath
+    .filter((taskId) => !baselineCritical.has(taskId))
+    .sort((a, b) => a.localeCompare(b));
+
   return Object.freeze({
     scenario,
     scenarioTasks: Object.freeze(orderedScenarioTasks),
     baseline,
     projected,
     durationDelta: round(projected.projectDuration - baseline.projectDuration),
+    blockedTaskDelta: projected.blockedTaskCount - baseline.blockedTaskCount,
+    newlyCriticalTaskIds: Object.freeze(newlyCriticalTaskIds),
     criticalPathChanged:
       baseline.criticalPath.join("\u0000") !==
       projected.criticalPath.join("\u0000"),

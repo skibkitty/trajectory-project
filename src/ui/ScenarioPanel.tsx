@@ -197,6 +197,26 @@ function ScenarioComparison({
             </td>
           </tr>
           <tr>
+            <td>Blocked tasks</td>
+            <td>{baseline.blockedTaskCount}</td>
+            <td>{projected.blockedTaskCount}</td>
+            <td data-testid="blocked-task-delta">
+              {formatDelta(result.blockedTaskDelta)}
+            </td>
+          </tr>
+          <tr>
+            <td>Newly critical tasks</td>
+            <td>—</td>
+            <td data-testid="newly-critical">
+              {result.newlyCriticalTaskIds.length > 0
+                ? result.newlyCriticalTaskIds.join(", ")
+                : "none"}
+            </td>
+            <td>
+              {result.newlyCriticalTaskIds.length > 0 ? "at risk" : "—"}
+            </td>
+          </tr>
+          <tr>
             <td>Critical path</td>
             <td>{baseline.criticalPath.join(", ")}</td>
             <td>{projected.criticalPath.join(", ")}</td>
