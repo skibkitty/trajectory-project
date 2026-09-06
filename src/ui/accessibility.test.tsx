@@ -13,18 +13,7 @@ import { createProject, createTask, createGoal } from "../domain/index.js";
 import { DependencyEditor } from "./DependencyEditor.js";
 import { DependencyGraphVisualization } from "./DependencyGraph.js";
 import { createDependencyGraph, calculateSchedule } from "../domain/index.js";
-
-function createStubRepository(
-  overrides: Partial<ProjectRepository> = {},
-): ProjectRepository {
-  return {
-    save: vi.fn().mockResolvedValue(undefined),
-    load: vi.fn().mockResolvedValue(null),
-    list: vi.fn().mockResolvedValue([]),
-    delete: vi.fn().mockResolvedValue(false),
-    ...overrides,
-  };
-}
+import { createStubRepository } from "../test-support/index.js";
 
 function makeTestProject(): Project {
   const goal = createGoal({ id: "g1", name: "Ship MVP" });
@@ -106,8 +95,10 @@ function makeSingleProjectRepo(): {
     goalCount: project.goals.length,
   };
   const repository = createStubRepository({
-    list: vi.fn().mockResolvedValue([summary]),
-    load: vi.fn().mockResolvedValue(project),
+    overrides: {
+      list: vi.fn().mockResolvedValue([summary]),
+      load: vi.fn().mockResolvedValue(project),
+    },
   });
   return { repository, summary, project };
 }
@@ -150,8 +141,12 @@ describe("Accessibility and UX", () => {
     };
     let resolveList: (v: readonly ProjectSummary[]) => void = () => {};
     const repository = createStubRepository({
-      list: vi.fn().mockReturnValue(new Promise((res) => (resolveList = res))),
-      load: vi.fn().mockResolvedValue(project),
+      overrides: {
+        list: vi
+          .fn()
+          .mockReturnValue(new Promise((res) => (resolveList = res))),
+        load: vi.fn().mockResolvedValue(project),
+      },
     });
     renderDashboard(repository);
     expect(screen.getByRole("status")).toBeInTheDocument();
@@ -200,21 +195,7 @@ describe("Accessibility and UX", () => {
 
   it("moves focus to the workspace on project selection but not on a subsequent refresh", async () => {
     const project = makeTestProject();
-    const summary: ProjectSummary = {
-      id: project.id,
-      name: project.name,
-      description: project.description,
-      taskCount: project.tasks.length,
-      goalCount: project.goals.length,
-    };
-    let currentProject = project;
-    const repository = createStubRepository({
-      list: vi.fn().mockResolvedValue([summary]),
-      load: vi.fn().mockResolvedValue(currentProject),
-      save: vi
-        .fn()
-        .mockImplementation(async (p: Project) => (currentProject = p)),
-    });
+    const repository = createStubRepository({ initialProject: project });
     renderDashboard(repository);
 
     await waitFor(() => {

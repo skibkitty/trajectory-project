@@ -10,18 +10,7 @@ import type { ProjectRepository } from "../application/repository.js";
 import type { ProjectSummary } from "../application/repository.js";
 import type { Project } from "../domain/index.js";
 import { createProject, createTask, createGoal } from "../domain/index.js";
-
-function createStubRepository(
-  overrides: Partial<ProjectRepository> = {},
-): ProjectRepository {
-  return {
-    save: vi.fn().mockResolvedValue(undefined),
-    load: vi.fn().mockResolvedValue(null),
-    list: vi.fn().mockResolvedValue([]),
-    delete: vi.fn().mockResolvedValue(false),
-    ...overrides,
-  };
-}
+import { createStubRepository } from "../test-support/index.js";
 
 function makeTestProject(): Project {
   const goal = createGoal({ id: "g1", name: "Ship MVP" });
@@ -329,5 +318,32 @@ describe("Dashboard", () => {
       expect(screen.getByTestId("recommendation-card")).toBeInTheDocument();
     });
     expect(screen.getByTestId("recommendation-card")).toHaveTextContent("t2");
+  });
+
+  it("surfaces an error when re-seeding the sample project instead of overwriting", async () => {
+    render(
+      <Dashboard
+        projectService={projectService}
+        recommendationService={recommendationService}
+        taskService={taskService}
+        dependencyService={dependencyService}
+        scenarioService={scenarioService}
+      />,
+    );
+
+    const seedButton = screen.getByTestId("seed-sample-button");
+    fireEvent.click(seedButton);
+
+    await waitFor(() => {
+      expect(screen.getByText(/Trajectory Demo/)).toBeInTheDocument();
+    });
+
+    fireEvent.click(seedButton);
+
+    await waitFor(() => {
+      expect(screen.getByRole("alert")).toHaveTextContent(
+        /Project already exists: sample-project/,
+      );
+    });
   });
 });

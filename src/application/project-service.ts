@@ -10,6 +10,10 @@ export class ProjectService {
   }
 
   async createProject(input: CreateProjectInput): Promise<Project> {
+    const existing = await this.repository.load(input.id);
+    if (existing !== null) {
+      throw new Error(`Project already exists: ${input.id}`);
+    }
     const project = createProject(input);
     await this.repository.save(project);
     return project;

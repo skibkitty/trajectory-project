@@ -1,5 +1,16 @@
 # TASK-006 Implementation Review
 
+> **ARCHIVED — historical record.**
+>
+> This document was written during the TASK-006 review cycle. Every substantive
+> issue it raises has since been resolved: element-level freezing (issue #1) was
+> applied in the TASK-006 review follow-up and the `affectedTaskIds` arrays in
+> warnings were deep-frozen in TASK-018; the structural type, naming, warning,
+> and test-coverage items were addressed in the same follow-up, ADR-008, and
+> later remediation tasks (TASK-018–TASK-026). It is retained for history and
+> must not be read as a description of the current codebase. See `docs/decisions.md`
+> (ADR-008) and `docs/progress.md` for the current contract and state.
+
 ## Summary
 
 This document records issues found during a thorough review of the TASK-006

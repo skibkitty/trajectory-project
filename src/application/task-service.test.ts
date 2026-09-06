@@ -1,37 +1,8 @@
 import { describe, it, expect } from "vitest";
 import { TaskService } from "./task-service.js";
-import type { ProjectRepository, ProjectSummary } from "./repository.js";
 import type { Project, Task } from "../domain/index.js";
 import { createTask, TaskStatus } from "../domain/index.js";
-
-function createStubRepository(initialProject?: Project): ProjectRepository {
-  const store = new Map<string, Project>();
-  if (initialProject) {
-    store.set(initialProject.id, initialProject);
-  }
-  return {
-    save: async (project: Project) => {
-      store.set(project.id, project);
-    },
-    load: async (id: string) => store.get(id) ?? null,
-    list: async () => {
-      const summaries: ProjectSummary[] = [];
-      for (const [id, project] of store) {
-        summaries.push({
-          id,
-          name: project.name,
-          description: project.description,
-          taskCount: project.tasks.length,
-          goalCount: project.goals.length,
-        });
-      }
-      return Object.freeze(summaries.sort((a, b) => a.id.localeCompare(b.id)));
-    },
-    delete: async (id: string) => {
-      return store.delete(id);
-    },
-  };
-}
+import { createStubRepository } from "../test-support/index.js";
 
 function makeProject(tasks: Task[] = []): Project {
   return {
@@ -46,7 +17,7 @@ function makeProject(tasks: Task[] = []): Project {
 describe("TaskService", () => {
   describe("addTask", () => {
     it("adds a task to the project", async () => {
-      const repo = createStubRepository(makeProject());
+      const repo = createStubRepository({ initialProject: makeProject() });
       const service = new TaskService(repo);
 
       const task = await service.addTask("p1", {
@@ -63,9 +34,11 @@ describe("TaskService", () => {
     });
 
     it("rejects duplicate task ids", async () => {
-      const repo = createStubRepository(
-        makeProject([createTask({ id: "t1", title: "Existing" })]),
-      );
+      const repo = createStubRepository({
+        initialProject: makeProject([
+          createTask({ id: "t1", title: "Existing" }),
+        ]),
+      });
       const service = new TaskService(repo);
 
       await expect(
@@ -88,7 +61,7 @@ describe("TaskService", () => {
       const project = makeProject([
         createTask({ id: "t1", title: "Task", status: TaskStatus.BACKLOG }),
       ]);
-      const repo = createStubRepository(project);
+      const repo = createStubRepository({ initialProject: project });
       const service = new TaskService(repo);
 
       const updated = await service.updateTaskStatus(
@@ -104,7 +77,7 @@ describe("TaskService", () => {
     });
 
     it("throws for non-existent task", async () => {
-      const repo = createStubRepository(makeProject());
+      const repo = createStubRepository({ initialProject: makeProject() });
       const service = new TaskService(repo);
 
       await expect(
@@ -120,7 +93,7 @@ describe("TaskService", () => {
         createTask({ id: "t2", title: "B", dependencies: ["t1"] }),
         createTask({ id: "t3", title: "C", dependencies: ["t1", "t2"] }),
       ]);
-      const repo = createStubRepository(project);
+      const repo = createStubRepository({ initialProject: project });
       const service = new TaskService(repo);
 
       await service.removeTask("p1", "t1");
@@ -133,7 +106,7 @@ describe("TaskService", () => {
     });
 
     it("throws for non-existent task", async () => {
-      const repo = createStubRepository(makeProject());
+      const repo = createStubRepository({ initialProject: makeProject() });
       const service = new TaskService(repo);
 
       await expect(service.removeTask("p1", "missing")).rejects.toThrow(
@@ -145,7 +118,7 @@ describe("TaskService", () => {
   describe("getTask", () => {
     it("returns the task when it exists", async () => {
       const project = makeProject([createTask({ id: "t1", title: "Task" })]);
-      const repo = createStubRepository(project);
+      const repo = createStubRepository({ initialProject: project });
       const service = new TaskService(repo);
 
       const task = await service.getTask("p1", "t1");
@@ -154,7 +127,7 @@ describe("TaskService", () => {
     });
 
     it("returns null for non-existent task", async () => {
-      const repo = createStubRepository(makeProject());
+      const repo = createStubRepository({ initialProject: makeProject() });
       const service = new TaskService(repo);
 
       expect(await service.getTask("p1", "missing")).toBeNull();

@@ -435,3 +435,39 @@ Completed:
 - Updated `docs/handoff.md` to reflect TASK-017 DONE and all phases complete
 - Updated `docs/tasks.md` to mark TASK-017 DONE
 - Verified: `npm run verify` (typecheck, 287 tests, lint, format:check), `npm run build`, all pass
+
+## 2026-09-05 — Consolidated test repository stubs (review remediation, on fix/review-remediation-018-026)
+
+Completed:
+- Extracted the duplicated `createStubRepository` helper into a single shared module `src/test-support/index.ts` (with the existing `createInMemoryStorage`)
+- The shared stub seeds an in-memory Map via the `initialProject` option and accepts per-method `overrides`; each base method is a `vi.fn()` around its behavioral implementation, so tests can both rely on real save/load/list/delete behavior and reconfigure methods in place via `vi.mocked(repository.x).mockResolvedValue(...)` — no behavioral difference from the old per-file stubs
+- Migrated all ten test files that previously defined their own stub to import the shared one:
+  - Application service tests (`project`, `task`, `goal`, `dependency`, `recommendation`, `scenario`): positional `createStubRepository(project)` calls rewritten to the `{ initialProject }` options bag
+  - UI tests (`Dashboard`, `ScenarioPanel`, `TaskList`, `accessibility`): local vi.fn stubs replaced with the shared stub; `accessibility.test.tsx` passes its vi.fn list/load spies through `overrides`, and the focus-management test now relies on the stub's real save/load store instead of hand-rolled `currentProject` mutation
+- Net diff: −275 lines of duplicated test helper code; no production code touched
+- Test count verified unchanged at HEAD and after the change: 290 `it`/`test` blocks (older progress entries citing 287 were already stale relative to HEAD)
+- Verified: `npm run verify` (typecheck, 290 tests, lint, format:check) and `npm run build` both pass
+
+## 2026-09-05 — Review remediation backlog completed (TASK-018 through TASK-026, on fix/review-remediation-018-026)
+
+Completed:
+- TASK-018 — deep-frozen the `affectedTaskIds` arrays on the `tie-break-applied` and `blocked-status-eligible` warnings (fresh frozen copies per warning), with a regression test asserting `Object.isFrozen` on the nested arrays and elements
+- TASK-019 — extracted the copy-pasted `Task → CreateTaskInput` mapper (`goalId: null → undefined` bridge included) into `src/application/task-input.ts`; task/goal/dependency services now import it instead of redefining it
+- TASK-020 — consolidated the ten duplicated `createStubRepository` helpers (plus `createInMemoryStorage`) into `src/test-support/index.ts`; all call sites migrated (see the earlier entry)
+- TASK-021 — `TaskForm` and `TaskList` dropdowns now render from the domain `ALL_TASK_STATUSES`; `STATUS_COLORS` in `DependencyGraph` is keyed by `TaskStatus`; `as TaskStatus` casts replaced with a typed `find()`; dropdown coverage tests added
+- TASK-022 — `serializeTask` copies and freezes `dependencies` (no caller aliasing); `deserializeTask` rejects non-string dependency entries with a descriptive error instead of silently filtering; ADR-010 documents the chosen semantics; alias-freedom and rejection tests added
+- TASK-023 — `ProjectService.createProject` rejects an existing id (`Project already exists: {id}`) including the `sample-project` seed; Dashboard test asserts the error surfaces instead of overwriting
+- TASK-024 — the benchmark report write is now a hard contract: `writeReport` propagates write failures (no warn-and-pass), and a new test simulates an unwritable location and asserts failure
+- TASK-025 — `SimulationSide` now exposes `blockedTaskCount` and `SimulationResult` adds `blockedTaskDelta` plus `newlyCriticalTaskIds` as the deterministic risk indicator (slack exhausted = becomes critical); definitions recorded in ADR-009; the scenario comparison panel displays both; backward-compatible (new fields only)
+- TASK-026 — archived `docs/task-006-review.md` (superseded banner, no live references), corrected stale counts in `docs/tasks.md` (TASK-015: 286→287) and `docs/handoff.md` (engine tests 31→34, ADR total now 13), added the `isReachable(t, t)` self-reachability note to the case study, narrowed ADR-006's per-pass complexity claim (dominated by the topological sort), pointed TASK-014's determinism criterion at ADR-011, and removed the unused `.next/` entry from `.gitignore`
+- Also: the demo-story outcome is locked by an integration test (`a9b4ab8`) asserting the sample project's deterministic recommendation, factor breakdown, task count, and critical path
+- Verified: `npm run verify` (typecheck, 304 tests, lint, format:check), `npm run build`, and `npm run benchmark` (7 tests, with `benchmark/results.txt` written) all pass
+- Branch pushed as `fix/review-remediation-018-026`; pending human review and merge (no PR created from automation)
+
+## 2026-09-05 — PR #21 review response (on fix/review-remediation-018-026)
+
+Completed:
+- `newlyCriticalTaskIds` re-derived from per-task slack transitions (baseline slack > 0 → projected slack 0) instead of projected-critical-path membership difference; ADR-009 wording updated to match. Semantics unchanged for the current scheduler (its `criticalPath` is all zero-slack tasks, ADR-006), but the metric is now insensitive to how the critical-path set is represented. Regression test added for the review's two-parallel-paths scenario: baseline critical `["a","b"]`, projected critical `["c","d"]`, `newlyCriticalTaskIds` = `["c","d"]`.
+- Benchmark failure test now exercises the harness's actual `writeReport()` emission path (parameterized with a bad file path) instead of calling `writeResultsFile()` directly, matching the reviewer's request.
+- `ProjectRepository.save` gains a doc comment stating the repository is not atomic on id uniqueness — the application layer enforces check-then-save in `createProject`; a concurrent/distributed backend must enforce uniqueness at the storage level.
+- Verified: `npm run verify` (typecheck, 305 tests, lint, format:check), `npm run build`, and `npm run benchmark` (7 tests) all pass.

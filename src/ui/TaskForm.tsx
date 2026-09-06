@@ -1,13 +1,6 @@
 import { useState } from "react";
+import { ALL_TASK_STATUSES } from "../domain/index.js";
 import type { TaskStatus } from "../domain/index.js";
-
-const STATUS_OPTIONS: readonly TaskStatus[] = [
-  "BACKLOG",
-  "TODO",
-  "IN_PROGRESS",
-  "BLOCKED",
-  "DONE",
-];
 
 export interface TaskFormProps {
   existingTaskIds: readonly string[];
@@ -164,10 +157,13 @@ export function TaskForm({ existingTaskIds, onSubmit }: TaskFormProps) {
         <select
           id="task-status"
           value={status}
-          onChange={(e) => setStatus(e.target.value as TaskStatus)}
+          onChange={(e) => {
+            const next = ALL_TASK_STATUSES.find((s) => s === e.target.value);
+            if (next !== undefined) setStatus(next);
+          }}
           data-testid="task-status-input"
         >
-          {STATUS_OPTIONS.map((s) => (
+          {ALL_TASK_STATUSES.map((s) => (
             <option key={s} value={s}>
               {s}
             </option>

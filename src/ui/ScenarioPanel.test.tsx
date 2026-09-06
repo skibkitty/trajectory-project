@@ -5,18 +5,7 @@ import { ScenarioService } from "../application/scenario-service.js";
 import type { ProjectRepository } from "../application/repository.js";
 import type { Project } from "../domain/index.js";
 import { createProject, createTask } from "../domain/index.js";
-
-function createStubRepository(
-  overrides: Partial<ProjectRepository> = {},
-): ProjectRepository {
-  return {
-    save: vi.fn().mockResolvedValue(undefined),
-    load: vi.fn().mockResolvedValue(null),
-    list: vi.fn().mockResolvedValue([]),
-    delete: vi.fn().mockResolvedValue(false),
-    ...overrides,
-  };
-}
+import { createStubRepository } from "../test-support/index.js";
 
 function makeTestProject(): Project {
   const task1 = createTask({
@@ -182,6 +171,35 @@ describe("ScenarioPanel", () => {
     });
 
     expect(screen.getByTestId("value-removed")).toHaveTextContent("8");
+  });
+
+  it("reports blocked-task and newly-critical deltas in the comparison", async () => {
+    const project = makeTestProject();
+    vi.mocked(repository.load).mockResolvedValue(project);
+
+    render(
+      <ScenarioPanel
+        projectId="proj-1"
+        scenarioService={scenarioService}
+        tasks={project.tasks}
+      />,
+    );
+
+    // Delaying nothing on the critical path keeps blocking unchanged.
+    fireEvent.change(screen.getByTestId("scenario-task-select"), {
+      target: { value: "t2" },
+    });
+    fireEvent.change(screen.getByTestId("scenario-amount-input"), {
+      target: { value: "10" },
+    });
+    fireEvent.click(screen.getByTestId("run-scenario-button"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("scenario-comparison")).toBeInTheDocument();
+    });
+
+    expect(screen.getByTestId("blocked-task-delta")).toHaveTextContent("0");
+    expect(screen.getByTestId("newly-critical")).toHaveTextContent("none");
   });
 
   it("rejects a non-positive delay amount", async () => {

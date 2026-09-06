@@ -1,25 +1,11 @@
-import type { Task, CreateTaskInput } from "../domain/index.js";
+import type { Task } from "../domain/index.js";
 import {
   createTask,
   createProject,
   createDependencyGraph,
 } from "../domain/index.js";
 import type { ProjectRepository } from "./repository.js";
-
-function toCreateTaskInput(task: Task): CreateTaskInput {
-  return {
-    id: task.id,
-    title: task.title,
-    description: task.description,
-    status: task.status,
-    value: task.value,
-    urgency: task.urgency,
-    estimatedEffort: task.estimatedEffort,
-    confidence: task.confidence,
-    goalId: task.goalId ?? undefined,
-    dependencies: task.dependencies,
-  };
-}
+import { toCreateTaskInput } from "./task-input.js";
 
 export class DependencyService {
   private readonly repository: ProjectRepository;

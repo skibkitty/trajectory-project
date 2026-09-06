@@ -1,36 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { ProjectService } from "./project-service.js";
-import type { ProjectRepository, ProjectSummary } from "./repository.js";
-import type { Project } from "../domain/index.js";
-
-function createStubRepository(
-  overrides: Partial<ProjectRepository> = {},
-): ProjectRepository {
-  const store = new Map<string, Project>();
-  return {
-    save: async (project: Project) => {
-      store.set(project.id, project);
-    },
-    load: async (id: string) => store.get(id) ?? null,
-    list: async () => {
-      const summaries: ProjectSummary[] = [];
-      for (const [id, project] of store) {
-        summaries.push({
-          id,
-          name: project.name,
-          description: project.description,
-          taskCount: project.tasks.length,
-          goalCount: project.goals.length,
-        });
-      }
-      return Object.freeze(summaries.sort((a, b) => a.id.localeCompare(b.id)));
-    },
-    delete: async (id: string) => {
-      return store.delete(id);
-    },
-    ...overrides,
-  };
-}
+import { createSampleProject } from "../ui/sample-data.js";
+import { createStubRepository } from "../test-support/index.js";
 
 describe("ProjectService", () => {
   describe("createProject", () => {
@@ -48,14 +19,45 @@ describe("ProjectService", () => {
       expect(project.goals).toEqual([]);
     });
 
-    it("overwrites existing project with same id", async () => {
+    it("rejects a duplicate project id with a descriptive error", async () => {
       const repo = createStubRepository();
       const service = new ProjectService(repo);
       await service.createProject({ id: "p1", name: "First" });
-      await service.createProject({ id: "p1", name: "Second" });
+
+      await expect(
+        service.createProject({ id: "p1", name: "Second" }),
+      ).rejects.toThrow("Project already exists: p1");
+    });
+
+    it("keeps the original project when a duplicate id is rejected", async () => {
+      const repo = createStubRepository();
+      const service = new ProjectService(repo);
+      await service.createProject({
+        id: "p1",
+        name: "First",
+        description: "original",
+      });
+
+      await expect(
+        service.createProject({ id: "p1", name: "Second" }),
+      ).rejects.toThrow("Project already exists: p1");
 
       const loaded = await service.getProject("p1");
-      expect(loaded!.name).toBe("Second");
+      expect(loaded!.name).toBe("First");
+      expect(loaded!.description).toBe("original");
+    });
+
+    it("rejects re-seeding the sample project", async () => {
+      const repo = createStubRepository();
+      const service = new ProjectService(repo);
+      await service.createProject(createSampleProject());
+
+      await expect(
+        service.createProject(createSampleProject()),
+      ).rejects.toThrow("Project already exists: sample-project");
+
+      const loaded = await service.getProject("sample-project");
+      expect(loaded!.name).toBe("Trajectory Demo");
     });
   });
 

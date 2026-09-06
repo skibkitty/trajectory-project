@@ -110,7 +110,9 @@ function buildWarnings(
       Object.freeze({
         id: "tie-break-applied",
         message: `${tied.length} candidates tie at score ${top.score}; the recommendation was chosen by the documented tie-breaking policy (ascending task id).`,
-        affectedTaskIds: tied,
+        // Build a fresh frozen copy so each warning owns its own immutable
+        // array; never share or freeze a caller-supplied array in place.
+        affectedTaskIds: Object.freeze([...tied]),
       }),
     );
   }
@@ -137,7 +139,7 @@ function buildWarnings(
         id: "blocked-status-eligible",
         message:
           "Tasks marked BLOCKED satisfy the eligibility rule (all prerequisites DONE) and therefore remain under consideration; the BLOCKED flag does not exclude tasks.",
-        affectedTaskIds: blockedEligible,
+        affectedTaskIds: Object.freeze([...blockedEligible]),
       }),
     );
   }
