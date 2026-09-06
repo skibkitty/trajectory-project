@@ -463,3 +463,11 @@ Completed:
 - Also: the demo-story outcome is locked by an integration test (`a9b4ab8`) asserting the sample project's deterministic recommendation, factor breakdown, task count, and critical path
 - Verified: `npm run verify` (typecheck, 304 tests, lint, format:check), `npm run build`, and `npm run benchmark` (7 tests, with `benchmark/results.txt` written) all pass
 - Branch pushed as `fix/review-remediation-018-026`; pending human review and merge (no PR created from automation)
+
+## 2026-09-05 — PR #21 review response (on fix/review-remediation-018-026)
+
+Completed:
+- `newlyCriticalTaskIds` re-derived from per-task slack transitions (baseline slack > 0 → projected slack 0) instead of projected-critical-path membership difference; ADR-009 wording updated to match. Semantics unchanged for the current scheduler (its `criticalPath` is all zero-slack tasks, ADR-006), but the metric is now insensitive to how the critical-path set is represented. Regression test added for the review's two-parallel-paths scenario: baseline critical `["a","b"]`, projected critical `["c","d"]`, `newlyCriticalTaskIds` = `["c","d"]`.
+- Benchmark failure test now exercises the harness's actual `writeReport()` emission path (parameterized with a bad file path) instead of calling `writeResultsFile()` directly, matching the reviewer's request.
+- `ProjectRepository.save` gains a doc comment stating the repository is not atomic on id uniqueness — the application layer enforces check-then-save in `createProject`; a concurrent/distributed backend must enforce uniqueness at the storage level.
+- Verified: `npm run verify` (typecheck, 305 tests, lint, format:check), `npm run build`, and `npm run benchmark` (7 tests) all pass.

@@ -308,6 +308,28 @@ describe("simulateScenario — risk indicators", () => {
     expect(result.durationDelta).toBe(0);
     expect(result.newlyCriticalTaskIds).toEqual([]);
   });
+
+  it("reports newly critical tasks on every parallel path that loses slack", () => {
+    // Two parallel paths in the baseline: A→B is critical (duration 4); C→D
+    // has slack 2. Delaying C pushes C→D to the same duration as A→B, so the
+    // projected state has TWO parallel zero-slack paths. The metric must
+    // report every task whose slack was exhausted, not just the tasks on a
+    // single path pulled from criticalPath membership.
+    const baseline: Task[] = [
+      task("a", { estimatedEffort: 2 }),
+      task("b", { estimatedEffort: 2, dependencies: ["a"] }),
+      task("c", { estimatedEffort: 1 }),
+      task("d", { estimatedEffort: 1, dependencies: ["c"] }),
+    ];
+    const result = simulateScenario(baseline, {
+      kind: "delay-task",
+      taskId: "c",
+      additionalEffort: 2,
+    });
+    expect(result.baseline.criticalPath).toEqual(["a", "b"]);
+    expect(result.projected.criticalPath).toEqual(["a", "b", "c", "d"]);
+    expect(result.newlyCriticalTaskIds).toEqual(["c", "d"]);
+  });
 });
 
 describe("simulateScenario — determinism and immutability", () => {

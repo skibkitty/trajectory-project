@@ -143,18 +143,25 @@ describe("benchmark harness output", () => {
     const badPath = fileURLToPath(
       new URL("./results.txt/unwritable.txt", import.meta.url),
     );
-    expect(() => writeResultsFile([sample], badPath)).toThrow();
+
+    // Exercise the harness's actual emission path (writeReport), not just the
+    // lower-level helper, so a failure here is what `npm run benchmark` would
+    // actually hit.
+    expect(() => writeReport([sample], badPath)).toThrow();
 
     // The same result writes cleanly to the canonical report location.
-    expect(() => writeResultsFile([sample], RESULTS_FILE)).not.toThrow();
+    expect(() => writeReport([sample], RESULTS_FILE)).not.toThrow();
     expect(readFileSync(RESULTS_FILE, "utf8")).toContain("Total measurements");
   });
 });
 
-function writeReport(results: readonly OperationResult[]): void {
-  if (existsSync(RESULTS_FILE)) unlinkSync(RESULTS_FILE);
-  writeResultsFile(results, RESULTS_FILE);
-  const written = readFileSync(RESULTS_FILE, "utf8");
+function writeReport(
+  results: readonly OperationResult[],
+  filePath: string = RESULTS_FILE,
+): void {
+  if (existsSync(filePath)) unlinkSync(filePath);
+  writeResultsFile(results, filePath);
+  const written = readFileSync(filePath, "utf8");
   expect(written).toContain("Total measurements");
   expect(written).toContain("mean (ms)");
   console.log("\n" + written);

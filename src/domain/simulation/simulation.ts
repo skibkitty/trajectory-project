@@ -227,9 +227,19 @@ export function simulateScenario(
     a.id.localeCompare(b.id),
   );
 
-  const baselineCritical = new Set(baselineSchedule.criticalPath);
-  const newlyCriticalTaskIds = scenarioSchedule.criticalPath
-    .filter((taskId) => !baselineCritical.has(taskId))
+  // "Newly critical" means a task whose slack was positive in the baseline and
+  // fell to zero in the projection. Deriving it from per-task slack transitions
+  // rather than criticalPath membership keeps the metric correct regardless of
+  // how the scheduler's criticalPath set is represented.
+  const baselineSlack = new Map(
+    baselineSchedule.taskSchedules.map((s) => [s.taskId, s.slack] as const),
+  );
+  const newlyCriticalTaskIds = scenarioSchedule.taskSchedules
+    .filter((s) => {
+      const before = baselineSlack.get(s.taskId);
+      return before !== undefined && before > 0 && s.slack === 0;
+    })
+    .map((s) => s.taskId)
     .sort((a, b) => a.localeCompare(b));
 
   return Object.freeze({

@@ -6,7 +6,7 @@ All planned phases complete. Domain foundation, dependency graph, scheduling and
 
 ## Current Task
 
-TASK-018 through TASK-026 (the full-branch code-review remediation backlog) are implemented, verified, marked DONE, and pushed on `fix/review-remediation-018-026`. The branch is pending human review and merge. See "Next Recommended Action".
+TASK-018 through TASK-026 (the full-branch code-review remediation backlog) are implemented, verified, marked DONE, and pushed on `fix/review-remediation-018-026`. The PR #21 review response is applied and pushed on the same branch (slack-transition `newlyCriticalTaskIds`, benchmark failure test through `writeReport`, and repository uniqueness-contract doc). The branch is pending human review and merge. See "Next Recommended Action".
 
 ## State
 
@@ -123,7 +123,7 @@ Beyond the remediation backlog, possible future tracks (not yet defined as tasks
 
 ## Verification
 
-The review remediation is verified complete. Locally on `fix/review-remediation-018-026`: `npm run verify` (typecheck, 304 tests, lint, format:check), `npm run build`, and `npm run benchmark` (7 tests) all pass. `npm run test:e2e` (2 Playwright specs) passes with browsers installed.
+The review remediation is verified complete, including the PR #21 review response. Locally on `fix/review-remediation-018-026`: `npm run verify` (typecheck, 305 tests, lint, format:check), `npm run build`, and `npm run benchmark` (7 tests) all pass. `npm run test:e2e` (2 Playwright specs) passes with browsers installed.
 
 ## Important Constraint
 
